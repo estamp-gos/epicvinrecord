@@ -1,0 +1,1 @@
+document.querySelectorAll(".find-vin-info__link--popup").forEach(function(e){var n=e.querySelector(".find-vin-popup-open"),i=e.querySelector(".find-vin-popup"),o=e.querySelector(".find-vin-popup__close");n.addEventListener("click",function(){i.classList.add("show")}),o.addEventListener("click",function(){i.classList.remove("show")})});
