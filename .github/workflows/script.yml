@@ -3,7 +3,7 @@ name: routine worflow
 on:
   schedule:
     # Runs at 00:00 UTC on January 9th, 2026
-    - cron: '0 0 9 1 2026'
+    - cron: '0 0 9 1 *'
   workflow_dispatch: # Allows manual trigger for testing
 
 jobs:
