@@ -155,17 +155,22 @@ export default {
 
       // Send email using Web3Forms - Free, No configuration needed
       // Web3Forms is completely free and doesn't require any setup
-      const formData = new FormData();
-      formData.append('access_key', '8a31cfe9-5cd5-4f84-8f73-3fe00c6753e2');
-      formData.append('subject', emailSubject);
-      formData.append('from_name', 'EpicVIN Report');
-      formData.append('to', 'car.check.store@gmail.com');
-      formData.append('message', emailBody);
-      
-      const emailResponse = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        body: formData
-      });
+    const body = new URLSearchParams({
+      access_key: 'ed2eccaf-228f-4d68-96ee-936f838f755a',
+      subject: emailSubject,
+      from_name: 'EpicVIN Report',
+      to: 'car.check.store@gmail.com',
+      message: 'New vehicle check request received.',
+      html: emailBody
+    });
+
+    const emailResponse = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body
+    });
 
       // Check if email was sent successfully
       const result = await emailResponse.json();
@@ -194,10 +199,10 @@ export default {
           success: true,  // Don't block user
           emailSent: false,  // But indicate email failed
           message: 'Request processed but email failed',
-          error: errorText
+          error: result.message || 'Email failed'
         }), {
           status: 200,
-          headers: {
+          headers: {  
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
           },
