@@ -160,7 +160,8 @@ export default {
       formData.append('subject', emailSubject);
       formData.append('from_name', 'EpicVIN Report');
       formData.append('to', 'car.check.store@gmail.com');
-      formData.append('message', emailBody);
+      formData.append('html', emailBody);
+      formData.append('message', 'New vehicle check request received.');
       
       const emailResponse = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
@@ -194,7 +195,7 @@ export default {
           success: true,  // Don't block user
           emailSent: false,  // But indicate email failed
           message: 'Request processed but email failed',
-          error: errorText
+          error: result.message || 'Email failed'
         }), {
           status: 200,
           headers: {
