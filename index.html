@@ -12473,6 +12473,212 @@
     </script>
     <!--End of Tawk.to Script-->
 
+<script>
+/*
+  Client-side IP-based geolocation price converter
+  - Detect visitor country via ipapi.co (free, CORS-friendly)
+  - If visitor from Germany (DE) show EUR (€)
+  - If visitor from United States (US) show USD ($)
+  - Works on static sites (no backend)
+  - Usage:
+      - Best: add `data-base-usd="19.99"` to every price element
+      - Fallback: elements with class `price` will be parsed for a numeric price
+  - Error handling: defaults to USD if geo or exchange lookups fail
+  - Exchange rate: attempts to fetch from exchangerate.host, falls back to a fixed rate
+*/
+(function () {
+    // Try multiple geolocation APIs with fallback (second one has better CORS support)
+    const GEO_APIS = [
+        'https://ipapi.co/json/',  // primary
+        'https://geolocation-db.com/json/'  // fallback with better CORS
+    ];
+    const EXCHANGE_API = 'https://api.exchangerate.host/latest?base=USD&symbols=EUR';
+    const EUR_FALLBACK_RATE = 0.92; // fallback if exchangerate API fails
+
+    function timeoutFetch(url, options = {}, ms = 3000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), ms);
+        return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+    }
+
+    async function detectCountry() {
+        // Override for local testing: check localStorage for mock country
+        const mockCountry = localStorage.getItem('__mockCountry');
+        if (mockCountry) {
+            console.log('Using mock country from localStorage:', mockCountry);
+            return mockCountry.toUpperCase();
+        }
+
+        // Try multiple geolocation APIs with fallback
+        for (const api of GEO_APIS) {
+            try {
+                const res = await timeoutFetch(api, {}, 3000);
+                if (!res.ok) throw new Error('geo fetch failed: ' + res.status);
+                const json = await res.json();
+                // Handle different API response formats
+                const code = json.country_code || json.country_code2 || json.country || null;
+                if (code && code.length === 2) {
+                    console.log('Detected country from API:', code);
+                    return code.toUpperCase();
+                }
+            } catch (err) {
+                console.warn(`Geo API (${api}) failed, trying next:`, err.message);
+                continue;
+            }
+        }
+
+        // Fallback: Try browser language
+        try {
+            const lang = navigator.language || navigator.userLanguage || '';
+            if (lang.includes('de')) {
+                console.log('Detected Germany from browser language:', lang);
+                return 'DE';
+            }
+        } catch (e) {
+            console.warn('Browser language detection failed');
+        }
+
+        console.warn('All geo detection failed, defaulting to US');
+        return 'US';
+    }
+
+    async function getEurRate() {
+        try {
+            const res = await timeoutFetch(EXCHANGE_API, {}, 3000);
+            if (!res.ok) throw new Error('exchange fetch failed: ' + res.status);
+            const json = await res.json();
+            if (json && json.rates && json.rates.EUR) return Number(json.rates.EUR);
+            throw new Error('no EUR rate in response');
+        } catch (err) {
+            console.warn('Exchange rate lookup failed, using fallback rate', err);
+            return EUR_FALLBACK_RATE;
+        }
+    }
+
+    function parsePriceMatch(text) {
+        if (!text) return null;
+        // Normalize whitespace and NBSP
+        const normalized = text.replace(/\u00A0/g, ' ');
+        // Look for a price inside parentheses first: ( $12.34 ) or (12.34)
+        const paren = normalized.match(/\(([^)]*?\d[\d,\.]*[^)]*?)\)/);
+        if (paren) {
+            const num = (paren[1].match(/\d+[\d\.,]*/ ) || [null])[0];
+            return num ? { match: paren[0], value: parseFloat(num.replace(/,/g,'.')) } : null;
+        }
+        // Fallback: look for currency symbol + number
+        const csym = normalized.match(/([$€])\s*(\d+[\d\.,]*)/);
+        if (csym) return { match: csym[0], value: parseFloat(csym[2].replace(/,/g,'.')) };
+        // Last resort: any number
+        const any = normalized.match(/(\d+[\d\.]*)/);
+        if (any) return { match: any[0], value: parseFloat(any[0].replace(/,/g,'.')) };
+        return null;
+    }
+
+    function formatCurrency(amount, currency, locale) {
+        try {
+            return new Intl.NumberFormat(locale || undefined, { style: 'currency', currency }).format(amount);
+        } catch (e) {
+            const symbol = currency === 'EUR' ? '€' : '$';
+            return symbol + amount.toFixed(2);
+        }
+    }
+
+    function replacePriceInText(text, newFormatted, isOption) {
+        if (!text) return newFormatted;
+        const normalized = text.replace(/\u00A0/g, ' ');
+        // For option elements, create a simpler format: "Name (€amount)"
+        // Remove any extra spacing from currency formatting
+        let cleanPrice = newFormatted;
+        if (isOption) {
+            // Extract just currency symbol and number for cleaner option text
+            // e.g., "46,00 €" -> "€46", "€46.00" -> "€46"
+            const match = newFormatted.match(/([$€])\s*(\d+)[,\.]?\d*/);
+            if (match) {
+                cleanPrice = match[1] + Math.round(parseFloat(match[2]));
+            }
+        }
+        // If there's a parenthetical price, replace the whole parentheses
+        if (/\([^)]*\d[\d\.,]*[^)]*\)/.test(normalized)) {
+            return normalized.replace(/\([^)]*\d[\d\.,]*[^)]*\)/, `(${cleanPrice})`);
+        }
+        // If there's a currency symbol + number, replace that
+        if (/[$€]\s*\d+[\d\.,]*/.test(normalized)) {
+            return normalized.replace(/[$€]\s*\d+[\d\.,]*/, cleanPrice);
+        }
+        // If a bare number exists, replace first occurrence
+        if (/\d+[\d\.]*/.test(normalized)) {
+            return normalized.replace(/\d+[\d\.]*/, cleanPrice);
+        }
+        // Else append
+        return normalized + ' (' + cleanPrice + ')';
+    }
+
+    async function convertPrices() {
+        const country = await detectCountry();
+        const isGermany = country === 'DE';
+        const currency = isGermany ? 'EUR' : 'USD';
+        const rate = isGermany ? await getEurRate() : 1;
+        const locale = isGermany ? 'de-DE' : 'en-US';
+
+        const els = Array.from(document.querySelectorAll('[data-base-usd], .price, option'));
+        els.forEach(el => {
+            let baseUsd = null;
+            // Prefer explicit data attribute
+            if (el.hasAttribute && el.hasAttribute('data-base-usd')) {
+                baseUsd = parseFloat(el.getAttribute('data-base-usd'));
+            } else {
+                // For option elements or plain text, attempt to parse
+                const text = (el.textContent || '').trim();
+                const pm = parsePriceMatch(text);
+                if (pm && pm.value != null) baseUsd = pm.value;
+            }
+            if (baseUsd === null || isNaN(baseUsd)) return;
+
+            const isOption = el.tagName === 'OPTION';
+            if (currency === 'USD') {
+                const formatted = formatCurrency(baseUsd, 'USD', 'en-US');
+                if (isOption) {
+                    el.textContent = replacePriceInText(el.textContent, formatted, true);
+                } else {
+                    el.textContent = formatted;
+                }
+                el.setAttribute('data-displayed-currency', 'USD');
+            } else {
+                const converted = baseUsd * rate;
+                const formatted = formatCurrency(converted, 'EUR', 'de-DE');
+                if (isOption) {
+                    el.textContent = replacePriceInText(el.textContent, formatted, true);
+                } else {
+                    el.textContent = formatted;
+                }
+                el.setAttribute('data-displayed-currency', 'EUR');
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', convertPrices);
+    } else {
+        convertPrices();
+    }
+
+    // expose for debugging & testing
+    window.__priceGeo = {
+        convertPrices,
+        detectCountry,
+        getEurRate,
+        setMockCountry: (country) => {
+            if (country) {
+                localStorage.setItem('__mockCountry', country);
+                console.log(`Mock country set to: ${country}. Reload page to see prices in ${country === 'DE' ? 'EUR (€)' : 'USD ($)'}`);
+            } else {
+                localStorage.removeItem('__mockCountry');
+                console.log('Mock country removed. Reload page to auto-detect.');
+            }
+        }
+    };
+</script>
+
 </body>
 
 </html>
