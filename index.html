@@ -12480,6 +12480,7 @@ console.log('Price geo script loading...');
   - Detect visitor country via ipapi.co (free, CORS-friendly)
   - If visitor from Germany (DE) show EUR (€)
   - If visitor from Australia (AU) show AUD ($)
+  - If visitor from United Kingdom (GB) show GBP (£)
   - If visitor from United States (US) show USD ($)
   - Works on static sites (no backend)
   - Usage:
@@ -12495,9 +12496,10 @@ console.log('Setting up window.__priceGeo...');
         'https://ipapi.co/json/',  // primary
         'https://geolocation-db.com/json/'  // fallback with better CORS
     ];
-    const EXCHANGE_API = 'https://api.exchangerate.host/latest?base=USD&symbols=EUR,AUD';
+    const EXCHANGE_API = 'https://api.exchangerate.host/latest?base=USD&symbols=EUR,AUD,GBP';
     const EUR_FALLBACK_RATE = 0.92; // fallback if exchangerate API fails
     const AUD_FALLBACK_RATE = 1.54; // fallback if exchangerate API fails
+    const GBP_FALLBACK_RATE = 0.79; // fallback if exchangerate API fails
 
     function timeoutFetch(url, options = {}, ms = 3000) {
         const controller = new AbortController();
@@ -12572,6 +12574,19 @@ console.log('Setting up window.__priceGeo...');
         }
     }
 
+    async function getGbpRate() {
+        try {
+            const res = await timeoutFetch(EXCHANGE_API, {}, 3000);
+            if (!res.ok) throw new Error('exchange fetch failed: ' + res.status);
+            const json = await res.json();
+            if (json && json.rates && json.rates.GBP) return Number(json.rates.GBP);
+            throw new Error('no GBP rate in response');
+        } catch (err) {
+            console.warn('Exchange rate lookup failed, using fallback rate', err);
+            return GBP_FALLBACK_RATE;
+        }
+    }
+
     function parsePriceMatch(text) {
         if (!text) return null;
         // Normalize whitespace and NBSP
@@ -12595,7 +12610,9 @@ console.log('Setting up window.__priceGeo...');
         try {
             return new Intl.NumberFormat(locale || undefined, { style: 'currency', currency }).format(amount);
         } catch (e) {
-            const symbol = currency === 'EUR' ? '€' : '$';
+            let symbol = '$';
+            if (currency === 'EUR') symbol = '€';
+            if (currency === 'GBP') symbol = '£';
             return symbol + amount.toFixed(2);
         }
     }
@@ -12634,6 +12651,7 @@ console.log('Setting up window.__priceGeo...');
         const country = await detectCountry();
         const isGermany = country === 'DE';
         const isAustralia = country === 'AU';
+        const isUK = country === 'GB';
         let currency, rate, locale;
         
         if (isGermany) {
@@ -12644,6 +12662,10 @@ console.log('Setting up window.__priceGeo...');
             currency = 'AUD';
             rate = await getAudRate();
             locale = 'en-AU';
+        } else if (isUK) {
+            currency = 'GBP';
+            rate = await getGbpRate();
+            locale = 'en-GB';
         } else {
             currency = 'USD';
             rate = 1;
@@ -12688,12 +12710,14 @@ console.log('Setting up window.__priceGeo...');
         detectCountry,
         getEurRate,
         getAudRate,
+        getGbpRate,
         setMockCountry: (country) => {
             if (country) {
                 localStorage.setItem('__mockCountry', country);
                 let currencyDisplay = 'USD ($)';
                 if (country === 'DE') currencyDisplay = 'EUR (€)';
                 if (country === 'AU') currencyDisplay = 'AUD ($)';
+                if (country === 'GB') currencyDisplay = 'GBP (£)';
                 console.log(`Mock country set to: ${country}. Reload page to see prices in ${currencyDisplay}`);
             } else {
                 localStorage.removeItem('__mockCountry');
