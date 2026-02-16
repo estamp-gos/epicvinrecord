@@ -10376,9 +10376,9 @@
                                                     onmouseout="this.style.borderColor='#e6e6e6'"
                                                     onfocus="this.style.borderColor='var(--main-blue)'"
                                                     onblur="this.style.borderColor='#e6e6e6'">
-                                                    <option value="basic">Basic ($30)</option>
-                                                    <option value="standard" selected>Standard ($50)</option>
-                                                    <option value="premium">Premium ($70)</option>
+                                                    <option value="basic" data-base-usd="30">Basic ($30)</option>
+                                                    <option value="standard" selected data-base-usd="50">Standard ($50)</option>
+                                                    <option value="premium" data-base-usd="70">Premium ($70)</option>
                                                 </select>
                                             </div>
                                             <div
@@ -10457,9 +10457,9 @@
                                                     onmouseout="this.style.borderColor='#e6e6e6'"
                                                     onfocus="this.style.borderColor='var(--main-blue)'"
                                                     onblur="this.style.borderColor='#e6e6e6'">
-                                                    <option value="basic">Basic ($30)</option>
-                                                    <option value="standard" selected>Standard ($50)</option>
-                                                    <option value="premium">Premium ($70)</option>
+                                                    <option value="basic" data-base-usd="30">Basic ($30)</option>
+                                                    <option value="standard" selected data-base-usd="50">Standard ($50)</option>
+                                                    <option value="premium" data-base-usd="70">Premium ($70)</option>
                                                 </select>
                                             </div>
                                             <div
@@ -11188,7 +11188,7 @@
                 <section class="offer-banner">
                     <div class="offer-banner__info">
                         <h2 class="heading heading--xl offer-banner__title"><span class="accent">Starting from</span>
-                            <span class="accent accent-price">$30<sup></sup></span><br> for a vehicle history report
+                            <span class="accent accent-price price" data-base-usd="30">$30<sup></sup></span><br> for a vehicle history report
                         </h2>
                         <p class="offer-banner__text">Verify the VIN number and gain valuable insights before buying a
                             used car. Get started today for peace of mind and confidence in your investment.</p>
@@ -11685,9 +11685,9 @@
                                             onmouseout="this.style.borderColor='#e6e6e6'"
                                             onfocus="this.style.borderColor='var(--main-blue)'"
                                             onblur="this.style.borderColor='#e6e6e6'">
-                                            <option value="basic">Basic ($30)</option>
-                                            <option value="standard" selected>Standard ($50)</option>
-                                            <option value="premium">Premium ($70)</option>
+                                            <option value="basic" data-base-usd="30">Basic ($30)</option>
+                                            <option value="standard" selected data-base-usd="50">Standard ($50)</option>
+                                            <option value="premium" data-base-usd="70">Premium ($70)</option>
                                         </select>
                                     </div>
                                     <div
@@ -11741,9 +11741,9 @@
                                             onmouseout="this.style.borderColor='#e6e6e6'"
                                             onfocus="this.style.borderColor='var(--main-blue)'"
                                             onblur="this.style.borderColor='#e6e6e6'">
-                                            <option value="hatchback">Hatchback ($40)</option>
-                                            <option value="sedan" selected>Sedan ($60)</option>
-                                            <option value="4x4">SUV or 4x4 ($80)</option>
+                                            <option value="hatchback" data-base-usd="40">Hatchback ($40)</option>
+                                            <option value="sedan" selected data-base-usd="60">Sedan ($60)</option>
+                                            <option value="4x4" data-base-usd="80">SUV or 4x4 ($80)</option>
                                         </select>
                                     </div>
                                     <div
@@ -12474,10 +12474,12 @@
     <!--End of Tawk.to Script-->
 
 <script>
+console.log('Price geo script loading...');
 /*
   Client-side IP-based geolocation price converter
   - Detect visitor country via ipapi.co (free, CORS-friendly)
   - If visitor from Germany (DE) show EUR (€)
+  - If visitor from Australia (AU) show AUD ($)
   - If visitor from United States (US) show USD ($)
   - Works on static sites (no backend)
   - Usage:
@@ -12487,13 +12489,15 @@
   - Exchange rate: attempts to fetch from exchangerate.host, falls back to a fixed rate
 */
 (function () {
+console.log('Setting up window.__priceGeo...');
     // Try multiple geolocation APIs with fallback (second one has better CORS support)
     const GEO_APIS = [
         'https://ipapi.co/json/',  // primary
         'https://geolocation-db.com/json/'  // fallback with better CORS
     ];
-    const EXCHANGE_API = 'https://api.exchangerate.host/latest?base=USD&symbols=EUR';
+    const EXCHANGE_API = 'https://api.exchangerate.host/latest?base=USD&symbols=EUR,AUD';
     const EUR_FALLBACK_RATE = 0.92; // fallback if exchangerate API fails
+    const AUD_FALLBACK_RATE = 1.54; // fallback if exchangerate API fails
 
     function timeoutFetch(url, options = {}, ms = 3000) {
         const controller = new AbortController();
@@ -12552,6 +12556,19 @@
         } catch (err) {
             console.warn('Exchange rate lookup failed, using fallback rate', err);
             return EUR_FALLBACK_RATE;
+        }
+    }
+
+    async function getAudRate() {
+        try {
+            const res = await timeoutFetch(EXCHANGE_API, {}, 3000);
+            if (!res.ok) throw new Error('exchange fetch failed: ' + res.status);
+            const json = await res.json();
+            if (json && json.rates && json.rates.AUD) return Number(json.rates.AUD);
+            throw new Error('no AUD rate in response');
+        } catch (err) {
+            console.warn('Exchange rate lookup failed, using fallback rate', err);
+            return AUD_FALLBACK_RATE;
         }
     }
 
@@ -12616,9 +12633,22 @@
     async function convertPrices() {
         const country = await detectCountry();
         const isGermany = country === 'DE';
-        const currency = isGermany ? 'EUR' : 'USD';
-        const rate = isGermany ? await getEurRate() : 1;
-        const locale = isGermany ? 'de-DE' : 'en-US';
+        const isAustralia = country === 'AU';
+        let currency, rate, locale;
+        
+        if (isGermany) {
+            currency = 'EUR';
+            rate = await getEurRate();
+            locale = 'de-DE';
+        } else if (isAustralia) {
+            currency = 'AUD';
+            rate = await getAudRate();
+            locale = 'en-AU';
+        } else {
+            currency = 'USD';
+            rate = 1;
+            locale = 'en-US';
+        }
 
         const els = Array.from(document.querySelectorAll('[data-base-usd], .price, option'));
         els.forEach(el => {
@@ -12635,24 +12665,14 @@
             if (baseUsd === null || isNaN(baseUsd)) return;
 
             const isOption = el.tagName === 'OPTION';
-            if (currency === 'USD') {
-                const formatted = formatCurrency(baseUsd, 'USD', 'en-US');
-                if (isOption) {
-                    el.textContent = replacePriceInText(el.textContent, formatted, true);
-                } else {
-                    el.textContent = formatted;
-                }
-                el.setAttribute('data-displayed-currency', 'USD');
+            const converted = baseUsd * rate;
+            const formatted = formatCurrency(converted, currency, locale);
+            if (isOption) {
+                el.textContent = replacePriceInText(el.textContent, formatted, true);
             } else {
-                const converted = baseUsd * rate;
-                const formatted = formatCurrency(converted, 'EUR', 'de-DE');
-                if (isOption) {
-                    el.textContent = replacePriceInText(el.textContent, formatted, true);
-                } else {
-                    el.textContent = formatted;
-                }
-                el.setAttribute('data-displayed-currency', 'EUR');
+                el.textContent = formatted;
             }
+            el.setAttribute('data-displayed-currency', currency);
         });
     }
 
@@ -12667,16 +12687,22 @@
         convertPrices,
         detectCountry,
         getEurRate,
+        getAudRate,
         setMockCountry: (country) => {
             if (country) {
                 localStorage.setItem('__mockCountry', country);
-                console.log(`Mock country set to: ${country}. Reload page to see prices in ${country === 'DE' ? 'EUR (€)' : 'USD ($)'}`);
+                let currencyDisplay = 'USD ($)';
+                if (country === 'DE') currencyDisplay = 'EUR (€)';
+                if (country === 'AU') currencyDisplay = 'AUD ($)';
+                console.log(`Mock country set to: ${country}. Reload page to see prices in ${currencyDisplay}`);
             } else {
                 localStorage.removeItem('__mockCountry');
                 console.log('Mock country removed. Reload page to auto-detect.');
             }
         }
     };
+    console.log('window.__priceGeo is now available:', window.__priceGeo);
+})();
 </script>
 
 </body>
