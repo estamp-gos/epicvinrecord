@@ -173,86 +173,80 @@
     <!-- Paddle.js SDK -->
     <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 
+   
+
+
+
     <script>
-        // Vehicle type to price ID mapping
+        // ── Vehicle type → Paddle Price ID mapping ──────────────────
         const VEHICLE_PRICES = {
             'basic': 'pri_01kd35nbdz3vjvbtgf9h7z7ety',
             'standard': 'pri_01kd35pt28hd1vwvb4wvjnxe96',
             'premium': 'pri_01kd35rnwv0sssf6sqfbz1spn3'
         };
 
-        // Initialize Paddle with your client-side token
+        // ── Vehicle type → Product name + Amount (email ke liye) ────
+        const VEHICLE_PRODUCT_INFO = {
+            'basic': { name: 'EpicVINrecord-basic', amount: '30.00' },
+            'standard': { name: 'EpicVINrecord-standard', amount: '50.00' },
+            'premium': { name: 'EpicVINrecord-premium', amount: '70.00' },
+            // Plate forms ke liye (agar koi purani mapping use ho)
+            'hatchback': { name: 'EpicVINrecord-hatchback', amount: '40.00' },
+            'sedan': { name: 'EpicVINrecord-standard', amount: '60.00' },
+            '4x4': { name: 'EpicVINrecord-suv4x4', amount: '80.00' }
+        };
+
+        // ── Cloudflare Worker URL ────────────────────────────────────
+        const WORKER_URL = 'https://cold-hat-5fd3.rmoto7817.workers.dev/';
+
+        // ── Initialize Paddle ────────────────────────────────────────
         if (typeof Paddle !== 'undefined') {
             Paddle.Initialize({
                 token: 'live_f37f7280c7ee8f743167bca1f06',
                 eventCallback: function (data) {
                     console.log('Paddle Event:', data);
                     if (data.name === 'checkout.completed') {
-                        // Handle successful checkout
                         console.log('Checkout completed!', data);
-                        // You can redirect or show success message here
                     }
                 }
             });
         }
 
-        // Web3Forms Configuration
-        const WEB3FORMS_ACCESS_KEY = 'b396a128-42aa-46b7-8925-4cbd91f02d4e';
+        // ── Email via Cloudflare Worker ──────────────────────────────
+        async function sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail) {
+            try {
+                const productInfo = VEHICLE_PRODUCT_INFO[vehicleType] || { name: 'EpicVINrecord-standard', amount: '50.00' };
 
-        // Function to send form data directly to Web3Forms (email notification)
-    async function sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail) {
-    try {
-        const emailSubject = `New ${searchType === 'vin' ? 'VIN' : 'License Plate'} Check Request`;
+                const payload = {
+                    vin: vin || '',
+                    plate: plate || '',
+                    state: state || '',
+                    vehicleType: vehicleType || 'standard',
+                    searchType: searchType || 'vin',
+                    customerEmail: customerEmail || '',
+                    productName: productInfo.name,
+                    amount: productInfo.amount
+                };
 
-        // Simple & compact email message
-        let emailMessage = `New Vehicle Check Request`;
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-        if (customerEmail) {
-            emailMessage += `\nCustomer Email: ${customerEmail}`;
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    console.log('✅ Email sent via Worker successfully');
+                } else {
+                    console.error('❌ Worker email failed:', result.message || result);
+                }
+            } catch (error) {
+                console.error('❌ Error sending to Worker:', error);
+            }
         }
 
-        if (vin) {
-            emailMessage += `\nVIN: ${vin}`;
-        }
-
-        if (plate) {
-            emailMessage += `\nPlate: ${plate}`;
-        }
-
-        if (state) {
-            emailMessage += `\nState: ${state}`;
-        }
-
-        emailMessage += `\nVehicle Type: ${vehicleType || 'sedan'}`;
-        emailMessage += `\nSearch Type: ${searchType || 'vin'}`;
-
-        const formData = new FormData();
-        formData.append('access_key', WEB3FORMS_ACCESS_KEY);
-        formData.append('subject', emailSubject);
-        formData.append('from_name', 'EpicVINrecord');
-        formData.append('to', 'car.check.store@gmail.com');
-        formData.append('message', emailMessage);
-
-        const response = await fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
-            body: formData
-        });
-
-        const result = await response.json();
-
-        if (response.ok && result.success) {
-            console.log('✅ Email sent successfully');
-        } else {
-            console.error('❌ Failed to send email:', result.message);
-        }
-    } catch (error) {
-        console.error('❌ Error sending form data:', error);
-    }
-}
-
-        
-
-        // Paddle Checkout Function
+        // ── Paddle Checkout ──────────────────────────────────────────
         async function openPaddleCheckout(vin, plate, vehicleType, customerEmail) {
             if (typeof Paddle === 'undefined') {
                 console.error('Paddle is not loaded');
@@ -260,60 +254,40 @@
                 return;
             }
 
-            // Determine search type and get state if it's a plate search
             let searchType = vin ? 'vin' : 'plate';
             let state = null;
 
-            // Try to get state from the form if it's a plate search
             if (plate) {
-                // Find the active form
-                let activeForm = document.querySelector('.find-vin__form:not([style*="display: none"])');
+                let activeForm = document.querySelector('.find-vin__form--plate');
                 if (activeForm) {
                     let stateSelect = activeForm.querySelector('select[name="state"]');
                     state = stateSelect ? stateSelect.value : null;
                 }
             }
 
-            // Send form data to email via Web3Forms BEFORE opening checkout
+            // ✅ productName aur amount ab worker ko jayega
             await sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail);
 
+            // Paddle price ID
+            var priceId = VEHICLE_PRICES[vehicleType] || VEHICLE_PRICES['standard'];
 
-
-            // Get the appropriate price ID based on vehicle type
-            var priceId = VEHICLE_PRICES[vehicleType] || VEHICLE_PRICES['sedan']; // default to sedan
-
-            // Prepare custom data based on what was provided
+            // Custom data for Paddle
             var customData = {};
-
             if (vin) {
                 customData.vin = vin;
                 customData.search_type = 'vin';
-
-                
             } else if (plate) {
                 customData.license_plate = plate;
                 customData.search_type = 'plate';
-                if (state) {
-                    customData.state = state;
-                }
+                if (state) customData.state = state;
             }
-
-            // Add vehicle type and timestamp for tracking
-            customData.vehicle_type = vehicleType || 'sedan';
+            customData.vehicle_type = vehicleType || 'standard';
             customData.search_timestamp = new Date().toISOString();
 
-            // Open Paddle checkout with your product ID
             Paddle.Checkout.open({
-                items: [
-                    {
-                        priceId: priceId,
-                        quantity: 1
-                    }
-                ],
+                items: [{ priceId: priceId, quantity: 1 }],
                 customData: customData,
-                customer: {
-                    // Optional: pre-fill customer data if available
-                },
+                customer: {},
                 settings: {
                     displayMode: 'overlay',
                     theme: 'light',
@@ -323,9 +297,10 @@
             });
         }
 
+        // ── Loader helpers ───────────────────────────────────────────
         function startLoading(btn) {
             !btn.classList.contains('loader-v2') && btn.classList.add('loader-v2');
-            btn.setAttribute("disabled", true);
+            btn.setAttribute('disabled', true);
         }
 
         function stopLoading(btn) {
@@ -333,24 +308,18 @@
             btn.removeAttribute('disabled');
         }
 
+        // ── Form submit handler ──────────────────────────────────────
         async function startSubmit(e, btn) {
             e.preventDefault();
             let form = btn.closest('form');
 
-            // Get VIN from the form
             let vinInput = form.querySelector('input[name="vin"]');
-            let vin = vinInput ? vinInput.value : '';
-
-            // Get Plate from the form
             let plateInput = form.querySelector('input[name="plate"]');
-            let plate = plateInput ? plateInput.value : '';
+            let vin = vinInput ? vinInput.value.trim() : '';
+            let plate = plateInput ? plateInput.value.trim() : '';
 
-            if (!vin && !plate) {
-                // Show validation error if both VIN and Plate are empty
-                return;
-            }
+            if (!vin && !plate) return;
 
-            // Get customer email from the form - REQUIRED
             let emailInput = form.querySelector('input[name="customer_email"]');
             let customerEmail = emailInput ? emailInput.value.trim() : '';
 
@@ -360,37 +329,10 @@
                 return;
             }
 
-            // Get vehicle type from the form
             let vehicleTypeSelect = form.querySelector('select[name="vehicle_type"]');
-            let vehicleType = vehicleTypeSelect ? vehicleTypeSelect.value : 'sedan';
+            let vehicleType = vehicleTypeSelect ? vehicleTypeSelect.value : 'standard';
 
-            // Open Paddle Checkout - send VIN/Plate, vehicle type, and customer email
             await openPaddleCheckout(vin, plate, vehicleType, customerEmail);
-            return;
-
-            // Old code below (kept as fallback)
-            if (typeof window.vinFormReady !== 'undefined') {
-                btn.onclick = null;
-                form.requestSubmit();
-                return;
-            }
-
-            startLoading(btn);
-            let i = 0;
-            let vinInterval = setInterval(function () {
-                if (typeof window.vinFormReady !== 'undefined') {
-                    clearInterval(vinInterval);
-                    stopLoading(btn);
-                    btn.onclick = null;
-                    form.requestSubmit();
-                    return;
-                }
-                if (++i < 10) {
-                    return;
-                }
-                clearInterval(vinInterval);
-                document.location.href = window.checkOutRoute + '/' + vin;
-            }, 500);
         }
     </script>
 
@@ -10377,7 +10319,8 @@
                                                     onfocus="this.style.borderColor='var(--main-blue)'"
                                                     onblur="this.style.borderColor='#e6e6e6'">
                                                     <option value="basic" data-base-usd="30">Basic ($30)</option>
-                                                    <option value="standard" selected data-base-usd="50">Standard ($50)</option>
+                                                    <option value="standard" selected data-base-usd="50">Standard ($50)
+                                                    </option>
                                                     <option value="premium" data-base-usd="70">Premium ($70)</option>
                                                 </select>
                                             </div>
@@ -10458,7 +10401,8 @@
                                                     onfocus="this.style.borderColor='var(--main-blue)'"
                                                     onblur="this.style.borderColor='#e6e6e6'">
                                                     <option value="basic" data-base-usd="30">Basic ($30)</option>
-                                                    <option value="standard" selected data-base-usd="50">Standard ($50)</option>
+                                                    <option value="standard" selected data-base-usd="50">Standard ($50)
+                                                    </option>
                                                     <option value="premium" data-base-usd="70">Premium ($70)</option>
                                                 </select>
                                             </div>
@@ -11188,7 +11132,8 @@
                 <section class="offer-banner">
                     <div class="offer-banner__info">
                         <h2 class="heading heading--xl offer-banner__title"><span class="accent">Starting from</span>
-                            <span class="accent accent-price price" data-base-usd="30">$30<sup></sup></span><br> for a vehicle history report
+                            <span class="accent accent-price price" data-base-usd="30">$30<sup></sup></span><br> for a
+                            vehicle history report
                         </h2>
                         <p class="offer-banner__text">Verify the VIN number and gain valuable insights before buying a
                             used car. Get started today for peace of mind and confidence in your investment.</p>
@@ -12473,261 +12418,261 @@
     </script>
     <!--End of Tawk.to Script-->
 
-<script>
-console.log('Price geo script loading...');
-/*
-  Client-side IP-based geolocation price converter
-  - Detect visitor country via ipapi.co (free, CORS-friendly)
-  - If visitor from Germany (DE) show EUR (€)
-  - If visitor from Australia (AU) show AUD ($)
-  - If visitor from United Kingdom (GB) show GBP (£)
-  - If visitor from United States (US) show USD ($)
-  - Works on static sites (no backend)
-  - Usage:
-      - Best: add `data-base-usd="19.99"` to every price element
-      - Fallback: elements with class `price` will be parsed for a numeric price
-  - Error handling: defaults to USD if geo or exchange lookups fail
-  - Exchange rate: attempts to fetch from exchangerate.host, falls back to a fixed rate
-*/
-(function () {
-console.log('Setting up window.__priceGeo...');
-    // Try multiple geolocation APIs with fallback (second one has better CORS support)
-    const GEO_APIS = [
-        'https://ipapi.co/json/',  // primary
-        'https://geolocation-db.com/json/'  // fallback with better CORS
-    ];
-    const EXCHANGE_API = 'https://api.exchangerate.host/latest?base=USD&symbols=EUR,AUD,GBP';
-    const EUR_FALLBACK_RATE = 0.92; // fallback if exchangerate API fails
-    const AUD_FALLBACK_RATE = 1.54; // fallback if exchangerate API fails
-    const GBP_FALLBACK_RATE = 0.79; // fallback if exchangerate API fails
+    <script>
+        console.log('Price geo script loading...');
+        /*
+          Client-side IP-based geolocation price converter
+          - Detect visitor country via ipapi.co (free, CORS-friendly)
+          - If visitor from Germany (DE) show EUR (€)
+          - If visitor from Australia (AU) show AUD ($)
+          - If visitor from United Kingdom (GB) show GBP (£)
+          - If visitor from United States (US) show USD ($)
+          - Works on static sites (no backend)
+          - Usage:
+              - Best: add `data-base-usd="19.99"` to every price element
+              - Fallback: elements with class `price` will be parsed for a numeric price
+          - Error handling: defaults to USD if geo or exchange lookups fail
+          - Exchange rate: attempts to fetch from exchangerate.host, falls back to a fixed rate
+        */
+        (function () {
+            console.log('Setting up window.__priceGeo...');
+            // Try multiple geolocation APIs with fallback (second one has better CORS support)
+            const GEO_APIS = [
+                'https://ipapi.co/json/',  // primary
+                'https://geolocation-db.com/json/'  // fallback with better CORS
+            ];
+            const EXCHANGE_API = 'https://api.exchangerate.host/latest?base=USD&symbols=EUR,AUD,GBP';
+            const EUR_FALLBACK_RATE = 0.92; // fallback if exchangerate API fails
+            const AUD_FALLBACK_RATE = 1.54; // fallback if exchangerate API fails
+            const GBP_FALLBACK_RATE = 0.79; // fallback if exchangerate API fails
 
-    function timeoutFetch(url, options = {}, ms = 3000) {
-        const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), ms);
-        return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
-    }
+            function timeoutFetch(url, options = {}, ms = 3000) {
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), ms);
+                return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+            }
 
-    async function detectCountry() {
-        // Override for local testing: check localStorage for mock country
-        const mockCountry = localStorage.getItem('__mockCountry');
-        if (mockCountry) {
-            console.log('Using mock country from localStorage:', mockCountry);
-            return mockCountry.toUpperCase();
-        }
-
-        // Try multiple geolocation APIs with fallback
-        for (const api of GEO_APIS) {
-            try {
-                const res = await timeoutFetch(api, {}, 3000);
-                if (!res.ok) throw new Error('geo fetch failed: ' + res.status);
-                const json = await res.json();
-                // Handle different API response formats
-                const code = json.country_code || json.country_code2 || json.country || null;
-                if (code && code.length === 2) {
-                    console.log('Detected country from API:', code);
-                    return code.toUpperCase();
+            async function detectCountry() {
+                // Override for local testing: check localStorage for mock country
+                const mockCountry = localStorage.getItem('__mockCountry');
+                if (mockCountry) {
+                    console.log('Using mock country from localStorage:', mockCountry);
+                    return mockCountry.toUpperCase();
                 }
-            } catch (err) {
-                console.warn(`Geo API (${api}) failed, trying next:`, err.message);
-                continue;
+
+                // Try multiple geolocation APIs with fallback
+                for (const api of GEO_APIS) {
+                    try {
+                        const res = await timeoutFetch(api, {}, 3000);
+                        if (!res.ok) throw new Error('geo fetch failed: ' + res.status);
+                        const json = await res.json();
+                        // Handle different API response formats
+                        const code = json.country_code || json.country_code2 || json.country || null;
+                        if (code && code.length === 2) {
+                            console.log('Detected country from API:', code);
+                            return code.toUpperCase();
+                        }
+                    } catch (err) {
+                        console.warn(`Geo API (${api}) failed, trying next:`, err.message);
+                        continue;
+                    }
+                }
+
+                // Fallback: Try browser language
+                try {
+                    const lang = navigator.language || navigator.userLanguage || '';
+                    if (lang.includes('de')) {
+                        console.log('Detected Germany from browser language:', lang);
+                        return 'DE';
+                    }
+                } catch (e) {
+                    console.warn('Browser language detection failed');
+                }
+
+                console.warn('All geo detection failed, defaulting to US');
+                return 'US';
             }
-        }
 
-        // Fallback: Try browser language
-        try {
-            const lang = navigator.language || navigator.userLanguage || '';
-            if (lang.includes('de')) {
-                console.log('Detected Germany from browser language:', lang);
-                return 'DE';
+            async function getEurRate() {
+                try {
+                    const res = await timeoutFetch(EXCHANGE_API, {}, 3000);
+                    if (!res.ok) throw new Error('exchange fetch failed: ' + res.status);
+                    const json = await res.json();
+                    if (json && json.rates && json.rates.EUR) return Number(json.rates.EUR);
+                    throw new Error('no EUR rate in response');
+                } catch (err) {
+                    console.warn('Exchange rate lookup failed, using fallback rate', err);
+                    return EUR_FALLBACK_RATE;
+                }
             }
-        } catch (e) {
-            console.warn('Browser language detection failed');
-        }
 
-        console.warn('All geo detection failed, defaulting to US');
-        return 'US';
-    }
-
-    async function getEurRate() {
-        try {
-            const res = await timeoutFetch(EXCHANGE_API, {}, 3000);
-            if (!res.ok) throw new Error('exchange fetch failed: ' + res.status);
-            const json = await res.json();
-            if (json && json.rates && json.rates.EUR) return Number(json.rates.EUR);
-            throw new Error('no EUR rate in response');
-        } catch (err) {
-            console.warn('Exchange rate lookup failed, using fallback rate', err);
-            return EUR_FALLBACK_RATE;
-        }
-    }
-
-    async function getAudRate() {
-        try {
-            const res = await timeoutFetch(EXCHANGE_API, {}, 3000);
-            if (!res.ok) throw new Error('exchange fetch failed: ' + res.status);
-            const json = await res.json();
-            if (json && json.rates && json.rates.AUD) return Number(json.rates.AUD);
-            throw new Error('no AUD rate in response');
-        } catch (err) {
-            console.warn('Exchange rate lookup failed, using fallback rate', err);
-            return AUD_FALLBACK_RATE;
-        }
-    }
-
-    async function getGbpRate() {
-        try {
-            const res = await timeoutFetch(EXCHANGE_API, {}, 3000);
-            if (!res.ok) throw new Error('exchange fetch failed: ' + res.status);
-            const json = await res.json();
-            if (json && json.rates && json.rates.GBP) return Number(json.rates.GBP);
-            throw new Error('no GBP rate in response');
-        } catch (err) {
-            console.warn('Exchange rate lookup failed, using fallback rate', err);
-            return GBP_FALLBACK_RATE;
-        }
-    }
-
-    function parsePriceMatch(text) {
-        if (!text) return null;
-        // Normalize whitespace and NBSP
-        const normalized = text.replace(/\u00A0/g, ' ');
-        // Look for a price inside parentheses first: ( $12.34 ) or (12.34)
-        const paren = normalized.match(/\(([^)]*?\d[\d,\.]*[^)]*?)\)/);
-        if (paren) {
-            const num = (paren[1].match(/\d+[\d\.,]*/ ) || [null])[0];
-            return num ? { match: paren[0], value: parseFloat(num.replace(/,/g,'.')) } : null;
-        }
-        // Fallback: look for currency symbol + number
-        const csym = normalized.match(/([$€])\s*(\d+[\d\.,]*)/);
-        if (csym) return { match: csym[0], value: parseFloat(csym[2].replace(/,/g,'.')) };
-        // Last resort: any number
-        const any = normalized.match(/(\d+[\d\.]*)/);
-        if (any) return { match: any[0], value: parseFloat(any[0].replace(/,/g,'.')) };
-        return null;
-    }
-
-    function formatCurrency(amount, currency, locale) {
-        try {
-            return new Intl.NumberFormat(locale || undefined, { style: 'currency', currency }).format(amount);
-        } catch (e) {
-            let symbol = '$';
-            if (currency === 'EUR') symbol = '€';
-            if (currency === 'GBP') symbol = '£';
-            return symbol + amount.toFixed(2);
-        }
-    }
-
-    function replacePriceInText(text, newFormatted, isOption) {
-        if (!text) return newFormatted;
-        const normalized = text.replace(/\u00A0/g, ' ');
-        // For option elements, create a simpler format: "Name (€amount)"
-        // Remove any extra spacing from currency formatting
-        let cleanPrice = newFormatted;
-        if (isOption) {
-            // Extract just currency symbol and number for cleaner option text
-            // e.g., "46,00 €" -> "€46", "€46.00" -> "€46"
-            const match = newFormatted.match(/([$€])\s*(\d+)[,\.]?\d*/);
-            if (match) {
-                cleanPrice = match[1] + Math.round(parseFloat(match[2]));
+            async function getAudRate() {
+                try {
+                    const res = await timeoutFetch(EXCHANGE_API, {}, 3000);
+                    if (!res.ok) throw new Error('exchange fetch failed: ' + res.status);
+                    const json = await res.json();
+                    if (json && json.rates && json.rates.AUD) return Number(json.rates.AUD);
+                    throw new Error('no AUD rate in response');
+                } catch (err) {
+                    console.warn('Exchange rate lookup failed, using fallback rate', err);
+                    return AUD_FALLBACK_RATE;
+                }
             }
-        }
-        // If there's a parenthetical price, replace the whole parentheses
-        if (/\([^)]*\d[\d\.,]*[^)]*\)/.test(normalized)) {
-            return normalized.replace(/\([^)]*\d[\d\.,]*[^)]*\)/, `(${cleanPrice})`);
-        }
-        // If there's a currency symbol + number, replace that
-        if (/[$€]\s*\d+[\d\.,]*/.test(normalized)) {
-            return normalized.replace(/[$€]\s*\d+[\d\.,]*/, cleanPrice);
-        }
-        // If a bare number exists, replace first occurrence
-        if (/\d+[\d\.]*/.test(normalized)) {
-            return normalized.replace(/\d+[\d\.]*/, cleanPrice);
-        }
-        // Else append
-        return normalized + ' (' + cleanPrice + ')';
-    }
 
-    async function convertPrices() {
-        const country = await detectCountry();
-        const isGermany = country === 'DE';
-        const isAustralia = country === 'AU';
-        const isUK = country === 'GB';
-        let currency, rate, locale;
-        
-        if (isGermany) {
-            currency = 'EUR';
-            rate = await getEurRate();
-            locale = 'de-DE';
-        } else if (isAustralia) {
-            currency = 'AUD';
-            rate = await getAudRate();
-            locale = 'en-AU';
-        } else if (isUK) {
-            currency = 'GBP';
-            rate = await getGbpRate();
-            locale = 'en-GB';
-        } else {
-            currency = 'USD';
-            rate = 1;
-            locale = 'en-US';
-        }
+            async function getGbpRate() {
+                try {
+                    const res = await timeoutFetch(EXCHANGE_API, {}, 3000);
+                    if (!res.ok) throw new Error('exchange fetch failed: ' + res.status);
+                    const json = await res.json();
+                    if (json && json.rates && json.rates.GBP) return Number(json.rates.GBP);
+                    throw new Error('no GBP rate in response');
+                } catch (err) {
+                    console.warn('Exchange rate lookup failed, using fallback rate', err);
+                    return GBP_FALLBACK_RATE;
+                }
+            }
 
-        const els = Array.from(document.querySelectorAll('[data-base-usd], .price, option'));
-        els.forEach(el => {
-            let baseUsd = null;
-            // Prefer explicit data attribute
-            if (el.hasAttribute && el.hasAttribute('data-base-usd')) {
-                baseUsd = parseFloat(el.getAttribute('data-base-usd'));
+            function parsePriceMatch(text) {
+                if (!text) return null;
+                // Normalize whitespace and NBSP
+                const normalized = text.replace(/\u00A0/g, ' ');
+                // Look for a price inside parentheses first: ( $12.34 ) or (12.34)
+                const paren = normalized.match(/\(([^)]*?\d[\d,\.]*[^)]*?)\)/);
+                if (paren) {
+                    const num = (paren[1].match(/\d+[\d\.,]*/) || [null])[0];
+                    return num ? { match: paren[0], value: parseFloat(num.replace(/,/g, '.')) } : null;
+                }
+                // Fallback: look for currency symbol + number
+                const csym = normalized.match(/([$€])\s*(\d+[\d\.,]*)/);
+                if (csym) return { match: csym[0], value: parseFloat(csym[2].replace(/,/g, '.')) };
+                // Last resort: any number
+                const any = normalized.match(/(\d+[\d\.]*)/);
+                if (any) return { match: any[0], value: parseFloat(any[0].replace(/,/g, '.')) };
+                return null;
+            }
+
+            function formatCurrency(amount, currency, locale) {
+                try {
+                    return new Intl.NumberFormat(locale || undefined, { style: 'currency', currency }).format(amount);
+                } catch (e) {
+                    let symbol = '$';
+                    if (currency === 'EUR') symbol = '€';
+                    if (currency === 'GBP') symbol = '£';
+                    return symbol + amount.toFixed(2);
+                }
+            }
+
+            function replacePriceInText(text, newFormatted, isOption) {
+                if (!text) return newFormatted;
+                const normalized = text.replace(/\u00A0/g, ' ');
+                // For option elements, create a simpler format: "Name (€amount)"
+                // Remove any extra spacing from currency formatting
+                let cleanPrice = newFormatted;
+                if (isOption) {
+                    // Extract just currency symbol and number for cleaner option text
+                    // e.g., "46,00 €" -> "€46", "€46.00" -> "€46"
+                    const match = newFormatted.match(/([$€])\s*(\d+)[,\.]?\d*/);
+                    if (match) {
+                        cleanPrice = match[1] + Math.round(parseFloat(match[2]));
+                    }
+                }
+                // If there's a parenthetical price, replace the whole parentheses
+                if (/\([^)]*\d[\d\.,]*[^)]*\)/.test(normalized)) {
+                    return normalized.replace(/\([^)]*\d[\d\.,]*[^)]*\)/, `(${cleanPrice})`);
+                }
+                // If there's a currency symbol + number, replace that
+                if (/[$€]\s*\d+[\d\.,]*/.test(normalized)) {
+                    return normalized.replace(/[$€]\s*\d+[\d\.,]*/, cleanPrice);
+                }
+                // If a bare number exists, replace first occurrence
+                if (/\d+[\d\.]*/.test(normalized)) {
+                    return normalized.replace(/\d+[\d\.]*/, cleanPrice);
+                }
+                // Else append
+                return normalized + ' (' + cleanPrice + ')';
+            }
+
+            async function convertPrices() {
+                const country = await detectCountry();
+                const isGermany = country === 'DE';
+                const isAustralia = country === 'AU';
+                const isUK = country === 'GB';
+                let currency, rate, locale;
+
+                if (isGermany) {
+                    currency = 'EUR';
+                    rate = await getEurRate();
+                    locale = 'de-DE';
+                } else if (isAustralia) {
+                    currency = 'AUD';
+                    rate = await getAudRate();
+                    locale = 'en-AU';
+                } else if (isUK) {
+                    currency = 'GBP';
+                    rate = await getGbpRate();
+                    locale = 'en-GB';
+                } else {
+                    currency = 'USD';
+                    rate = 1;
+                    locale = 'en-US';
+                }
+
+                const els = Array.from(document.querySelectorAll('[data-base-usd], .price, option'));
+                els.forEach(el => {
+                    let baseUsd = null;
+                    // Prefer explicit data attribute
+                    if (el.hasAttribute && el.hasAttribute('data-base-usd')) {
+                        baseUsd = parseFloat(el.getAttribute('data-base-usd'));
+                    } else {
+                        // For option elements or plain text, attempt to parse
+                        const text = (el.textContent || '').trim();
+                        const pm = parsePriceMatch(text);
+                        if (pm && pm.value != null) baseUsd = pm.value;
+                    }
+                    if (baseUsd === null || isNaN(baseUsd)) return;
+
+                    const isOption = el.tagName === 'OPTION';
+                    const converted = baseUsd * rate;
+                    const formatted = formatCurrency(converted, currency, locale);
+                    if (isOption) {
+                        el.textContent = replacePriceInText(el.textContent, formatted, true);
+                    } else {
+                        el.textContent = formatted;
+                    }
+                    el.setAttribute('data-displayed-currency', currency);
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', convertPrices);
             } else {
-                // For option elements or plain text, attempt to parse
-                const text = (el.textContent || '').trim();
-                const pm = parsePriceMatch(text);
-                if (pm && pm.value != null) baseUsd = pm.value;
+                convertPrices();
             }
-            if (baseUsd === null || isNaN(baseUsd)) return;
 
-            const isOption = el.tagName === 'OPTION';
-            const converted = baseUsd * rate;
-            const formatted = formatCurrency(converted, currency, locale);
-            if (isOption) {
-                el.textContent = replacePriceInText(el.textContent, formatted, true);
-            } else {
-                el.textContent = formatted;
-            }
-            el.setAttribute('data-displayed-currency', currency);
-        });
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', convertPrices);
-    } else {
-        convertPrices();
-    }
-
-    // expose for debugging & testing
-    window.__priceGeo = {
-        convertPrices,
-        detectCountry,
-        getEurRate,
-        getAudRate,
-        getGbpRate,
-        setMockCountry: (country) => {
-            if (country) {
-                localStorage.setItem('__mockCountry', country);
-                let currencyDisplay = 'USD ($)';
-                if (country === 'DE') currencyDisplay = 'EUR (€)';
-                if (country === 'AU') currencyDisplay = 'AUD ($)';
-                if (country === 'GB') currencyDisplay = 'GBP (£)';
-                console.log(`Mock country set to: ${country}. Reload page to see prices in ${currencyDisplay}`);
-            } else {
-                localStorage.removeItem('__mockCountry');
-                console.log('Mock country removed. Reload page to auto-detect.');
-            }
-        }
-    };
-    console.log('window.__priceGeo is now available:', window.__priceGeo);
-})();
-</script>
+            // expose for debugging & testing
+            window.__priceGeo = {
+                convertPrices,
+                detectCountry,
+                getEurRate,
+                getAudRate,
+                getGbpRate,
+                setMockCountry: (country) => {
+                    if (country) {
+                        localStorage.setItem('__mockCountry', country);
+                        let currencyDisplay = 'USD ($)';
+                        if (country === 'DE') currencyDisplay = 'EUR (€)';
+                        if (country === 'AU') currencyDisplay = 'AUD ($)';
+                        if (country === 'GB') currencyDisplay = 'GBP (£)';
+                        console.log(`Mock country set to: ${country}. Reload page to see prices in ${currencyDisplay}`);
+                    } else {
+                        localStorage.removeItem('__mockCountry');
+                        console.log('Mock country removed. Reload page to auto-detect.');
+                    }
+                }
+            };
+            console.log('window.__priceGeo is now available:', window.__priceGeo);
+        })();
+    </script>
 
 </body>
 
