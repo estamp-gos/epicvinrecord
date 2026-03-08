@@ -42,13 +42,70 @@ export default {
 
     try {
       // Parse the request body
-      const data = await request.json();
-      
-      // Extract form data
-      const { vin, plate, state, vehicleType, searchType, timestamp } = data;
+      const rawData = await request.json();
+      console.log('Received data:', JSON.stringify(rawData, null, 2));
 
-      // Validate that we have at least VIN or Plate
-      if (!vin && !plate) {
+      // Normalize data: Handle both direct form submissions and Paddle webhooks
+      let data = rawData;
+      let isPaddleWebhook = false;
+
+      if (rawData.event_type && rawData.data) {
+        isPaddleWebhook = true;
+        // It's a Paddle webhook, merge custom_data into top level for easier access
+        const paddleData = rawData.data;
+        const customData = paddleData.custom_data || {};
+
+        data = {
+          ...customData,
+          transactionId: paddleData.id || paddleData.transaction_id,
+          amount: paddleData.amount || (paddleData.details && paddleData.details.totals && paddleData.details.totals.total),
+          customerEmail: paddleData.customer && paddleData.customer.email,
+          customerName: paddleData.customer && (paddleData.customer.name || `${paddleData.customer.first_name} ${paddleData.customer.last_name}`),
+          eventType: rawData.event_type,
+          eventId: rawData.id,
+          occurredAt: rawData.occurred_at || new Date().toISOString(),
+          status: paddleData.status
+        };
+
+        // Extraction of Product Name from Paddle:
+        // 1. From custom_data (which we just merged)
+        // 2. From items[0].price.product.name
+        if (!data.product_name && paddleData.items && paddleData.items.length > 0) {
+          const firstItem = paddleData.items[0];
+          if (firstItem.price && firstItem.price.product && firstItem.price.product.name) {
+            data.product_name = firstItem.price.product.name;
+          }
+        }
+      }
+
+      // Extract form data (works for both normalized Paddle data and direct submissions)
+      const {
+        vin,
+        plate,
+        state,
+        vehicleType,
+        searchType,
+        timestamp,
+        product_name,
+        productName,
+        amount,
+        transactionId,
+        customerEmail,
+        eventType,
+        eventId,
+        occurredAt,
+        status,
+        customerName
+      } = data;
+
+      const displayProduct = product_name || productName || 'EpicVIN Standard Report';
+      const displayAmount = amount ? (typeof amount === 'object' ? `${amount.amount} ${amount.currency_code}` : amount) : 'N/A';
+      const displayVIN = vin || plate || 'N/A';
+      const displayTime = occurredAt || timestamp || new Date().toISOString();
+
+      // Validate that we have at least VIN or Plate (for form submissions)
+      // For webhooks, we proceed anyway but log it
+      if (!vin && !plate && !isPaddleWebhook) {
         return new Response(JSON.stringify({ error: 'VIN or Plate required' }), {
           status: 400,
           headers: {
@@ -59,125 +116,118 @@ export default {
       }
 
       // Build email content
-      const emailSubject = `New ${searchType === 'vin' ? 'VIN' : 'License Plate'} Check Request`;
-      
+      const emailSubject = isPaddleWebhook
+        ? `Payment Successful! New Vehicle Check — ${displayVIN}`
+        : `New ${searchType === 'vin' ? 'VIN' : 'License Plate'} Check Request — ${displayVIN}`;
+
       let emailBody = `
 <!DOCTYPE html>
 <html>
 <head>
   <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background-color: #0084ff; color: white; padding: 20px; text-align: center; }
-    .content { background-color: #f9f9f9; padding: 20px; margin-top: 20px; border-radius: 5px; }
-    .field { margin-bottom: 15px; }
-    .label { font-weight: bold; color: #0084ff; }
-    .value { color: #333; padding: 5px 0; }
-    .footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f7f6; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .header { background-color: ${isPaddleWebhook ? '#00c853' : '#0084ff'}; color: white; padding: 30px; text-align: center; }
+    .content { padding: 30px; }
+    .field { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .label { font-weight: bold; color: ${isPaddleWebhook ? '#00c853' : '#0084ff'}; font-size: 14px; text-transform: uppercase; margin-bottom: 5px; display: block; }
+    .value { font-size: 16px; color: #333; font-weight: 500; }
+    .footer { background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #eee; }
+    h1 { margin: 0; font-size: 24px; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; background: #e8f5e9; color: #2e7d32; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🚗 New Vehicle Check Request</h1>
+      <h1>${isPaddleWebhook ? '🎉 Payment Successful!' : '🚗 New Check Request'}</h1>
+      <p style="margin-top: 10px; opacity: 0.9;">${isPaddleWebhook ? 'A new vehicle history report has been purchased.' : 'A customer has initiated a vehicle history check.'}</p>
     </div>
     <div class="content">
-      <h2>Vehicle Information</h2>
-`;
-
-      // Add VIN if provided
-      if (vin) {
-        emailBody += `
       <div class="field">
-        <div class="label">VIN Number:</div>
-        <div class="value">${vin}</div>
+        <span class="label">Product Name</span>
+        <div class="value">${displayProduct}</div>
       </div>
-`;
-      }
 
-      // Add Plate if provided
-      if (plate) {
-        emailBody += `
       <div class="field">
-        <div class="label">License Plate:</div>
-        <div class="value">${plate}</div>
+        <span class="label">Vehicle Identification (VIN/Plate)</span>
+        <div class="value" style="font-family: monospace; letter-spacing: 1px;">${displayVIN}</div>
       </div>
-`;
-      }
 
-      // Add State if provided
-      if (state) {
-        emailBody += `
+      ${isPaddleWebhook ? `
       <div class="field">
-        <div class="label">State:</div>
+        <span class="label">Amount Paid</span>
+        <div class="value">${displayAmount}</div>
+      </div>
+      <div class="field">
+        <span class="label">Transaction ID</span>
+        <div class="value">${transactionId || 'N/A'}</div>
+      </div>
+      <div class="field">
+        <span class="label">Customer Email</span>
+        <div class="value">${customerEmail || 'N/A'}</div>
+      </div>
+      ` : `
+      <div class="field">
+        <span class="label">Vehicle Type</span>
+        <div class="value">${vehicleType || 'sedan'}</div>
+      </div>
+      `}
+
+      ${state ? `
+      <div class="field">
+        <span class="label">State</span>
         <div class="value">${state}</div>
-      </div>
-`;
-      }
+      </div>` : ''}
 
-      // Add Vehicle Type
-      if (vehicleType) {
-        emailBody += `
       <div class="field">
-        <div class="label">Vehicle Type:</div>
-        <div class="value">${vehicleType}</div>
+        <span class="label">Timestamp</span>
+        <div class="value">${new Date(displayTime).toLocaleString()}</div>
       </div>
-`;
-      }
 
-      // Add Search Type
-      emailBody += `
-      <div class="field">
-        <div class="label">Search Type:</div>
-        <div class="value">${searchType || 'N/A'}</div>
-      </div>
-`;
-
-      // Add Timestamp
-      if (timestamp) {
-        emailBody += `
-      <div class="field">
-        <div class="label">Timestamp:</div>
-        <div class="value">${new Date(timestamp).toLocaleString()}</div>
-      </div>
-`;
-      }
-
-      emailBody += `
+      ${isPaddleWebhook ? `
+      <div class="field" style="border: none;">
+        <span class="label">Status</span>
+        <div class="status-badge">${status || 'completed'}</div>
+      </div>` : ''}
     </div>
     <div class="footer">
-      <p>This email was automatically generated from EpicVIN vehicle history check form.</p>
+      <p>This is an automated notification from <strong>EpicVINrecord</strong>.</p>
+      <p>&copy; ${new Date().getFullYear()} EpicVINrecord Admin Portal</p>
     </div>
   </div>
 </body>
 </html>
 `;
 
+
       // Send email using Web3Forms - Free, No configuration needed
       // Web3Forms is completely free and doesn't require any setup
-    const body = new URLSearchParams({
-      access_key: 'b396a128-42aa-46b7-8925-4cbd91f02d4e',
-      subject: emailSubject,
-      from_name: 'EpicVIN Report',
-      to: 'car.check.store@gmail.com',
-      message: 'New vehicle check request received.',
-      html: emailBody
-    });
+      const body = new URLSearchParams({
+        access_key: 'b396a128-42aa-46b7-8925-4cbd91f02d4e',
+        subject: emailSubject,
+        from_name: 'EpicVIN Report',
+        to: 'car.check.store@gmail.com',
+        message: isPaddleWebhook
+          ? `Payment successful for ${displayVIN}. Amount: ${displayAmount}. Product: ${displayProduct}`
+          : `New check request for ${displayVIN}. Type: ${vehicleType || 'sedan'}`,
+        html: emailBody
+      });
 
-    const emailResponse = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body
-    });
+      const emailResponse = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body
+      });
 
       // Check if email was sent successfully
       const result = await emailResponse.json();
-      
+
       if (emailResponse.ok && result.success) {
         console.log('✅ Email sent successfully via Web3Forms to car.check.store@gmail.com');
-        return new Response(JSON.stringify({ 
+        return new Response(JSON.stringify({
           success: true,
           emailSent: true,
           message: 'Email sent successfully to car.check.store@gmail.com'
@@ -193,16 +243,16 @@ export default {
         console.error('❌ Web3Forms API error:', result.message || 'Unknown error');
         console.error('Response status:', emailResponse.status);
         console.error('Full response:', result);
-        
+
         // Still return success to not block the checkout, but flag email failure
-        return new Response(JSON.stringify({ 
+        return new Response(JSON.stringify({
           success: true,  // Don't block user
           emailSent: false,  // But indicate email failed
           message: 'Request processed but email failed',
           error: result.message || 'Email failed'
         }), {
           status: 200,
-          headers: {  
+          headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
           },
@@ -212,9 +262,9 @@ export default {
     } catch (error) {
       console.error('❌ Worker error:', error);
       console.error('Error details:', error.message);
-      
+
       // Return success even on error to not block the user's checkout
-      return new Response(JSON.stringify({ 
+      return new Response(JSON.stringify({
         success: true,
         emailSent: false,
         message: 'Request processed but encountered error',
