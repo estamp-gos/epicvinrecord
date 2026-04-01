@@ -285,7 +285,8 @@ Customer Information:
             }
 
             // Send form data to email via Web3Forms BEFORE opening checkout
-            await sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail);
+            // await sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail);
+            // Email sending disabled; preserve payment flow only.
 
             // Get the appropriate price ID based on vehicle type
             var priceId = VEHICLE_PRICES[vehicleType] || VEHICLE_PRICES['sedan']; // default to sedan
