@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Reviews - epicvinrecord</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #0084ff;
+            border-bottom: 3px solid #0084ff;
+            padding-bottom: 10px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: #0084ff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            background: #0071b2;
+        }
+        .reviews-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .review-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+        }
+        .review-stars {
+            color: #ffc107;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .review-text {
+            font-style: italic;
+            color: #444;
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+        .review-author {
+            font-weight: bold;
+            color: #0084ff;
+            display: flex;
+            align-items: center;
+        }
+        .review-author::before {
+            content: "";
+            display: inline-block;
+            width: 30px;
+            height: 2px;
+            background: #0084ff;
+            margin-right: 10px;
+        }
+        .rating-summary {
+            background: #f0f8ff;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .rating-score {
+            font-size: 3em;
+            font-weight: bold;
+            color: #0084ff;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Back to Home</a>
+    
+    <div class="rating-summary">
+        <h1>Customer Reviews</h1>
+        <span class="rating-score">4.8 / 5</span>
+        <div class="review-stars">★★★★★</div>
+        <p>Based on over 1,800+ verified customer ratings</p>
+    </div>
+
+    <div class="reviews-container">
+        <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">"Once I decided to buy a good looking Cadillac Escalade. I really appreciate that my colleague advised me to take your service guys. As it turns out that Cadillac is Salvage, Junk and even flood damaged car - that’s what I learned from your EpicVINrecord report. I was about to buy it, thankfully I checked the report first. I skipped a lot of trouble."</p>
+            <span class="review-author">John D.</span>
+        </div>
+
+        <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">"Easy to understand, results were very quick, and gave me everything I wanted to know. EpicVINrecord is now where I choose to go to find information about a vehicle."</p>
+            <span class="review-author">Sarah M.</span>
+        </div>
+
+        <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">"I found EpicVINrecord features a plethora of more detailed info about your specific vehicle. It even provided photos from when it was for sale actual real photos."</p>
+            <span class="review-author">Michael R.</span>
+        </div>
+
+        <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">"Excellent service! The report was delivered to my email within seconds. It saved me from buying a car with a rolled-back odometer. Highly recommended!"</p>
+            <span class="review-author">David L.</span>
+        </div>
+
+        <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">"The flood damage check is a lifesaver, especially living in a coastal area. Very thorough and worth every penny."</p>
+            <span class="review-author">Emily W.</span>
+        </div>
+
+        <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">"Compared several sites and EpicVINrecord had the most data for the best price. The plate lookup feature is especially convenient."</p>
+            <span class="review-author">Robert K.</span>
+        </div>
+    </div>
+
+    <p style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666;">
+        Share your experience with us! Email your feedback to <a href="mailto:info@epicvinrecord.com" style="color: #0084ff;">info@epicvinrecord.com</a>
+    </p>
+
+    <p style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+        © 2012 - 2025 epicvinrecord (epicvinrecord.com). All Rights Reserved.
+    </p>
+</body>
+</html>

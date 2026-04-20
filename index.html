@@ -29,9 +29,9 @@
     <meta name="format-detection" content="telephone=no">
     <!-- CSRF Token -->
     <meta name="csrf-token" content="khBtIypMkrUD4a8fhmWDEDwBzmJeQmzKR5CgIrRe">
-    <title> VIN Check & Vehicle History Report</title>
+    <title>VIN Check & Vehicle History Report</title>
     <meta name="description"
-        content="Check your vehicle history report with EpicVIN. Get a  and reliable ⚡ VIN check about the vehicle’s history, price, damages, title records, recalls.">
+        content="Check your vehicle history report with EpicVIN. Get a reliable ⚡ VIN check about the vehicle’s history, price, damages, title records, recalls.">
     <meta name="p:domain_verify" content="22c01edeb834b27a8d1b434c2ac47b16">
     <script type="application/ld+json">
                 {
@@ -171,7 +171,7 @@
 }
     </script>
     <!-- Paddle.js SDK -->
-    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+    <!-- <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script> -->
 
 
 
@@ -193,6 +193,7 @@
         };
 
         // Initialize Paddle with your client-side token
+        /* Temporarily disabled Paddle Initialization
         if (typeof Paddle !== 'undefined') {
             Paddle.Initialize({
                 token: 'live_f37f7280c7ee8f743167bca1f06',
@@ -206,6 +207,7 @@
                 }
             });
         }
+        */
 
         // Web3Forms Configuration
         const WEB3FORMS_ACCESS_KEY = 'b396a128-42aa-46b7-8925-4cbd91f02d4e';
@@ -264,75 +266,18 @@
 
 
         // Paddle Checkout Function
+        // Redirect to Freemius Checkout
         async function openPaddleCheckout(vin, plate, vehicleType, customerEmail) {
-            if (typeof Paddle === 'undefined') {
-                console.error('Paddle is not loaded');
-                alert('Payment system is loading, please try again.');
-                return;
+            // Prepare Freemius URL
+            let freemiusUrl = 'https://checkout.freemius.com/product/27824/plan/45986/';
+            
+            // Append customer email if available
+            if (customerEmail) {
+                freemiusUrl += '?checkout_email=' + encodeURIComponent(customerEmail);
             }
 
-            // Determine search type and get state if it's a plate search
-            let searchType = vin ? 'vin' : 'plate';
-            let state = null;
-
-            // Try to get state from the form if it's a plate search
-            if (plate) {
-                // Find the active form
-                let activeForm = document.querySelector('.find-vin__form:not([style*="display: none"])');
-                if (activeForm) {
-                    let stateSelect = activeForm.querySelector('select[name="state"]');
-                    state = stateSelect ? stateSelect.value : null;
-                }
-            }
-
-            // Send form data to email via Web3Forms BEFORE opening checkout
-            // await sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail);
-
-
-
-            // Get the appropriate price ID based on vehicle type
-            var priceId = VEHICLE_PRICES[vehicleType] || VEHICLE_PRICES['sedan']; // default to sedan
-
-            // Prepare custom data based on what was provided
-            var customData = {};
-
-            if (vin) {
-                customData.vin = vin;
-                customData.search_type = 'vin';
-
-
-            } else if (plate) {
-                customData.license_plate = plate;
-                customData.search_type = 'plate';
-                if (state) {
-                    customData.state = state;
-                }
-            }
-
-            // Add vehicle type, product name and timestamp for tracking
-            customData.vehicle_type = vehicleType || 'sedan';
-            customData.product_name = PRODUCT_NAMES[vehicleType] || 'EpicVIN Standard Report';
-            customData.search_timestamp = new Date().toISOString();
-
-            // Open Paddle checkout with your product ID
-            Paddle.Checkout.open({
-                items: [
-                    {
-                        priceId: priceId,
-                        quantity: 1
-                    }
-                ],
-                customData: customData,
-                customer: {
-                    // Optional: pre-fill customer data if available
-                },
-                settings: {
-                    displayMode: 'overlay',
-                    theme: 'light',
-                    locale: 'en',
-                    successUrl: 'https://epicvinrecord.com/thank-you'
-                }
-            });
+            // Redirect user to Freemius
+            window.location.href = freemiusUrl;
         }
 
         function startLoading(btn) {
@@ -362,15 +307,9 @@
                 return;
             }
 
-            // Get customer email from the form - REQUIRED
+            // Get customer email from the form - optional for now
             let emailInput = form.querySelector('input[name="customer_email"]');
             let customerEmail = emailInput ? emailInput.value.trim() : '';
-
-            if (!customerEmail) {
-                alert('Please enter your email address');
-                if (emailInput) emailInput.focus();
-                return;
-            }
 
             // Get vehicle type from the form
             let vehicleTypeSelect = form.querySelector('select[name="vehicle_type"]');
@@ -684,7 +623,7 @@
     </style>
     <meta property="og:url" content="https://epicvinrecord.com">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Get  VIN check of your vehicle">
+    <meta property="og:title" content="Get VIN check of your vehicle">
     <meta property="og:description"
         content="Check your vehicle history report with EpicVIN. Get reliable VIN check about the vehicle’s history, price, damages, title records, recalls.">
     <meta property="og:image" content="img/EpicVIN.jpg">
@@ -10435,8 +10374,8 @@
                                                     data-type="sb"
                                                     onclick="typeof startSubmit === 'function' && startSubmit(event, this)"
                                                     type="submit">
-                                                    <span class="find-vin__text-btn-mob">Check Now</span>
-                                                    <span class="find-vin__text-btn-desc">Check VIN</span>
+                                                    <span class="find-vin__text-btn-mob">Check VIN</span>
+                                                    <span class="find-vin__text-btn-desc">Check VIN - Check Your Car</span>
                                                 </button>
                                             </div>
                                         </form>
@@ -10647,44 +10586,7 @@
                 }
             </script>
 
-            <div class="we-trusted">
-                <div class="holder">
-                    <div class="we-trusted__users">
-                        <picture>
-                            <source srcset="img2/we-trusted/webp/users.webp" type="image/webp">
-                            <img src="img2/we-trusted/png/users.png" width="79" height="36"
-                                alt="Photos of users who trust us">
-                        </picture>
-                        <p class="we-trusted__text">
-                            Trusted globally by <strong>1,000,000+</strong> users <br> across <strong>150+</strong>
-                            nations
-                        </p>
-                    </div>
-                    <ul class="we-trusted__logos">
-                        <li>
-                            <img src="img2/we-trusted/svg/forbes-logo.svg" width="85" height="22" alt="Forbes Logo">
-                        </li>
-                        <li>
-                            <img src="img2/copart-logos/copart-logo.svg" width="63" height="24" alt="Copart Logo">
-                        </li>
-                        <li>
-                            <img src="img2/we-trusted/png/sca-logo%401x.png"
-                                srcset="img2/we-trusted/png/sca-logo%402x.png 2x" width="47" height="28" alt="SCA Logo">
-                        </li>
-                        <li>
-                            <img src="img2/security/png/nmvtis-logo%401x.png"
-                                srcset="img2/security/png/nmvtis-logo%402x.png 2x" width="62" height="28"
-                                alt="NMVTIS Logo">
-                        </li>
-                        <li>
-                            <img src="img2/we-trusted/svg/nicb-logo.svg" width="79" height="22" alt="NICB Logo">
-                        </li>
-                        <li>
-                            <img src="img2/security/svg/nhtsa-logo.svg" width="90" height="22" alt="NHTSA Logo">
-                        </li>
-                    </ul>
-                </div>
-            </div>
+           
             <section class="main-features">
                 <div class="holder">
                     <div class="main-features__table-wrap">
@@ -10721,8 +10623,7 @@
                                 damage, and nearly 20 percent still sit under an open safety recall. One quick, VIN
                                 check can flag those issues, catch odometer tampering, and expose any title washing long
                                 before your money leaves your pocket.</p>
-                            <a class="button button--border-accent video__button desktop" href="#homePromo">Check Your
-                                Vin For Free</a>
+                            <a class="button button--border-accent video__button desktop" href="#homePromo">Check VIN - Check Your Car</a>
                         </div>
                         <div>
                             <div class="video__container">
@@ -10745,8 +10646,7 @@
                                     </svg>
                                 </button>
                             </div>
-                            <a class="button button--border-accent video__button mobile" href="#homePromo">Check Your
-                                Vin For Free</a>
+                            <a class="button button--border-accent video__button mobile" href="#homePromo">Check VIN - Check Your Car</a>
                         </div>
                     </div>
                 </div>
@@ -10804,7 +10704,7 @@
                                 </picture>
                                 <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--odometer">Past
                                     Odometer Readings - Has the odometer ever been rolled back?</h3>
-                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                             </div>
                             <div id="ownerPane" class="tab-pane fade" role="tabpanel" aria-labelledby="ownerTab">
                                 <picture>
@@ -10818,7 +10718,7 @@
                                 </picture>
                                 <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--owner">How was the
                                     car previously used? Was it a prior taxi or a rental car?</h3>
-                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                             </div>
                             <div id="photosPane" class="tab-pane fade" role="tabpanel" aria-labelledby="photosTab">
                                 <picture>
@@ -10832,7 +10732,7 @@
                                 </picture>
                                 <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--photo">Photos of
                                     Previous Sales - Has this vehicle previously been listed for sale?</h3>
-                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                             </div>
                             <div id="damagePane" class="tab-pane fade" role="tabpanel" aria-labelledby="damageTab">
                                 <picture>
@@ -10846,7 +10746,7 @@
                                 </picture>
                                 <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--damage">Hidden
                                     Damages - Does this car have any undisclosed or hidden damages?</h3>
-                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                             </div>
                             <div id="dataPane" class="tab-pane fade" role="tabpanel" aria-labelledby="dataTab">
                                 <picture>
@@ -10859,7 +10759,7 @@
                                 </picture>
                                 <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--data">Technical Data
                                     - What are the vehicle's specifications and technical data?</h3>
-                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                             </div>
                             <div id="stolenPane" class="tab-pane fade" role="tabpanel" aria-labelledby="stolenTab">
                                 <picture>
@@ -10873,7 +10773,7 @@
                                 </picture>
                                 <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--stolen">Theft Vehicle
                                     Check - Has the car been registered as a stolen vehicle?</h3>
-                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                                <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                             </div>
                         </div>
                     </div>
@@ -11233,7 +11133,7 @@
                             </div>
                             <button class="btn-check btn-reset button button--main find-vin__check-btn" data-type="sb"
                                 onclick="typeof startSubmit === 'function' && startSubmit(event, this)" type="submit">
-                                Check your Car
+                                Check VIN - Check Your Car
                             </button>
                         </form>
                         <!-- <p class="offer-banner__note">*This price is available with a trial subscription to our Unlimited Vehicle History Reports package.</p> -->
@@ -11744,7 +11644,7 @@
                                             onclick="typeof startSubmit === 'function' && startSubmit(event, this)"
                                             type="submit">
                                             <span class="find-vin__text-btn-mob">Check Now</span>
-                                            <span class="find-vin__text-btn-desc">Check VIN</span>
+                                            <span class="find-vin__text-btn-desc">Check VIN - Check Your Car</span>
                                         </button>
                                     </div>
                                 </form>
@@ -11900,19 +11800,16 @@
                         <div class="footer__nav-item">
                             <p class="footer__title">About EpicVIN</p>
                             <ul class="footer__nav-list">
-                                <li><a class="footer__link" href="/">About Us</a></li>
-                                <li><a class="footer__link" href="/">Contact Us</a></li>
-                                <li><a class="footer__link" href="/">Reviews</a></li>
-                                <li><a class="footer__link" href="/">Blog</a></li>
-                                <li><a class="footer__link" href="/">Affiliate Program</a></li>
-                                <li><a class="footer__link" href="/">Sitemap</a></li>
+                                <li><a class="footer__link" href="/about.html">About Us</a></li>
+                                <li><a class="footer__link" href="/contact.html">Contact Us</a></li>
+                                <li><a class="footer__link" href="/reviews.html">Reviews</a></li>
+
                             </ul>
                         </div>
                         <div class="footer__nav-item">
                             <p class="footer__title">Support</p>
                             <ul class="footer__nav-list">
-                                <li><a class="footer__link" href="/">Glossary</a></li>
-                                <li><a class="footer__link" href="/">FAQ</a></li>
+
                                 <li><a class="footer__link" href="/refund-policy.html">Refund Policy</a></li>
                                 <li><a class="footer__link" href="/privacy.html">Privacy Policy</a></li>
                                 <li><a class="footer__link" href="/terms-and-conditions.html">Terms & Conditions</a>
@@ -11939,9 +11836,8 @@
                                         href="https://epicvinrecord.com/license-plate-lookup">License Plate Lookup</a>
                                 </li>
                                 <li><a class="footer__link" href="/">Vehicle Owner Lookup</a></li>
-                                <li><a class="footer__link" href="/">Free Title Check by VIN</a></li>
                                 <li><a class="footer__link" href="/">Flood Damage Check</a></li>
-                                <li><a class="footer__link" href="/">Free Odometer Check</a></li>
+                                
                             </ul>
                         </div>
                         <div class="footer__nav-item">
@@ -12239,7 +12135,7 @@
         }
     </script>
 
-    <!-- Paddle Integration: Intercept all VIN forms -->
+    <!-- Payment Integration: Intercept all VIN forms -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Intercept all VIN forms that don't use startSubmit
@@ -12277,15 +12173,9 @@
                     var vehicleTypeSelect = form.querySelector('select[name="vehicle_type"]');
                     var vehicleType = vehicleTypeSelect ? vehicleTypeSelect.value : 'sedan';
 
-                    // Get customer email from the form - REQUIRED
+                    // Get customer email from the form - optional
                     var emailInput = form.querySelector('input[name="customer_email"]');
                     var customerEmail = emailInput ? emailInput.value.trim() : '';
-
-                    if (!customerEmail) {
-                        alert('Please enter your email address');
-                        if (emailInput) emailInput.focus();
-                        return false;
-                    }
 
                     // Open Paddle Checkout with VIN, vehicle type, and customer email
                     openPaddleCheckout(vin, null, vehicleType, customerEmail);
@@ -12323,19 +12213,14 @@
                         return false;
                     }
 
-                    if (!customerEmail) {
-                        alert('Please enter your email address');
-                        if (emailInput) emailInput.focus();
-                        return false;
-                    }
 
-                    // Open Paddle Checkout with plate, vehicle type, and customer email
+                    // Open Payment Checkout with plate, vehicle type, and customer email
                     openPaddleCheckout(null, plate, vehicleType, customerEmail);
                     return false;
                 });
             });
 
-            console.log('Paddle integration active - ' + vinForms.length + ' VIN forms and ' + plateForms.length + ' plate forms intercepted');
+            console.log('Payment integration active - ' + vinForms.length + ' VIN forms and ' + plateForms.length + ' plate forms intercepted');
         });
     </script>
     </script>

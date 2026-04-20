@@ -27,7 +27,7 @@
     <meta name="format-detection" content="telephone=no">
     <!-- CSRF Token -->
     <meta name="csrf-token" content="khBtIypMkrUD4a8fhmWDEDwBzmJeQmzKR5CgIrRe">
-    <title>Free VIN Decoder | EpicVINrecord</title>
+    <title>VIN Decoder | EpicVINrecord</title>
     <meta name="description" content="Use the VIN decoder to look up vehicle details and start a VIN check for a full vehicle history report.">
     <link rel="canonical" href="https://epicvinrecord.com">
 <meta name="p:domain_verify" content="22c01edeb834b27a8d1b434c2ac47b16">
@@ -86,7 +86,7 @@
     "@context": "https:\/\/schema.org",
     "@type": "VideoObject",
     "name": "How to find my car's usage history with EpicVINrecord Vehicle History?",
-    "description": "Quick walkthrough of EpicVIN: free VIN decoder, full vehicle history reports, recalls, title brands, and auction records.",
+    "description": "Quick walkthrough of EpicVIN: VIN decoder, full vehicle history reports, recalls, title brands, and auction records.",
     "inLanguage": "en",
     "thumbnailUrl": [
         "https:\/\/epicvinrecord.com\/img2\/video-covers\/webp\/promo-video-cover@2x.webp"
@@ -169,7 +169,7 @@
 }
     </script>
     <!-- Paddle.js SDK -->
-    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+    <!-- <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script> -->
     
     <script>
         // Vehicle type to price ID mapping
@@ -180,6 +180,7 @@
         };
 
         // Initialize Paddle with your client-side token
+        /*
         if (typeof Paddle !== 'undefined') {
             Paddle.Initialize({
                 token: 'live_f37f7280c7ee8f743167bca1f06',
@@ -193,6 +194,7 @@
                 }
             });
         }
+        */
 
         // Web3Forms Configuration
         const WEB3FORMS_ACCESS_KEY = '8a31cfe9-5cd5-4f84-8f73-3fe00c6753e2';
@@ -262,72 +264,18 @@ Customer Information:
             }
         }
 
-        // Paddle Checkout Function
+        // Redirect to Freemius Checkout
         async function openPaddleCheckout(vin, plate, vehicleType, customerEmail) {
-            if (typeof Paddle === 'undefined') {
-                console.error('Paddle is not loaded');
-                alert('Payment system is loading, please try again.');
-                return;
-            }
-
-            // Determine search type and get state if it's a plate search
-            let searchType = vin ? 'vin' : 'plate';
-            let state = null;
+            // Prepare Freemius URL
+            let freemiusUrl = 'https://checkout.freemius.com/product/27824/plan/45986/';
             
-            // Try to get state from the form if it's a plate search
-            if (plate) {
-                // Find the active form
-                let activeForm = document.querySelector('.find-vin__form:not([style*="display: none"])');
-                if (activeForm) {
-                    let stateSelect = activeForm.querySelector('select[name="state"]');
-                    state = stateSelect ? stateSelect.value : null;
-                }
-            }
-
-            // Send form data to email via Web3Forms BEFORE opening checkout
-            // await sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail);
-            // Email sending disabled; preserve payment flow only.
-
-            // Get the appropriate price ID based on vehicle type
-            var priceId = VEHICLE_PRICES[vehicleType] || VEHICLE_PRICES['sedan']; // default to sedan
-
-            // Prepare custom data based on what was provided
-            var customData = {};
-            
-            if (vin) {
-                customData.vin = vin;
-                customData.search_type = 'vin';
-            } else if (plate) {
-                customData.license_plate = plate;
-                customData.search_type = 'plate';
-                if (state) {
-                    customData.state = state;
-                }
+            // Append email if available
+            if (customerEmail) {
+                freemiusUrl += '?checkout_email=' + encodeURIComponent(customerEmail);
             }
             
-            // Add vehicle type and timestamp for tracking
-            customData.vehicle_type = vehicleType || 'sedan';
-            customData.search_timestamp = new Date().toISOString();
-
-            // Open Paddle checkout with your product ID
-            Paddle.Checkout.open({
-                items: [
-                    {
-                        priceId: priceId,
-                        quantity: 1
-                    }
-                ],
-                customData: customData,
-                customer: {
-                    // Optional: pre-fill customer data if available
-                },
-                settings: {
-                    displayMode: 'overlay',
-                    theme: 'light',
-                    locale: 'en',
-                    successUrl: window.location.origin + '/thank-you'
-                }
-            });
+            // Redirect user to Freemius
+            window.location.href = freemiusUrl;
         }
 
         function startLoading(btn) {
@@ -357,15 +305,9 @@ Customer Information:
                 return;
             }
 
-            // Get customer email from the form - REQUIRED
+            // Get customer email from the form - optional for now
             let emailInput = form.querySelector('input[name="customer_email"]');
             let customerEmail = emailInput ? emailInput.value.trim() : '';
-            
-            if (!customerEmail) {
-                alert('Please enter your email address');
-                if (emailInput) emailInput.focus();
-                return;
-            }
 
             // Get vehicle type from the form
             let vehicleTypeSelect = form.querySelector('select[name="vehicle_type"]');
@@ -427,8 +369,8 @@ Customer Information:
     <style type="text/css">@font-face {font-family:Inter;font-style:normal;font-weight:400;src:url(cf-fonts/v/inter/5.0.16/cyrillic-ext/wght/normal.woff2);unicode-range:U+0460-052F,U+1C80-1C88,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:400;src:url(cf-fonts/v/inter/5.0.16/cyrillic/wght/normal.woff2);unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:400;src:url(cf-fonts/v/inter/5.0.16/greek/wght/normal.woff2);unicode-range:U+0370-03FF;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:400;src:url(cf-fonts/v/inter/5.0.16/latin-ext/wght/normal.woff2);unicode-range:U+0100-02AF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20CF,U+2113,U+2C60-2C7F,U+A720-A7FF;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:400;src:url(cf-fonts/v/inter/5.0.16/greek-ext/wght/normal.woff2);unicode-range:U+1F00-1FFF;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:400;src:url(cf-fonts/v/inter/5.0.16/latin/wght/normal.woff2);unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:400;src:url(cf-fonts/v/inter/5.0.16/vietnamese/wght/normal.woff2);unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:500;src:url(cf-fonts/v/inter/5.0.16/greek/wght/normal.woff2);unicode-range:U+0370-03FF;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:500;src:url(cf-fonts/v/inter/5.0.16/greek-ext/wght/normal.woff2);unicode-range:U+1F00-1FFF;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:500;src:url(cf-fonts/v/inter/5.0.16/latin-ext/wght/normal.woff2);unicode-range:U+0100-02AF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20CF,U+2113,U+2C60-2C7F,U+A720-A7FF;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:500;src:url(cf-fonts/v/inter/5.0.16/cyrillic-ext/wght/normal.woff2);unicode-range:U+0460-052F,U+1C80-1C88,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:500;src:url(cf-fonts/v/inter/5.0.16/vietnamese/wght/normal.woff2);unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:500;src:url(cf-fonts/v/inter/5.0.16/cyrillic/wght/normal.woff2);unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:500;src:url(cf-fonts/v/inter/5.0.16/latin/wght/normal.woff2);unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:600;src:url(cf-fonts/v/inter/5.0.16/cyrillic-ext/wght/normal.woff2);unicode-range:U+0460-052F,U+1C80-1C88,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:600;src:url(cf-fonts/v/inter/5.0.16/latin/wght/normal.woff2);unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:600;src:url(cf-fonts/v/inter/5.0.16/vietnamese/wght/normal.woff2);unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:600;src:url(cf-fonts/v/inter/5.0.16/cyrillic/wght/normal.woff2);unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:600;src:url(cf-fonts/v/inter/5.0.16/latin-ext/wght/normal.woff2);unicode-range:U+0100-02AF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20CF,U+2113,U+2C60-2C7F,U+A720-A7FF;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:600;src:url(cf-fonts/v/inter/5.0.16/greek/wght/normal.woff2);unicode-range:U+0370-03FF;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:600;src:url(cf-fonts/v/inter/5.0.16/greek-ext/wght/normal.woff2);unicode-range:U+1F00-1FFF;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:700;src:url(cf-fonts/v/inter/5.0.16/latin/wght/normal.woff2);unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:700;src:url(cf-fonts/v/inter/5.0.16/latin-ext/wght/normal.woff2);unicode-range:U+0100-02AF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20CF,U+2113,U+2C60-2C7F,U+A720-A7FF;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:700;src:url(cf-fonts/v/inter/5.0.16/vietnamese/wght/normal.woff2);unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:700;src:url(cf-fonts/v/inter/5.0.16/cyrillic/wght/normal.woff2);unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:700;src:url(cf-fonts/v/inter/5.0.16/cyrillic-ext/wght/normal.woff2);unicode-range:U+0460-052F,U+1C80-1C88,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:700;src:url(cf-fonts/v/inter/5.0.16/greek-ext/wght/normal.woff2);unicode-range:U+1F00-1FFF;font-display:swap;}@font-face {font-family:Inter;font-style:normal;font-weight:700;src:url(cf-fonts/v/inter/5.0.16/greek/wght/normal.woff2);unicode-range:U+0370-03FF;font-display:swap;}</style>
                     <meta property="og:url" content="https://epicvinrecord.com">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Get free VIN check of your vehicle">
-<meta property="og:description" content="Check your vehicle history report with EpicVIN. Get a free and reliable VIN check about the vehicle’s history, price, damages, title records, recalls.">
+<meta property="og:title" content="Get VIN check of your vehicle">
+<meta property="og:description" content="Check your vehicle history report with EpicVIN. Get a reliable VIN check about the vehicle’s history, price, damages, title records, recalls.">
 <meta property="og:image" content="img/EpicVIN.jpg">
     
     <!-- Scripts -->
@@ -985,8 +927,8 @@ Customer Information:
             <div>
                 <p class="home__promo-slogan">Decode a VIN<br> in seconds</p>
                 <h1 class="heading heading--xxl home__promo-title">
-                    <span class="mobile">Free VIN Decoder</span>
-                    <span class="desktop">Free VIN Decoder</span>
+                    <span class="mobile">VIN Decoder</span>
+                    <span class="desktop">VIN Decoder</span>
                 </h1>
                 <p class="home__promo-text" data-find="vin">Enter a VIN to decode and check history</p>
                 <p class="home__promo-text" data-find="license-plate">Prefer a plate? Run a license plate lookup</p>
@@ -1151,7 +1093,7 @@ Customer Information:
             <table class="table d-md-block">
                 <tbody class="d-md-flex justify-content-md-center">
                     <tr class="d-md-flex flex-md-column">
-                        <th><span>🟡</span> Free VIN Check:</th>
+                        <th><span>🟡</span> VIN Check:</th>
                         <td>By VIN & Plate</td>
                     </tr>
                     <tr class="d-md-flex flex-md-column">
@@ -1175,9 +1117,9 @@ Customer Information:
     <div class="holder">
         <div class="video__content">
             <div>
-                <h2 class="heading heading--xl video__title">Skip the headache - run a free 30-second VIN Lookup.</h2>
-                <p class="video__text">About 40 percent of used cars on U.S. roads carry documented accident damage, and nearly 20 percent still sit under an open safety recall. One quick, free VIN check can flag those issues, catch odometer tampering, and expose any title washing long before your money leaves your pocket.</p>
-                <a class="button button--border-accent video__button desktop" href="#homePromo">Check Your Vin For Free</a>
+                <h2 class="heading heading--xl video__title">Skip the headache - run a 30-second VIN Lookup.</h2>
+                <p class="video__text">About 40 percent of used cars on U.S. roads carry documented accident damage, and nearly 20 percent still sit under an open safety recall. One quick, VIN check can flag those issues, catch odometer tampering, and expose any title washing long before your money leaves your pocket.</p>
+                <a class="button button--border-accent video__button desktop" href="#homePromo">Check VIN - Check Your Car</a>
             </div>
             <div>
                 <div class="video__container">
@@ -1193,7 +1135,7 @@ Customer Information:
         </svg>
     </button>
 </div>
-                <a class="button button--border-accent video__button mobile" href="#homePromo">Check Your Vin For Free</a>
+                <a class="button button--border-accent video__button mobile" href="#homePromo">Check VIN - Check Your Car</a>
             </div>
         </div>
     </div>
@@ -1236,7 +1178,7 @@ Customer Information:
                         <img class="cycle-tabs__img" src="img2/interface-screens/png/odometer-check-en%401x.png" srcset="img2/interface-screens/png/odometer-check-en%402x.png 2x" width="669" height="422" alt="Odometer screen shot" loading="lazy">
                     </picture>
                     <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--odometer">Past Odometer Readings - Has the odometer ever been rolled back?</h3>
-                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                 </div>
                 <div id="ownerPane" class="tab-pane fade" role="tabpanel" aria-labelledby="ownerTab">
                     <picture>
@@ -1244,7 +1186,7 @@ Customer Information:
                         <img class="cycle-tabs__img" src="img2/interface-screens/png/owner-check-en%401x_v%3D1.png" srcset="img2/interface-screens/png/owner-check-en%402x_v%3D1.png 2x" width="669" height="422" alt="Ownership history screen shot" loading="lazy">
                     </picture>
                     <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--owner">How was the car previously used? Was it a prior taxi or a rental car?</h3>
-                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                 </div>
                 <div id="photosPane" class="tab-pane fade" role="tabpanel" aria-labelledby="photosTab">
                     <picture>
@@ -1252,7 +1194,7 @@ Customer Information:
                         <img class="cycle-tabs__img" src="img2/interface-screens/jpg/photos-check-en%401x.jpg" srcset="img2/interface-screens/jpg/photos-check-en%402x.jpg 2x" width="669" height="422" alt="Photos on sale screen shot" loading="lazy">
                     </picture>
                     <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--photo">Photos of Previous Sales - Has this vehicle previously been listed for sale?</h3>
-                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                 </div>
                 <div id="damagePane" class="tab-pane fade" role="tabpanel" aria-labelledby="damageTab">
                     <picture>
@@ -1260,7 +1202,7 @@ Customer Information:
                         <img class="cycle-tabs__img" src="img2/interface-screens/png/damage-check-en%401x_v%3D1.png" srcset="img2/interface-screens/png/damage-check-en%402x_v%3D1.png 2x" width="669" height="422" alt="Vehicle damages screen shot" loading="lazy">
                     </picture>
                     <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--damage">Hidden Damages - Does this car have any undisclosed or hidden damages?</h3>
-                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                 </div>
                 <div id="dataPane" class="tab-pane fade" role="tabpanel" aria-labelledby="dataTab">
                     <picture>
@@ -1268,7 +1210,7 @@ Customer Information:
                         <img class="cycle-tabs__img" src="img2/interface-screens/png/data-check-en%401x.png" srcset="img2/interface-screens/png/data-check-en%402x.png 2x" width="669" height="422" alt="Vehicle specifications screen shot" loading="lazy">
                     </picture>
                     <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--data">Technical Data - What are the vehicle's specifications and technical data?</h3>
-                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                 </div>
                 <div id="stolenPane" class="tab-pane fade" role="tabpanel" aria-labelledby="stolenTab">
                     <picture>
@@ -1276,7 +1218,7 @@ Customer Information:
                         <img class="cycle-tabs__img" src="img2/interface-screens/png/stolen-check-en%401x.png" srcset="img2/interface-screens/png/stolen-check-en%402x.png 2x" width="669" height="422" alt="Stolen vehicle check screen shot" loading="lazy">
                     </picture>
                     <h3 class="heading heading--l cycle-tabs__title cycle-tabs__title--stolen">Theft Vehicle Check - Has the car been registered as a stolen vehicle?</h3>
-                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check Your Car</a>
+                    <a class="button button--accent cycle-tabs__btn" href="#homePromo">Check VIN - Check Your Car</a>
                 </div>
             </div>
         </div>
@@ -1547,7 +1489,7 @@ Customer Information:
                 <a class="find-vin__scan" href="/scan-vin" aria-label="Scan VIN"></a>
             </div>
             <button class="btn-check btn-reset button button--main find-vin__check-btn" data-type="sb" onclick="typeof startSubmit === 'function' && startSubmit(event, this)" type="submit">
-                    Check your Car
+                    Check VIN - Check Your Car
             </button>
         </form>
         <!-- <p class="offer-banner__note">*This price is available with a trial subscription to our Unlimited Vehicle History Reports package.</p> -->
@@ -1957,8 +1899,8 @@ registration card or insurance documents.
                     <input id="vin-inputbanner" name="vin" type="text" class="find-vin__input" placeholder="" data-placeholder-mob="Enter VIN or Scan it" data-placeholder-desk="Enter VIN Number">
                     <a class="find-vin__scan" href="/scan-vin" aria-label="Scan VIN"></a>
                     <button class="btn-check btn-reset button button--main find-vin__check-btn" data-type="sb" onclick="typeof startSubmit === 'function' && startSubmit(event, this)" type="submit">
-                            <span class="find-vin__text-btn-mob">Check Now</span>
-                            <span class="find-vin__text-btn-desc">Check VIN</span>
+                            <span class="find-vin__text-btn-mob">Check VIN - Check Your Car</span>
+                            <span class="find-vin__text-btn-desc">Check VIN - Check Your Car</span>
                     </button>
                 </div>
             </form>
@@ -2082,19 +2024,16 @@ registration card or insurance documents.
                 <div class="footer__nav-item">
                     <p class="footer__title">About EpicVIN</p>
                     <ul class="footer__nav-list">
-                        <li><a class="footer__link" href="/">About Us</a></li>
-                        <li><a class="footer__link" href="/">Contact Us</a></li>
-                        <li><a class="footer__link" href="/">Reviews</a></li>
-                        <li><a class="footer__link" href="/">Blog</a></li>
-                        <li><a class="footer__link" href="/">Affiliate Program</a></li>
-                        <li><a class="footer__link" href="/">Sitemap</a></li>
+                        <li><a class="footer__link" href="/about.html">About Us</a></li>
+                        <li><a class="footer__link" href="/contact.html">Contact Us</a></li>
+                        <li><a class="footer__link" href="/reviews.html">Reviews</a></li>
+
                     </ul>
                 </div>
                 <div class="footer__nav-item">
                     <p class="footer__title">Support</p>
                     <ul class="footer__nav-list">
-                        <li><a class="footer__link" href="/">Glossary</a></li>
-                        <li><a class="footer__link" href="/">FAQ</a></li>
+
                         <li><a class="footer__link" href="/refund-policy.html">Refund Policy</a></li>
                         <li><a class="footer__link" href="/privacy.html">Privacy Policy</a></li>
                         <li><a class="footer__link" href="/terms-and-conditions.html">Terms & Conditions</a></li>
@@ -2116,9 +2055,9 @@ registration card or insurance documents.
                     <ul class="footer__nav-list">
                         <li><a class="footer__link" href="https://epicvinrecord.com/">License Plate Lookup</a></li>
                         <li><a class="footer__link" href="/">Vehicle Owner Lookup</a></li>
-                        <li><a class="footer__link" href="/">Free Title Check by VIN</a></li>
+                        <li><a class="footer__link" href="/">Title Check by VIN</a></li>
                         <li><a class="footer__link" href="/">Flood Damage Check</a></li>
-                        <li><a class="footer__link" href="/">Free Odometer Check</a></li>
+                        <li><a class="footer__link" href="/">Odometer Check</a></li>
                     </ul>
                 </div>
                 <div class="footer__nav-item">
@@ -2450,15 +2389,9 @@ registration card or insurance documents.
                         var vehicleTypeSelect = form.querySelector('select[name="vehicle_type"]');
                         var vehicleType = vehicleTypeSelect ? vehicleTypeSelect.value : 'sedan';
                         
-                        // Get customer email from the form - REQUIRED
+                        // Get customer email from the form - optional
                         var emailInput = form.querySelector('input[name="customer_email"]');
                         var customerEmail = emailInput ? emailInput.value.trim() : '';
-                        
-                        if (!customerEmail) {
-                            alert('Please enter your email address');
-                            if (emailInput) emailInput.focus();
-                            return false;
-                        }
                         
                         // Open Paddle Checkout with VIN, vehicle type, and customer email
                         openPaddleCheckout(vin, null, vehicleType, customerEmail);
@@ -2496,11 +2429,6 @@ registration card or insurance documents.
                             return false;
                         }
                         
-                        if (!customerEmail) {
-                            alert('Please enter your email address');
-                            if (emailInput) emailInput.focus();
-                            return false;
-                        }
                         
                         // Open Paddle Checkout with plate, vehicle type, and customer email
                         openPaddleCheckout(null, plate, vehicleType, customerEmail);
@@ -2508,7 +2436,7 @@ registration card or insurance documents.
                     });
                 });
                 
-                console.log('Paddle integration active - ' + vinForms.length + ' VIN forms and ' + plateForms.length + ' plate forms intercepted');
+                console.log('Payment integration active - ' + vinForms.length + ' VIN forms and ' + plateForms.length + ' plate forms intercepted');
             });
         </script>
         </script>
