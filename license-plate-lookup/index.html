@@ -266,8 +266,17 @@ Customer Information:
 
         // Paddle Checkout Function
         async function openPaddleCheckout(vin, plate, vehicleType, customerEmail) {
+            // Map vehicle type to Freemius plan ID
+            let planId = '45986'; // Default (Basic)
+            
+            if (vehicleType === 'standard' || vehicleType === 'sedan') {
+                planId = '45987'; // Standard
+            } else if (vehicleType === 'premium' || vehicleType === '4x4') {
+                planId = '45988'; // Premium
+            }
+            
             // Redirect to Freemius checkout instead of Paddle
-            const freemiusUrl = "https://checkout.freemius.com/product/27824/plan/45986/";
+            const freemiusUrl = "https://checkout.freemius.com/product/27824/plan/" + planId + "/";
             const queryParams = new URLSearchParams();
             
             if (customerEmail) {
