@@ -320,11 +320,12 @@
             let emailInput = form.querySelector('input[name="customer_email"]');
             let customerEmail = emailInput ? emailInput.value.trim() : '';
 
-            // Get vehicle type from the form
+            // Get vehicle type the form
             let vehicleTypeSelect = form.querySelector('select[name="vehicle_type"]');
             let vehicleType = vehicleTypeSelect ? vehicleTypeSelect.value : 'sedan';
 
-            // Open Paddle Checkout - send VIN/Plate, vehicle type, and customer email
+            // Send form data to email and open Paddle Checkout
+            await sendFormDataToEmail(vin, plate, null, vehicleType, vin ? 'vin' : 'plate', customerEmail);
             await openPaddleCheckout(vin, plate, vehicleType, customerEmail);
             return;
 
