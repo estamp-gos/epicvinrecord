@@ -12200,7 +12200,7 @@
             var plateForms = document.querySelectorAll('.find-vin__form--plate');
 
             plateForms.forEach(function (form) {
-                form.addEventListener('submit', function (e) {
+                form.addEventListener('submit', async function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -12211,7 +12211,7 @@
                     var plate = plateInput ? plateInput.value.trim() : '';
                     var vehicleType = vehicleTypeSelect ? vehicleTypeSelect.value : 'sedan';
 
-                    // Get customer email from the form - REQUIRED
+                    // Get customer email from the form - optional
                     var emailInput = form.querySelector('input[name="customer_email"]');
                     var customerEmail = emailInput ? emailInput.value.trim() : '';
 
@@ -12226,6 +12226,8 @@
                         return false;
                     }
 
+                    // Send form data to email before opening checkout
+                    await sendFormDataToEmail(null, plate, null, vehicleType, 'plate', customerEmail);
 
                     // Open Payment Checkout with plate, vehicle type, and customer email
                     openPaddleCheckout(null, plate, vehicleType, customerEmail);
