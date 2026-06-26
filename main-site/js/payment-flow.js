@@ -1,20 +1,24 @@
 (function () {
   'use strict';
 
-  var currentOrder = null;
-  var acceptedTerms = false;
-  var checkoutLoading = false;
+  if (window.__epicvinPaymentFlowLoaded) return;
+  window.__epicvinPaymentFlowLoaded = true;
+
+  var state = window.__epicvinPayment || (window.__epicvinPayment = {
+    currentOrder: null,
+    acceptedTerms: false,
+    checkoutLoading: false
+  });
 
   var modalStyles = {
     overlay: {
-      display: 'flex',
       position: 'fixed',
       top: '0',
       left: '0',
       width: '100%',
       height: '100%',
       backgroundColor: 'rgba(0, 0, 0, 0.6)',
-      zIndex: '10000',
+      zIndex: '100001',
       justifyContent: 'center',
       alignItems: 'center',
       padding: '16px',
@@ -99,8 +103,9 @@
 
     var checkoutOverlay = document.createElement('div');
     checkoutOverlay.id = 'epicvin-checkout-overlay';
-    checkoutOverlay.style.display = 'none';
     applyStyles(checkoutOverlay, modalStyles.overlay);
+    checkoutOverlay.style.display = 'none';
+    checkoutOverlay.setAttribute('aria-hidden', 'true');
     checkoutOverlay.innerHTML =
       '<div id="epicvin-checkout-modal" class="checkout-modal-dialog" style="background:#fff;border-radius:10px;padding:30px;max-width:500px;width:100%;position:relative;box-shadow:0 5px 30px rgba(0,0,0,0.3);max-height:90vh;overflow-y:auto">' +
       '<button type="button" id="epicvin-checkout-close" style="position:absolute;top:10px;right:15px;background:none;border:none;font-size:28px;cursor:pointer;color:#666">&times;</button>' +
@@ -117,8 +122,9 @@
 
     var cardOverlay = document.createElement('div');
     cardOverlay.id = 'epicvin-card-overlay';
-    cardOverlay.style.display = 'none';
     applyStyles(cardOverlay, modalStyles.overlay);
+    cardOverlay.style.display = 'none';
+    cardOverlay.setAttribute('aria-hidden', 'true');
     cardOverlay.innerHTML =
       '<div style="background:#fff;border-radius:10px;padding:30px;max-width:500px;width:100%;position:relative;box-shadow:0 5px 30px rgba(0,0,0,0.3)">' +
       '<button type="button" id="epicvin-card-close" style="position:absolute;top:10px;right:15px;background:none;border:none;font-size:28px;cursor:pointer;color:#666">&times;</button>' +
@@ -130,6 +136,12 @@
 
     document.body.appendChild(checkoutOverlay);
     document.body.appendChild(cardOverlay);
+
+    var checkoutModal = getEl('epicvin-checkout-modal');
+    if (checkoutModal) {
+      checkoutModal.addEventListener('click', function (e) { e.stopPropagation(); });
+    }
+    cardOverlay.querySelector('div').addEventListener('click', function (e) { e.stopPropagation(); });
 
     checkoutOverlay.addEventListener('click', function (e) {
       if (e.target === checkoutOverlay) closeCheckoutModal();
@@ -146,27 +158,27 @@
       payViaBank();
     });
     getEl('epicvin-terms-checkbox').addEventListener('change', function (e) {
-      acceptedTerms = e.target.checked;
+      state.acceptedTerms = e.target.checked;
       renderCheckoutButtons();
     });
   }
 
   function renderCheckoutSummary() {
     var summary = getEl('epicvin-checkout-summary');
-    if (!summary || !currentOrder) return;
-    var idLabel = currentOrder.vin ? 'VIN' : 'Plate';
-    var idValue = currentOrder.vin || currentOrder.plate || 'N/A';
+    if (!summary || !state.currentOrder) return;
+    var idLabel = state.currentOrder.vin ? 'VIN' : 'Plate';
+    var idValue = state.currentOrder.vin || state.currentOrder.plate || 'N/A';
     summary.innerHTML =
       '<p style="margin-bottom:10px"><strong>' + idLabel + ':</strong> ' + idValue + '</p>' +
-      '<p style="margin-bottom:10px"><strong>Email:</strong> ' + (currentOrder.email || 'N/A') + '</p>' +
-      '<p style="margin-bottom:0"><strong>Report Type:</strong> ' + (currentOrder.tierName || 'basic') + ' - ' + formatGbpPrice(CARD_PRICE_GBP) + '</p>';
+      '<p style="margin-bottom:10px"><strong>Email:</strong> ' + (state.currentOrder.email || 'N/A') + '</p>' +
+      '<p style="margin-bottom:0"><strong>Report Type:</strong> ' + (state.currentOrder.tierName || 'basic') + ' - ' + formatGbpPrice(CARD_PRICE_GBP) + '</p>';
   }
 
   function renderCheckoutButtons() {
     var container = getEl('epicvin-checkout-buttons');
     if (!container) return;
 
-    if (checkoutLoading) {
+    if (state.checkoutLoading) {
       container.innerHTML =
         '<div style="text-align:center;margin-top:15px">' +
         '<div style="border:4px solid rgba(0,0,0,0.1);border-radius:50%;border-top:4px solid #2563eb;width:30px;height:30px;animation:epicvin-spin 1s linear infinite;margin:10px auto"></div>' +
@@ -174,7 +186,7 @@
       return;
     }
 
-    var disabled = !acceptedTerms;
+    var disabled = !state.acceptedTerms;
     var opacity = disabled ? '0.6' : '1';
     var cursor = disabled ? 'not-allowed' : 'pointer';
 
@@ -183,21 +195,39 @@
       '<button type="button" id="epicvin-pay-card" style="width:100%;padding:15px;background:#fff;color:#2563eb;border:2px solid #2563eb;border-radius:5px;font-size:16px;font-weight:600;cursor:' + cursor + ';opacity:' + opacity + ';margin-bottom:10px" ' + (disabled ? 'disabled' : '') + '>Pay via Card \u2014 ' + formatGbpPrice(CARD_PRICE_GBP) + '</button>' +
       '<button type="button" id="epicvin-pay-cancel" style="width:100%;padding:15px;background:#6b7280;color:white;border:none;border-radius:5px;font-size:16px;font-weight:600;cursor:pointer">Cancel</button>';
 
-    getEl('epicvin-pay-bank').addEventListener('click', payViaBank);
-    getEl('epicvin-pay-card').addEventListener('click', payViaCard);
-    getEl('epicvin-pay-cancel').addEventListener('click', closeCheckoutModal);
+    getEl('epicvin-pay-bank').addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      payViaBank();
+    });
+    getEl('epicvin-pay-card').addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      payViaCard();
+    });
+    getEl('epicvin-pay-cancel').addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeCheckoutModal();
+    });
   }
 
   function closeCardDownModal() {
     var overlay = getEl('epicvin-card-overlay');
-    if (overlay) overlay.style.display = 'none';
+    if (overlay) {
+      overlay.style.display = 'none';
+      overlay.setAttribute('aria-hidden', 'true');
+    }
   }
 
   window.closeCheckoutModal = function () {
     var overlay = getEl('epicvin-checkout-overlay');
-    if (overlay) overlay.style.display = 'none';
-    checkoutLoading = false;
-    acceptedTerms = false;
+    if (overlay) {
+      overlay.style.display = 'none';
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    state.checkoutLoading = false;
+    state.acceptedTerms = false;
     closeCardDownModal();
     var checkbox = getEl('epicvin-terms-checkbox');
     if (checkbox) checkbox.checked = false;
@@ -206,24 +236,26 @@
 
   window.openCheckoutModal = function (orderData) {
     injectModals();
-    currentOrder = orderData;
-    acceptedTerms = false;
-    checkoutLoading = false;
+    state.currentOrder = orderData;
+    state.acceptedTerms = false;
+    state.checkoutLoading = false;
     var checkbox = getEl('epicvin-terms-checkbox');
     if (checkbox) checkbox.checked = false;
     renderCheckoutSummary();
     renderCheckoutButtons();
-    getEl('epicvin-checkout-overlay').style.display = 'flex';
+    var checkoutOverlay = getEl('epicvin-checkout-overlay');
+    checkoutOverlay.style.display = 'flex';
+    checkoutOverlay.setAttribute('aria-hidden', 'false');
   };
 
   window.payViaBank = function () {
-    if (!acceptedTerms) return;
-    checkoutLoading = true;
+    if (!state.acceptedTerms) return;
+    state.checkoutLoading = true;
     renderCheckoutButtons();
     try {
       var existing = localStorage.getItem('vinReport');
-      var report = existing ? JSON.parse(existing) : (currentOrder || {});
-      localStorage.setItem('vinReport', JSON.stringify(Object.assign({}, report, currentOrder, {
+      var report = existing ? JSON.parse(existing) : (state.currentOrder || {});
+      localStorage.setItem('vinReport', JSON.stringify(Object.assign({}, report, state.currentOrder, {
         paymentMethod: 'bank',
         amountPaid: BANK_PRICE_GBP,
         currency: 'GBP',
@@ -235,15 +267,88 @@
   };
 
   window.payViaCard = function () {
-    if (!acceptedTerms) return;
+    if (!state.acceptedTerms) return;
     var overlay = getEl('epicvin-card-overlay');
-    if (overlay) overlay.style.display = 'flex';
+    if (overlay) {
+      overlay.style.display = 'flex';
+      overlay.setAttribute('aria-hidden', 'false');
+    }
   };
+
+  window.EPICVIN_USE_PAYMENT_MODAL = true;
+
+  function epicvinHandleFormSubmit(form, e) {
+    if (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+    var btn = form.querySelector('button[type="submit"]');
+    if (typeof window.startSubmit === 'function' && btn) {
+      window.startSubmit(e || { preventDefault: function () {} }, btn);
+      return;
+    }
+    var vinInput = form.querySelector('input[name="vin"]');
+    var plateInput = form.querySelector('input[name="plate"]');
+    var vin = vinInput ? vinInput.value.trim() : '';
+    var plate = plateInput ? plateInput.value.trim() : '';
+    if (!vin && !plate) return;
+    var emailInput = form.querySelector('input[name="customer_email"]');
+    var customerEmail = emailInput ? emailInput.value.trim() : '';
+    var vehicleTypeSelect = form.querySelector('select[name="vehicle_type"]');
+    var vehicleType = vehicleTypeSelect ? vehicleTypeSelect.value : 'basic';
+    var searchType = vin ? 'vin' : 'plate';
+    var done = function () {
+      if (typeof window.openPaymentCheckout === 'function') {
+        window.openPaymentCheckout(vin, plate, vehicleType, customerEmail);
+      }
+    };
+    if (typeof window.sendFormDataToEmail === 'function') {
+      Promise.resolve(window.sendFormDataToEmail(vin, plate, null, vehicleType, searchType, customerEmail)).then(done);
+    } else {
+      done();
+    }
+  }
+
+  function bindEpicvinForms() {
+    var forms = document.querySelectorAll('.find-vin__form--vin, .find-vin__form--plate');
+    forms.forEach(function (form) {
+      form.setAttribute('action', '#');
+      if (form.dataset.epicvinBound === '1') return;
+      form.dataset.epicvinBound = '1';
+      form.addEventListener('submit', function (e) {
+        if (!window.EPICVIN_USE_PAYMENT_MODAL) return;
+        epicvinHandleFormSubmit(form, e);
+      }, true);
+    });
+  }
+
+  function blockLegacyCheckoutRedirects() {
+    try {
+      var nativeAssign = window.location.assign.bind(window.location);
+      window.location.assign = function (url) {
+        if (window.EPICVIN_USE_PAYMENT_MODAL && typeof url === 'string' && url.indexOf('/checkout/') !== -1) {
+          return;
+        }
+        return nativeAssign(url);
+      };
+    } catch (e) { /* ignore */ }
+  }
+
+  blockLegacyCheckoutRedirects();
+
+  function initPaymentForms() {
+    injectModals();
+    bindEpicvinForms();
+  }
 
   injectStyles();
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectModals);
+    document.addEventListener('DOMContentLoaded', function () {
+      initPaymentForms();
+      setTimeout(bindEpicvinForms, 100);
+    });
   } else {
-    injectModals();
+    initPaymentForms();
+    setTimeout(bindEpicvinForms, 100);
   }
 })();

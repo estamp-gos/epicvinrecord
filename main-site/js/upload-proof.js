@@ -3,6 +3,7 @@
 
   var order = null;
   var proofFile = null;
+  var MAX_ATTACHMENT_BYTES = 900000;
 
   function getEl(id) {
     return document.getElementById(id);
@@ -111,7 +112,15 @@
     if (!vin && manualVin && manualVin.value.trim()) vin = manualVin.value.trim();
     var notes = getEl('proof-notes') ? getEl('proof-notes').value.trim() : '';
     var amount = (order && order.amountPaid) ? order.amountPaid : BANK_PRICE_GBP;
-    return { email: email, vin: vin, plate: plate, notes: notes, amount: amount };
+    return {
+      email: email,
+      vin: vin,
+      plate: plate,
+      notes: notes,
+      amount: amount,
+      carModel: (order && order.carModel) || '',
+      year: (order && order.year) || ''
+    };
   }
 
   function showThankYou() {
@@ -122,6 +131,190 @@
   function hideThankYou() {
     var overlay = getEl('proof-thankyou-overlay');
     if (overlay) overlay.style.display = 'none';
+  }
+
+
+  function compressImageFile(file) {
+    return new Promise(function (resolve) {
+      if (!file.type || file.type.indexOf('image/') !== 0 || file.size <= MAX_ATTACHMENT_BYTES) {
+        resolve(file);
+        return;
+      }
+      var img = new Image();
+      var url = URL.createObjectURL(file);
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var maxW = 1200;
+        var w = img.width;
+        var h = img.height;
+        if (w > maxW) {
+          h = Math.round(h * (maxW / w));
+          w = maxW;
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        canvas.toBlob(function (blob) {
+          if (!blob) {
+            resolve(file);
+            return;
+          }
+          resolve(new File([blob], file.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' }));
+        }, 'image/jpeg', 0.82);
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        resolve(file);
+      };
+      img.src = url;
+    });
+  }
+
+  function buildProofPlainMessage(data, file, screenshotUrl, hasAttachment) {
+    var id = data.vin || data.plate;
+    var lines = [
+      'Payment Proof Submitted',
+      '',
+      'VIN/Plate: ' + id,
+      'Car Model: ' + (data.carModel || 'N/A'),
+      'Year: ' + (data.year || 'N/A'),
+      'Customer Email: ' + data.email,
+      'Amount Paid: ' + formatGbpPrice(data.amount),
+      'Notes: ' + (data.notes || 'None'),
+      'File: ' + file.name + ' (' + file.type + ', ' + Math.round(file.size / 1024) + ' KB)'
+    ];
+    if (hasAttachment) {
+      lines.push('', 'Payment screenshot is attached to this email.');
+    } else if (screenshotUrl) {
+      lines.push('', 'Payment Screenshot — open this link to view:', screenshotUrl);
+    }
+    return lines.join('\n');
+  }
+
+  function buildProofSubject(data) {
+    var id = data.vin || data.plate;
+    return '[Payment Proof] ' + id + ' - ' + formatGbpPrice(data.amount);
+  }
+
+  async function uploadToLitterbox(file) {
+    var fd = new FormData();
+    fd.append('reqtype', 'fileupload');
+    fd.append('time', '72h');
+    fd.append('fileToUpload', file, file.name);
+    var res = await fetch('https://litterbox.catbox.moe/resources/internals/api.php', {
+      method: 'POST',
+      body: fd
+    });
+    var url = (await res.text()).trim();
+    if (!res.ok || url.indexOf('http') !== 0) {
+      throw new Error('Litterbox upload failed');
+    }
+    return url;
+  }
+
+  async function uploadToCatbox(file) {
+    var fd = new FormData();
+    fd.append('reqtype', 'fileupload');
+    fd.append('fileToUpload', file, file.name);
+    var res = await fetch('https://catbox.moe/user/api.php', {
+      method: 'POST',
+      body: fd
+    });
+    var url = (await res.text()).trim();
+    if (!res.ok || url.indexOf('http') !== 0) {
+      throw new Error('Catbox upload failed');
+    }
+    return url;
+  }
+
+  async function uploadProofToPublicUrl(file) {
+    var providers = [uploadToLitterbox, uploadToCatbox];
+    var lastError = null;
+    for (var i = 0; i < providers.length; i++) {
+      try {
+        return await providers[i](file);
+      } catch (err) {
+        lastError = err;
+        console.warn('Screenshot host failed:', err);
+      }
+    }
+    throw new Error('Could not upload screenshot. Please try again.');
+  }
+
+  function getProofAccessKey() {
+    var key = typeof PROOF_WEB3FORMS_ACCESS_KEY !== 'undefined'
+      ? PROOF_WEB3FORMS_ACCESS_KEY
+      : '';
+    if (!key || key.indexOf('PASTE') !== -1) {
+      return '';
+    }
+    return key;
+  }
+
+  async function postWeb3Forms(formData) {
+    var res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: formData
+    });
+    var result = await res.json().catch(function () { return {}; });
+    if (!res.ok || !result.success) {
+      throw new Error(result.message || 'Email delivery failed.');
+    }
+    return result;
+  }
+
+  function appendWeb3FormsBaseFields(formData, accessKey, data, subject, message) {
+    formData.append('access_key', accessKey);
+    formData.append('subject', subject);
+    formData.append('from_name', 'EpicVINrecord Payment Proof');
+    formData.append('email', data.email);
+    formData.append('replyto', data.email);
+    formData.append('message', message);
+    formData.append('botcheck', '');
+  }
+
+  async function submitProofViaWeb3Forms(data, file) {
+    var prepared = await compressImageFile(file);
+    var accessKey = getProofAccessKey();
+    if (!accessKey) {
+      throw new Error(
+        'Proof email not configured. Add a Web3Forms access key for rmoto7817@gmail.com in payment-config.js (PROOF_WEB3FORMS_ACCESS_KEY).'
+      );
+    }
+
+    var subject = buildProofSubject(data);
+
+    if (prepared.size <= 1024 * 1024) {
+      var withAttachment = new FormData();
+      appendWeb3FormsBaseFields(
+        withAttachment,
+        accessKey,
+        data,
+        subject,
+        buildProofPlainMessage(data, prepared, null, true)
+      );
+      withAttachment.append('attachment', prepared, prepared.name);
+
+      try {
+        return await postWeb3Forms(withAttachment);
+      } catch (attachErr) {
+        console.warn('Web3Forms attachment unavailable, using screenshot link:', attachErr.message);
+      }
+    }
+
+    var screenshotUrl = await uploadProofToPublicUrl(prepared);
+    var withLink = new FormData();
+    appendWeb3FormsBaseFields(
+      withLink,
+      accessKey,
+      data,
+      subject,
+      buildProofPlainMessage(data, prepared, screenshotUrl, false)
+    );
+    withLink.append('Screenshot URL', screenshotUrl);
+    return postWeb3Forms(withLink);
   }
 
   async function handleSubmit(e) {
@@ -145,25 +338,10 @@
     }
 
     try {
-      var formData = new FormData();
-      formData.append('proof', proofFile);
-      formData.append('email', data.email);
-      formData.append('vin', data.vin || data.plate);
-      formData.append('plate', data.plate || '');
-      formData.append('carModel', (order && order.carModel) || '');
-      formData.append('year', (order && order.year) || '');
-      formData.append('amount', String(data.amount));
-      formData.append('notes', data.notes);
-
-      var res = await fetch(PROOF_UPLOAD_API, { method: 'POST', body: formData });
-      var result = await res.json().catch(function () { return {}; });
-
-      if (!res.ok || !result.success) {
-        throw new Error(result.message || 'Upload failed. Please try again.');
-      }
-
+      await submitProofViaWeb3Forms(data, proofFile);
       showThankYou();
     } catch (err) {
+      console.error('Proof submit failed:', err);
       showError(err.message || 'Upload failed. Please try again.');
     } finally {
       if (submitBtn) {

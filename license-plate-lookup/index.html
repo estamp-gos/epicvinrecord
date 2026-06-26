@@ -171,7 +171,11 @@
     <!-- Paddle.js SDK -->
     <!-- <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script> -->
     
-    <script>
+    <!-- Payment scripts must load before checkout handlers -->
+    <script src="../main-site/js/payment-config.js"></script>
+    <script src="../main-site/js/payment-flow.js"></script>
+
+        <script>
         // Vehicle type to price ID mapping
         const VEHICLE_PRICES = {
             'hatchback': 'pri_01kd35nbdz3vjvbtgf9h7z7ety',
@@ -327,6 +331,8 @@ Customer Information:
                 document.location.href = window.checkOutRoute + '/' + vin;
             }, 500);
         }
+        window.startSubmit = startSubmit;
+        window.sendFormDataToEmail = sendFormDataToEmail;
     </script>
 
 
@@ -896,7 +902,7 @@ Customer Information:
         </div>
     </header>
     <div class="find-vin find-vin--simple find-vin--top">
-    <form class="find-vin__form find-vin__form--vin " action="/check-vin-number-and-get-the-vehicle-history-report/checkout">
+    <form class="find-vin__form find-vin__form--vin " action="#">
         <div class="find-vin__group find-vin__group--vin">
             <span class="vin-form-tooltip find-vin__tooltip find-vin__tooltip--vin" data-toggle="tooltip" data-bs-trigger="manual" data-placement="bottom" title="Please, ensure that your VIN is in proper format. 5 - 17 digits">
             </span>
@@ -938,7 +944,7 @@ Customer Information:
     </ul>
     <div class="tab-content">
         <div id="checkVinPanelpromo" class="tab-pane " role="tabpanel" aria-labelledby="checkVinTabpromo">
-            <form class="find-vin__form find-vin__form--vin" action="/check-vin-number-and-get-the-vehicle-history-report/checkout">
+            <form class="find-vin__form find-vin__form--vin" action="#">
                 <div style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
                     <label for="vehicle-type-promo" style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Select Vehicle Type:</label>
                     <select id="vehicle-type-promo" name="vehicle_type" style="width: 100%; padding: 14px 18px; border: 2px solid #e6e6e6; border-radius: 10px; font-size: 16px; background-color: var(--basic-white); outline: none; cursor: pointer; transition: border-color 0.3s ease; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%278%27 viewBox=%270 0 12 8%27%3e%3cpath fill=%27%23666%27 d=%27M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z%27/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 15px center;" onmouseover="this.style.borderColor='var(--basic-black)'" onmouseout="this.style.borderColor='#e6e6e6'" onfocus="this.style.borderColor='var(--main-blue)'" onblur="this.style.borderColor='#e6e6e6'">
@@ -1465,7 +1471,7 @@ Customer Information:
     <div class="offer-banner__info">
         <h2 class="heading heading--xl offer-banner__title"><span class="accent">Starting from</span> <span class="accent accent-price price" data-fixed-gbp="true">£59.99<sup></sup></span><br> for a vehicle history report</h2>
         <p class="offer-banner__text">Verify the VIN number and gain valuable insights before buying a used car. Get started today for peace of mind and confidence in your investment.</p>
-        <form class="find-vin__form find-vin__form--vin" action="/check-vin-number-and-get-the-vehicle-history-report/checkout">
+        <form class="find-vin__form find-vin__form--vin" action="#">
             <div class="find-vin__group find-vin__group--vin">
                 <span class="vin-form-tooltip find-vin__tooltip find-vin__tooltip--vin" data-toggle="tooltip" data-bs-trigger="manual" data-placement="bottom" title="Please, ensure that your VIN is in proper format. 5 - 17 digits">
                 </span>
@@ -1864,7 +1870,7 @@ registration card or insurance documents.
     </ul>
     <div class="tab-content">
         <div id="checkVinPanelbanner" class="tab-pane show active" role="tabpanel" aria-labelledby="checkVinTabbanner">
-            <form class="find-vin__form find-vin__form--vin" action="/check-vin-number-and-get-the-vehicle-history-report/checkout">
+            <form class="find-vin__form find-vin__form--vin" action="#">
                 <div style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
                     <label for="vehicle-type-banner" style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Select Vehicle Type:</label>
                     <select id="vehicle-type-banner" name="vehicle_type" style="width: 100%; padding: 14px 18px; border: 2px solid #e6e6e6; border-radius: 10px; font-size: 16px; background-color: var(--basic-white); outline: none; cursor: pointer; transition: border-color 0.3s ease; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%278%27 viewBox=%270 0 12 8%27%3e%3cpath fill=%27%23666%27 d=%27M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z%27/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 15px center;" onmouseover="this.style.borderColor='var(--basic-black)'" onmouseout="this.style.borderColor='#e6e6e6'" onfocus="this.style.borderColor='var(--main-blue)'" onblur="this.style.borderColor='#e6e6e6'">
@@ -2197,7 +2203,7 @@ registration card or insurance documents.
             window.appLocale = 'en';
             window.authCheck = '';
             window.loginUrl = '/login';
-            window.checkOutRoute = '/check-vin-number-and-get-the-vehicle-history-report/checkout';
+            window.checkOutRoute = null;
             window.route = 'home';
             window.curUrl = 'https://epicvinrecord.com';
             window.plateAjax = '/plate-ajax';
@@ -2332,11 +2338,7 @@ registration card or insurance documents.
                 }
             } catch (e) {
             }
-        </script>
-        
-        <script src="../main-site/js/payment-config.js"></script>
-        <script src="../main-site/js/payment-flow.js"></script>
-        <!-- Payment Integration: Intercept all VIN forms -->
+        </script><!-- Payment Integration: Intercept all VIN forms -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // Intercept all VIN forms that don't use startSubmit
@@ -2380,7 +2382,7 @@ registration card or insurance documents.
                         
                         // Open checkout modal with VIN, vehicle type, and customer email
                         sendFormDataToEmail(vin, null, null, vehicleType, 'vin', customerEmail);
-                        openPaymentCheckout(vin, null, vehicleType, customerEmail);
+                        if (typeof window.openPaymentCheckout === 'function') { window.openPaymentCheckout(vin, null, vehicleType, customerEmail); }
                         return false;
                     });
                 });
@@ -2417,7 +2419,7 @@ registration card or insurance documents.
                         
                         
                         // Open Paddle Checkout with plate, vehicle type, and customer email
-                        openPaymentCheckout(null, plate, vehicleType, customerEmail);
+                        if (typeof window.openPaymentCheckout === 'function') { window.openPaymentCheckout(null, plate, vehicleType, customerEmail); }
                         return false;
                     });
                 });
@@ -2429,8 +2431,6 @@ registration card or insurance documents.
         <script src="vendors/js/splide.min.js"></script>
     <script src="main-site/js/home_id%3De8e8845d17355adc9253bc9d9ededbfd.js"></script>
     <script src="main-site/js/open-close-side-menu_id%3D0099881c5bad7a6ffd7879b9417619b9.js"></script>
-    <script src="main-site/js/find-vin-form_id%3D5c57bff97c21ff7d3b56e4d9da8848a5.js"></script>
-    <script src="main-site/js/find-plate-form_id%3D1c5832e76c62be940aba1e298965745c.js"></script>
     <script src="main-site/js/ratingWidget_id%3Dc2fdda228617a37746bcd88adaa6e9cf.js"></script>
     <script src="main-site/js/review-slider_id%3D597bd738396fa0eaf94e098a617737a4.js"></script>
     <script src="main-site/js/youtube-click-to-play_id%3D153d3e29ed63dabc5d5f78751445b8b8.js"></script>

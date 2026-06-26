@@ -43,15 +43,19 @@ function isUploadProofRequest(url) {
   return path.endsWith('/upload-proof');
 }
 
-async function sendWeb3FormsEmail({ subject, to, message, html }) {
-  const body = new URLSearchParams({
+async function sendWeb3FormsEmail({ subject, to, message, html, replyto, ccemail }) {
+  const params = {
     access_key: WEB3FORMS_ACCESS_KEY,
     subject,
     from_name: 'EpicVINrecord',
     to,
     message,
     html,
-  });
+  };
+  if (replyto) params.replyto = replyto;
+  if (ccemail) params.ccemail = ccemail;
+
+  const body = new URLSearchParams(params);
 
   const emailResponse = await fetch('https://api.web3forms.com/submit', {
     method: 'POST',
@@ -159,6 +163,8 @@ async function handleProofUpload(request) {
   const result = await sendWeb3FormsEmail({
     subject: emailSubject,
     to: PROOF_EMAIL_TO,
+    ccemail: PROOF_EMAIL_TO,
+    replyto: email,
     message: plainMessage,
     html: htmlBody,
   });

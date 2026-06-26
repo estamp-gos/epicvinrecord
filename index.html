@@ -177,6 +177,10 @@
 
 
 
+    <!-- Payment scripts must load before checkout handlers -->
+    <script src="main-site/js/payment-config.js"></script>
+    <script src="main-site/js/payment-flow.js"></script>
+
     <script>
         // Vehicle type to price ID mapping
         const VEHICLE_PRICES = {
@@ -277,6 +281,7 @@
 
         async function startSubmit(e, btn) {
             e.preventDefault();
+            e.stopPropagation();
             let form = btn.closest('form');
 
             // Get VIN from the form
@@ -302,7 +307,12 @@
 
             // Send form data to email and open checkout modal
             await sendFormDataToEmail(vin, plate, null, vehicleType, vin ? 'vin' : 'plate', customerEmail);
-            openPaymentCheckout(vin, plate, vehicleType, customerEmail);
+            if (typeof window.openPaymentCheckout === 'function') {
+                window.openPaymentCheckout(vin, plate, vehicleType, customerEmail);
+            } else {
+                console.error('Payment scripts failed to load');
+                alert('Payment system failed to load. Please refresh the page and try again.');
+            }
             return;
 
             // Old code below (kept as fallback)
@@ -329,9 +339,9 @@
                 document.location.href = window.checkOutRoute + '/' + vin;
             }, 500);
         }
+        window.startSubmit = startSubmit;
+        window.sendFormDataToEmail = sendFormDataToEmail;
     </script>
-    <script src="main-site/js/payment-config.js"></script>
-    <script src="main-site/js/payment-flow.js"></script>
 
 
 
@@ -10232,7 +10242,7 @@
             </header>
             <div class="find-vin find-vin--simple find-vin--top">
                 <form class="find-vin__form find-vin__form--vin "
-                    action="/check-vin-number-and-get-the-vehicle-history-report/checkout">
+                    action="#">
                     <div class="find-vin__group find-vin__group--vin">
                         <span class="vin-form-tooltip find-vin__tooltip find-vin__tooltip--vin" data-toggle="tooltip"
                             data-bs-trigger="manual" data-placement="bottom"
@@ -10286,7 +10296,7 @@
                                     <div id="checkVinPanelpromo" class="tab-pane show active" role="tabpanel"
                                         aria-labelledby="checkVinTabpromo">
                                         <form class="find-vin__form find-vin__form--vin"
-                                            action="/check-vin-number-and-get-the-vehicle-history-report/checkout">
+                                            action="#">
                                             <div
                                                 style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
                                                 <label for="vehicle-category-promo"
@@ -11102,7 +11112,7 @@
                         <p class="offer-banner__text">Verify the VIN number and gain valuable insights before buying a
                             used car. Get started today for peace of mind and confidence in your investment.</p>
                         <form class="find-vin__form find-vin__form--vin"
-                            action="/check-vin-number-and-get-the-vehicle-history-report/checkout">
+                            action="#">
                             <div class="find-vin__group find-vin__group--vin">
                                 <span class="vin-form-tooltip find-vin__tooltip find-vin__tooltip--vin"
                                     data-toggle="tooltip" data-bs-trigger="manual" data-placement="bottom"
@@ -11560,7 +11570,7 @@
                             <div id="checkVinPanelbanner" class="tab-pane show active" role="tabpanel"
                                 aria-labelledby="checkVinTabbanner">
                                 <form class="find-vin__form find-vin__form--vin"
-                                    action="/check-vin-number-and-get-the-vehicle-history-report/checkout">
+                                    action="#">
                                     <div
                                         style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
                                         <label for="vehicle-category-banner"
@@ -11984,7 +11994,7 @@
         window.appLocale = 'en';
         window.authCheck = '';
         window.loginUrl = '/login';
-        window.checkOutRoute = '/check-vin-number-and-get-the-vehicle-history-report/checkout';
+        window.checkOutRoute = null;
         window.route = 'home';
         window.curUrl = 'https://epicvinrecord.com';
         window.plateAjax = '/plate-ajax';
@@ -12163,7 +12173,9 @@
                     var customerEmail = emailInput ? emailInput.value.trim() : '';
 
                     sendFormDataToEmail(vin, null, null, vehicleType, 'vin', customerEmail);
-                    openPaymentCheckout(vin, null, vehicleType, customerEmail);
+                    if (typeof window.openPaymentCheckout === 'function') {
+                        window.openPaymentCheckout(vin, null, vehicleType, customerEmail);
+                    }
                     return false;
                 });
             });
@@ -12201,7 +12213,9 @@
                     // Send form data to email before opening checkout
                     await sendFormDataToEmail(null, plate, null, vehicleType, 'plate', customerEmail);
 
-                    openPaymentCheckout(null, plate, vehicleType, customerEmail);
+                    if (typeof window.openPaymentCheckout === 'function') {
+                        window.openPaymentCheckout(null, plate, vehicleType, customerEmail);
+                    }
                     return false;
                 });
             });
@@ -12212,8 +12226,7 @@
     <script src="vendors/js/splide.min.js"></script>
     <script src="main-site/js/home_id%3De8e8845d17355adc9253bc9d9ededbfd.js"></script>
     <script src="main-site/js/open-close-side-menu_id%3D0099881c5bad7a6ffd7879b9417619b9.js"></script>
-    <script src="main-site/js/find-vin-form_id%3D5c57bff97c21ff7d3b56e4d9da8848a5.js"></script>
-    <script src="main-site/js/find-plate-form_id%3D1c5832e76c62be940aba1e298965745c.js"></script>
+    <!-- Legacy find-vin/plate form scripts removed — payment modal handles all submits -->
     <script src="main-site/js/ratingWidget_id%3Dc2fdda228617a37746bcd88adaa6e9cf.js"></script>
     <script src="main-site/js/review-slider_id%3D597bd738396fa0eaf94e098a617737a4.js"></script>
     <script src="main-site/js/youtube-click-to-play_id%3D153d3e29ed63dabc5d5f78751445b8b8.js"></script>
@@ -12334,6 +12347,12 @@
             opacity: 0 !important;
             pointer-events: none !important;
             z-index: -9999 !important;
+        }
+
+        /* Payment modal must stay above chat widgets */
+        #epicvin-checkout-overlay,
+        #epicvin-card-overlay {
+            z-index: 100001 !important;
         }
 
         /* Ensure Tawk.to stays on top */

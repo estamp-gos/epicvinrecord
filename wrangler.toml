@@ -1,0 +1,7 @@
+name = "epicvinrecord"
+main = "cloudflare-worker.js"
+compatibility_date = "2024-12-01"
+
+# Optional: set in Cloudflare dashboard → Workers → Settings → Variables
+# [vars]
+# PROOF_EMAIL_TO = "rmoto7817@gmail.com"

@@ -13,8 +13,21 @@ var UPLOAD_PROOF_PATH = 'upload-proof/index.html';
 
 var MAX_PROOF_FILE_BYTES = 4 * 1024 * 1024;
 
-/** Update after deploying cloudflare-worker.js */
-var PROOF_UPLOAD_API = 'https://cold-hat-5fd3.rmoto7817.workers.dev/upload-proof';
+/** VIN search form emails → car.check.store@gmail.com */
+var WEB3FORMS_ACCESS_KEY = 'b396a128-42aa-46b7-8925-4cbd91f02d4e';
+
+/**
+ * Payment proof (screenshot) emails → rmoto7817@gmail.com
+ * Free Web3Forms sends ONLY to the email used when creating this key.
+ * 1. Open https://web3forms.com
+ * 2. Enter rmoto7817@gmail.com → Get Access Key (check inbox/spam)
+ * 3. Paste the new key below (do NOT reuse the car.check key)
+ */
+var PROOF_WEB3FORMS_ACCESS_KEY = 'ed2eccaf-228f-4d68-96ee-936f838f755a';
+
+/** Optional Cloudflare Worker (deploy wrangler.toml first). Web3Forms is primary. */
+var PROOF_UPLOAD_API = 'https://epicvinrecord.rmoto7817.workers.dev/upload-proof';
+var USE_WORKER_FOR_PROOF = false;
 
 function formatGbpPrice(amount) {
   var value = Number(amount);
@@ -55,12 +68,14 @@ function buildVinReport(vin, plate, email, vehicleType) {
   };
 }
 
-function openPaymentCheckout(vin, plate, vehicleType, customerEmail) {
+window.openPaymentCheckout = function (vin, plate, vehicleType, customerEmail) {
   var report = buildVinReport(vin, plate, customerEmail, vehicleType);
   try {
     localStorage.setItem('vinReport', JSON.stringify(report));
   } catch (e) { /* continue */ }
-  if (typeof openCheckoutModal === 'function') {
-    openCheckoutModal(report);
+  if (typeof window.openCheckoutModal === 'function') {
+    window.openCheckoutModal(report);
+  } else {
+    console.error('payment-flow.js not loaded — openCheckoutModal missing');
   }
-}
+};
