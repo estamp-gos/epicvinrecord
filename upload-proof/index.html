@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Payment Proof — EpicVINrecord</title>
+    <meta name="theme-color" content="#0084ff">
+    <style>
+        :root {
+            --main-blue: #0084ff;
+            --dark-blue: #00386c;
+            --basic-white: #fff;
+            --grey: #666;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #eff7ff 0%, #e8eeff 100%);
+            color: #111;
+        }
+        .header {
+            background: var(--basic-white);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            padding: 0 20px;
+        }
+        .header-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--main-blue);
+            text-decoration: none;
+        }
+        .back-link {
+            color: var(--grey);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover { color: var(--main-blue); }
+        main {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+        .card {
+            background: var(--basic-white);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+        h1 {
+            margin: 0 0 8px;
+            font-size: 24px;
+            color: var(--dark-blue);
+        }
+        .subtitle {
+            margin: 0 0 24px;
+            font-size: 14px;
+            color: var(--grey);
+            line-height: 1.5;
+        }
+        .wise-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: var(--main-blue);
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .order-summary {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .order-summary p { margin: 0 0 6px; }
+        .order-summary p:last-child { margin-bottom: 0; }
+        .alert {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #92400e;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e6e6e6;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--main-blue);
+        }
+        .file-upload-wrap { margin-bottom: 16px; }
+        .proof-file-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;
+            border: 2px dashed var(--main-blue);
+            border-radius: 12px;
+            background: rgba(0,132,255,0.06);
+            cursor: pointer;
+            transition: background 0.2s;
+            padding: 16px;
+            text-align: center;
+        }
+        .proof-file-label:hover { background: rgba(0,132,255,0.12); }
+        .proof-file-label--selected {
+            border-color: var(--dark-blue);
+            background: rgba(0,132,255,0.1);
+        }
+        .proof-file-plus {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--main-blue);
+            color: white;
+            font-size: 28px;
+            line-height: 48px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        .proof-file-title { margin: 0; font-weight: 600; color: var(--main-blue); font-size: 14px; }
+        .proof-file-name { margin: 0; font-weight: 600; color: var(--main-blue); font-size: 14px; word-break: break-all; }
+        .proof-file-hint { margin: 4px 0 0; font-size: 12px; color: var(--grey); }
+        .proof-error {
+            display: none;
+            color: #dc2626;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--main-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .submit-btn:hover { background: #0070d9; }
+        .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+        .thankyou-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .thankyou-modal {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 440px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .thankyou-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #666;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .thankyou-modal h2 { margin: 0 0 12px; font-size: 22px; }
+        .thankyou-modal p { margin: 0; font-size: 14px; color: #4b5563; line-height: 1.6; }
+        .thankyou-modal a { color: var(--main-blue); font-weight: 600; }
+        .thankyou-done {
+            margin-top: 24px;
+            width: 100%;
+            padding: 14px;
+            background: var(--main-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        #proof-file-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+        .manual-fields { margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">EpicVINrecord</a>
+            <a href="/" class="back-link">Back to Home</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="card">
+            <h1>Upload Payment Proof</h1>
+            <p class="subtitle" id="proof-subtitle">Complete your bank transfer on Wise, then upload your payment screenshot below.</p>
+
+            <a id="proof-wise-link" href="https://wise.com/pay/r/3z3m7dxtCGb6A6g" target="_blank" rel="noopener noreferrer" class="wise-link">Open Wise payment page</a>
+
+            <div id="proof-order-summary" class="order-summary" style="display:none"></div>
+
+            <div id="proof-fallback-fields" class="alert" style="display:none">
+                Order details not found. Enter your details below to submit proof.
+            </div>
+
+            <form id="proof-upload-form" novalidate>
+                <div id="proof-fallback-inputs" class="manual-fields" style="display:none">
+                    <label for="proof-vin-manual">VIN / Plate Number</label>
+                    <input type="text" id="proof-vin-manual" placeholder="Enter VIN or plate">
+
+                    <label for="proof-email-manual">Email</label>
+                    <input type="email" id="proof-email-manual" placeholder="Enter your email">
+                </div>
+
+                <div class="file-upload-wrap">
+                    <label>Payment screenshot (image or PDF, max 4MB)</label>
+                    <input type="file" id="proof-file-input" accept="image/*,.pdf">
+                    <label for="proof-file-input" id="proof-file-label" class="proof-file-label">
+                        <div class="proof-file-plus">+</div>
+                        <p class="proof-file-title">Tap to upload screenshot</p>
+                        <p class="proof-file-hint">PNG, JPG or PDF — max 4MB</p>
+                    </label>
+                </div>
+
+                <label for="proof-notes">Notes (optional)</label>
+                <textarea id="proof-notes" rows="3" placeholder="Any extra details about your payment..."></textarea>
+
+                <p id="proof-error" class="proof-error"></p>
+
+                <button type="submit" id="proof-submit-btn" class="submit-btn">Submit Payment Proof</button>
+            </form>
+        </div>
+    </main>
+
+    <div id="proof-thankyou-overlay" class="thankyou-overlay" role="dialog" aria-modal="true">
+        <div class="thankyou-modal">
+            <button type="button" id="proof-thankyou-close" class="thankyou-close" aria-label="Close">&times;</button>
+            <h2>Thank You!</h2>
+            <p>You will receive your report in 15–20 minutes after payment confirmation. For further chat support and inquiry, kindly contact: <a href="mailto:car.check.store@gmail.com">car.check.store@gmail.com</a></p>
+            <button type="button" id="proof-thankyou-done" class="thankyou-done">Done</button>
+        </div>
+    </div>
+
+    <script src="../main-site/js/payment-config.js"></script>
+    <script src="../main-site/js/upload-proof.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var subtitle = document.getElementById('proof-subtitle');
+            if (subtitle) {
+                subtitle.textContent = 'Complete your ' + formatGbpPrice(BANK_PRICE_GBP) + ' bank transfer on Wise, then upload your payment screenshot below.';
+            }
+            var wiseLink = document.getElementById('proof-wise-link');
+            if (wiseLink) wiseLink.href = WISE_BANK_URL;
+        });
+    </script>
+</body>
+</html>

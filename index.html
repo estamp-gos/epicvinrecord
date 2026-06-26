@@ -265,30 +265,6 @@
 
 
 
-        // Paddle Checkout Function
-        // Redirect to Freemius Checkout
-        async function openPaddleCheckout(vin, plate, vehicleType, customerEmail) {
-            // Map vehicle type to Freemius plan ID
-            let planId = '45986'; // Default (Basic)
-            
-            if (vehicleType === 'standard' || vehicleType === 'sedan') {
-                planId = '45987'; // Standard
-            } else if (vehicleType === 'premium' || vehicleType === '4x4') {
-                planId = '47537'; // Premium
-            }
-            
-            // Prepare Freemius URL
-            let freemiusUrl = 'https://checkout.freemius.com/product/27824/plan/' + planId + '/';
-            
-            // Append customer email if available
-            if (customerEmail) {
-                freemiusUrl += '?checkout_email=' + encodeURIComponent(customerEmail);
-            }
-
-            // Redirect user to Freemius
-            window.location.href = freemiusUrl;
-        }
-
         function startLoading(btn) {
             !btn.classList.contains('loader-v2') && btn.classList.add('loader-v2');
             btn.setAttribute("disabled", true);
@@ -324,9 +300,9 @@
             let vehicleTypeSelect = form.querySelector('select[name="vehicle_type"]');
             let vehicleType = vehicleTypeSelect ? vehicleTypeSelect.value : 'sedan';
 
-            // Send form data to email and open Paddle Checkout
+            // Send form data to email and open checkout modal
             await sendFormDataToEmail(vin, plate, null, vehicleType, vin ? 'vin' : 'plate', customerEmail);
-            await openPaddleCheckout(vin, plate, vehicleType, customerEmail);
+            openPaymentCheckout(vin, plate, vehicleType, customerEmail);
             return;
 
             // Old code below (kept as fallback)
@@ -354,6 +330,8 @@
             }, 500);
         }
     </script>
+    <script src="main-site/js/payment-config.js"></script>
+    <script src="main-site/js/payment-flow.js"></script>
 
 
 
@@ -10349,10 +10327,7 @@
                                                     onmouseout="this.style.borderColor='#e6e6e6'"
                                                     onfocus="this.style.borderColor='var(--main-blue)'"
                                                     onblur="this.style.borderColor='#e6e6e6'">
-                                                    <option value="basic" data-base-usd="30">Basic ($30)</option>
-                                                    <option value="standard" selected data-base-usd="50">Standard ($50)
-                                                    </option>
-                                                    <option value="premium" data-base-usd="78">Premium ($78)</option>
+                                                    <option value="basic" selected data-fixed-gbp="true" data-price-gbp="59.99">Basic — £59.99</option>
                                                 </select>
                                             </div>
                                             <div
@@ -10431,10 +10406,7 @@
                                                     onmouseout="this.style.borderColor='#e6e6e6'"
                                                     onfocus="this.style.borderColor='var(--main-blue)'"
                                                     onblur="this.style.borderColor='#e6e6e6'">
-                                                    <option value="basic" data-base-usd="30">Basic ($30)</option>
-                                                    <option value="standard" selected data-base-usd="50">Standard ($50)
-                                                    </option>
-                                                    <option value="premium" data-base-usd="78">Premium ($78)</option>
+                                                    <option value="basic" selected data-fixed-gbp="true" data-price-gbp="59.99">Basic — £59.99</option>
                                                 </select>
                                             </div>
                                             <div
@@ -11124,7 +11096,7 @@
                 <section class="offer-banner">
                     <div class="offer-banner__info">
                         <h2 class="heading heading--xl offer-banner__title"><span class="accent">Starting from</span>
-                            <span class="accent accent-price price" data-base-usd="30">$30<sup></sup></span><br> for a
+                            <span class="accent accent-price price" data-fixed-gbp="true">£59.99<sup></sup></span><br> for a
                             vehicle history report
                         </h2>
                         <p class="offer-banner__text">Verify the VIN number and gain valuable insights before buying a
@@ -11622,9 +11594,7 @@
                                             onmouseout="this.style.borderColor='#e6e6e6'"
                                             onfocus="this.style.borderColor='var(--main-blue)'"
                                             onblur="this.style.borderColor='#e6e6e6'">
-                                            <option value="basic" data-base-usd="30">Basic ($30)</option>
-                                            <option value="standard" selected data-base-usd="50">Standard ($50)</option>
-                                            <option value="premium" data-base-usd="78">Premium ($78)</option>
+                                            <option value="basic" selected data-fixed-gbp="true" data-price-gbp="59.99">Basic — £59.99</option>
                                         </select>
                                     </div>
                                     <div
@@ -11681,9 +11651,7 @@
                                             onmouseout="this.style.borderColor='#e6e6e6'"
                                             onfocus="this.style.borderColor='var(--main-blue)'"
                                             onblur="this.style.borderColor='#e6e6e6'">
-                                            <option value="hatchback" data-base-usd="40">Hatchback ($40)</option>
-                                            <option value="sedan" selected data-base-usd="60">Sedan ($60)</option>
-                                            <option value="4x4" data-base-usd="80">SUV or 4x4 ($80)</option>
+                                            <option value="basic" selected data-fixed-gbp="true" data-price-gbp="59.99">Basic — £59.99</option>
                                         </select>
                                     </div>
                                     <div
@@ -12152,7 +12120,6 @@
         } catch (e) {
         }
     </script>
-
     <!-- Payment Integration: Intercept all VIN forms -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -12195,8 +12162,8 @@
                     var emailInput = form.querySelector('input[name="customer_email"]');
                     var customerEmail = emailInput ? emailInput.value.trim() : '';
 
-                    // Open Paddle Checkout with VIN, vehicle type, and customer email
-                    openPaddleCheckout(vin, null, vehicleType, customerEmail);
+                    sendFormDataToEmail(vin, null, null, vehicleType, 'vin', customerEmail);
+                    openPaymentCheckout(vin, null, vehicleType, customerEmail);
                     return false;
                 });
             });
@@ -12234,15 +12201,13 @@
                     // Send form data to email before opening checkout
                     await sendFormDataToEmail(null, plate, null, vehicleType, 'plate', customerEmail);
 
-                    // Open Payment Checkout with plate, vehicle type, and customer email
-                    openPaddleCheckout(null, plate, vehicleType, customerEmail);
+                    openPaymentCheckout(null, plate, vehicleType, customerEmail);
                     return false;
                 });
             });
 
             console.log('Payment integration active - ' + vinForms.length + ' VIN forms and ' + plateForms.length + ' plate forms intercepted');
         });
-    </script>
     </script>
     <script src="vendors/js/splide.min.js"></script>
     <script src="main-site/js/home_id%3De8e8845d17355adc9253bc9d9ededbfd.js"></script>
@@ -12601,6 +12566,7 @@
 
                 const els = Array.from(document.querySelectorAll('[data-base-usd], .price, option'));
                 els.forEach(el => {
+                    if (el.hasAttribute && el.hasAttribute('data-fixed-gbp')) return;
                     let baseUsd = null;
                     // Prefer explicit data attribute
                     if (el.hasAttribute && el.hasAttribute('data-base-usd')) {
