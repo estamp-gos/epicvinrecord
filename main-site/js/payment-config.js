@@ -1,6 +1,7 @@
 /** Bank transfer payment configuration (matches VinXtract flow) */
 
-var CARD_PRICE_GBP = 59.99;
+var CARD_PRICE_GBP = 54.99;
+var PAYPAL_CARD_URL = 'https://www.paypal.com/ncp/payment/FFWBH4VTGWVCS';
 var BANK_PRICE_GBP = 52.99;
 var BANK_DISCOUNT_GBP = 7;
 

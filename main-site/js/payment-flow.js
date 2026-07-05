@@ -116,7 +116,6 @@
       '<label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;font-size:14px;color:#374151;cursor:pointer">' +
       '<input type="checkbox" id="epicvin-terms-checkbox" style="width:18px;height:18px;margin-top:2px">' +
       '<span>I have read and agree to the purchase confirmation above.</span></label>' +
-      '<p style="margin-bottom:20px;color:#4b5563;font-size:13px;line-height:1.5">Please ensure payments are directed to AMU Traders LLC. Your bank statement will reflect our name for easy tracking.</p>' +
       '<div id="epicvin-checkout-buttons"></div>' +
       '</div>';
 
@@ -191,15 +190,15 @@
     var cursor = disabled ? 'not-allowed' : 'pointer';
 
     container.innerHTML =
-      '<button type="button" id="epicvin-pay-bank" style="width:100%;padding:15px;background:#2563eb;color:white;border:none;border-radius:5px;font-size:16px;font-weight:600;cursor:' + cursor + ';opacity:' + opacity + ';margin-bottom:10px" ' + (disabled ? 'disabled' : '') + '>Pay via Bank (Get \u00A37 discount) \u2014 ' + formatGbpPrice(BANK_PRICE_GBP) + '</button>' +
+      // '<button type="button" id="epicvin-pay-bank" style="width:100%;padding:15px;background:#2563eb;color:white;border:none;border-radius:5px;font-size:16px;font-weight:600;cursor:' + cursor + ';opacity:' + opacity + ';margin-bottom:10px" ' + (disabled ? 'disabled' : '') + '>Pay via Bank (Get \u00A37 discount) \u2014 ' + formatGbpPrice(BANK_PRICE_GBP) + '</button>' +
       '<button type="button" id="epicvin-pay-card" style="width:100%;padding:15px;background:#fff;color:#2563eb;border:2px solid #2563eb;border-radius:5px;font-size:16px;font-weight:600;cursor:' + cursor + ';opacity:' + opacity + ';margin-bottom:10px" ' + (disabled ? 'disabled' : '') + '>Pay via Card \u2014 ' + formatGbpPrice(CARD_PRICE_GBP) + '</button>' +
       '<button type="button" id="epicvin-pay-cancel" style="width:100%;padding:15px;background:#6b7280;color:white;border:none;border-radius:5px;font-size:16px;font-weight:600;cursor:pointer">Cancel</button>';
 
-    getEl('epicvin-pay-bank').addEventListener('click', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      payViaBank();
-    });
+    // getEl('epicvin-pay-bank').addEventListener('click', function (e) {
+    //   e.preventDefault();
+    //   e.stopPropagation();
+    //   payViaBank();
+    // });
     getEl('epicvin-pay-card').addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -268,11 +267,17 @@
 
   window.payViaCard = function () {
     if (!state.acceptedTerms) return;
-    var overlay = getEl('epicvin-card-overlay');
-    if (overlay) {
-      overlay.style.display = 'flex';
-      overlay.setAttribute('aria-hidden', 'false');
-    }
+    try {
+      var existing = localStorage.getItem('vinReport');
+      var report = existing ? JSON.parse(existing) : (state.currentOrder || {});
+      localStorage.setItem('vinReport', JSON.stringify(Object.assign({}, report, state.currentOrder, {
+        paymentMethod: 'card',
+        amountPaid: CARD_PRICE_GBP,
+        currency: 'GBP',
+        currencySymbol: '\u00A3'
+      })));
+    } catch (e) { /* continue */ }
+    window.location.href = PAYPAL_CARD_URL;
   };
 
   window.EPICVIN_USE_PAYMENT_MODAL = true;
