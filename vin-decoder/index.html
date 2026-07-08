@@ -200,76 +200,6 @@
         }
         */
 
-        // Web3Forms Configuration
-        const WEB3FORMS_ACCESS_KEY = '8a31cfe9-5cd5-4f84-8f73-3fe00c6753e2';
-
-        // Function to send form data directly to Web3Forms (email notification)
-        async function sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail) {
-            try {
-                // Build email subject
-                const emailSubject = `New ${searchType === 'vin' ? 'VIN' : 'License Plate'} Check Request${customerEmail ? ' from ' + customerEmail : ''}`;
-                
-                // Build email message with HTML formatting
-                let emailMessage = `
-🚗 New Vehicle Check Request
-
-Customer Information:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
-
-                if (customerEmail) {
-                    emailMessage += `\n\n👤 Customer Email: ${customerEmail}`;
-                }
-
-                emailMessage += `\n\nVehicle Information:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
-
-                if (vin) {
-                    emailMessage += `\n\n📋 VIN Number: ${vin}`;
-                }
-                
-                if (plate) {
-                    emailMessage += `\n\n🚙 License Plate: ${plate}`;
-                }
-                
-                if (state) {
-                    emailMessage += `\n📍 State: ${state}`;
-                }
-                
-                emailMessage += `\n🚗 Vehicle Type: ${vehicleType || 'sedan'}`;
-                emailMessage += `\n🔍 Search Type: ${searchType || 'vin'}`;
-                emailMessage += `\n⏰ Timestamp: ${new Date().toLocaleString()}`;
-                emailMessage += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nThis email was automatically generated from EpicVINrecord vehicle history check form.`;
-
-                // Create FormData for Web3Forms
-                const formData = new FormData();
-                formData.append('access_key', WEB3FORMS_ACCESS_KEY);
-                formData.append('subject', emailSubject);
-                formData.append('from_name', 'EpicVINrecord Report');
-                formData.append('to', 'car.check.store@gmail.com');
-                formData.append('message', emailMessage);
-
-                // Send directly to Web3Forms API
-                const response = await fetch('https://api.web3forms.com/submit', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                // Check response status
-                const result = await response.json();
-                
-                if (response.ok && result.success) {
-                    console.log('✅ Email sent successfully to car.check.store@gmail.com via Web3Forms');
-                } else {
-                    console.error('❌ Failed to send email:', result.message);
-                }
-            } catch (error) {
-                // Log error but don't block the checkout process
-                console.error('❌ Error sending form data:', error);
-            }
-        }
-
-        }
-
         function startLoading(btn) {
             !btn.classList.contains('loader-v2') && btn.classList.add('loader-v2');
             btn.setAttribute("disabled", true);
@@ -335,7 +265,6 @@ Customer Information:
             }, 500);
         }
         window.startSubmit = startSubmit;
-        window.sendFormDataToEmail = sendFormDataToEmail;
     </script>
 
 

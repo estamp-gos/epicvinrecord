@@ -69,6 +69,61 @@ function buildVinReport(vin, plate, email, vehicleType) {
   };
 }
 
+/**
+ * Send VIN/plate form entry notification to SUPPORT_EMAIL via Web3Forms.
+ * Free Web3Forms delivers only to the inbox used when creating WEB3FORMS_ACCESS_KEY.
+ */
+async function sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail) {
+  try {
+    var emailSubject = 'New ' + (searchType === 'vin' ? 'VIN' : 'License Plate') + ' Check Request';
+    var lines = ['New Vehicle Check Request'];
+
+    if (customerEmail) {
+      lines.push('Customer Email: ' + customerEmail);
+    }
+    if (vin) {
+      lines.push('VIN: ' + vin);
+    }
+    if (plate) {
+      lines.push('Plate: ' + plate);
+    }
+    if (state) {
+      lines.push('State: ' + state);
+    }
+    lines.push('Vehicle Type: ' + (vehicleType || 'sedan'));
+    lines.push('Search Type: ' + (searchType || 'vin'));
+    lines.push('Timestamp: ' + new Date().toLocaleString());
+
+    var formData = new FormData();
+    formData.append('access_key', WEB3FORMS_ACCESS_KEY);
+    formData.append('subject', emailSubject);
+    formData.append('from_name', 'EpicVINrecord');
+    formData.append('message', lines.join('\n'));
+    if (customerEmail) {
+      formData.append('replyto', customerEmail);
+    }
+
+    var response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: formData
+    });
+    var result = await response.json();
+
+    if (response.ok && result.success) {
+      console.log('Entry form email sent to ' + SUPPORT_EMAIL);
+      return true;
+    }
+
+    console.error('Failed to send entry form email:', result.message || result);
+    return false;
+  } catch (error) {
+    console.error('Error sending entry form email:', error);
+    return false;
+  }
+}
+
+window.sendFormDataToEmail = sendFormDataToEmail;
+
 window.openPaymentCheckout = function (vin, plate, vehicleType, customerEmail) {
   var report = buildVinReport(vin, plate, customerEmail, vehicleType);
   try {

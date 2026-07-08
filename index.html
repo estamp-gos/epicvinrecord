@@ -213,62 +213,6 @@
         }
         */
 
-        // Web3Forms Configuration
-        const WEB3FORMS_ACCESS_KEY = 'b396a128-42aa-46b7-8925-4cbd91f02d4e';
-
-        // Function to send form data directly to Web3Forms (email notification)
-        async function sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail) {
-            try {
-                const emailSubject = `New ${searchType === 'vin' ? 'VIN' : 'License Plate'} Check Request`;
-
-                // Simple & compact email message
-                let emailMessage = `New Vehicle Check Request`;
-
-                if (customerEmail) {
-                    emailMessage += `\nCustomer Email: ${customerEmail}`;
-                }
-
-                if (vin) {
-                    emailMessage += `\nVIN: ${vin}`;
-                }
-
-                if (plate) {
-                    emailMessage += `\nPlate: ${plate}`;
-                }
-
-                if (state) {
-                    emailMessage += `\nState: ${state}`;
-                }
-
-                emailMessage += `\nVehicle Type: ${vehicleType || 'sedan'}`;
-                emailMessage += `\nSearch Type: ${searchType || 'vin'}`;
-
-                const formData = new FormData();
-                formData.append('access_key', WEB3FORMS_ACCESS_KEY);
-                formData.append('subject', emailSubject);
-                formData.append('from_name', 'EpicVINrecord');
-                formData.append('to', 'car.check.store@gmail.com');
-                formData.append('message', emailMessage);
-
-                const response = await fetch('https://api.web3forms.com/submit', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    console.log('✅ Email sent successfully');
-                } else {
-                    console.error('❌ Failed to send email:', result.message);
-                }
-            } catch (error) {
-                console.error('❌ Error sending form data:', error);
-            }
-        }
-
-
-
         function startLoading(btn) {
             !btn.classList.contains('loader-v2') && btn.classList.add('loader-v2');
             btn.setAttribute("disabled", true);
@@ -340,7 +284,6 @@
             }, 500);
         }
         window.startSubmit = startSubmit;
-        window.sendFormDataToEmail = sendFormDataToEmail;
     </script>
 
 
