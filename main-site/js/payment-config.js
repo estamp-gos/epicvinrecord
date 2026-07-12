@@ -31,11 +31,34 @@ var PROOF_UPLOAD_API = 'https://epicvinrecord.rmoto7817.workers.dev/upload-proof
 var USE_WORKER_FOR_PROOF = false;
 
 function formatGbpPrice(amount) {
+  if (window.__epicCurrency && typeof window.__epicCurrency.format === 'function') {
+    return window.__epicCurrency.format(amount);
+  }
   var value = Number(amount);
   var formatted = Number.isInteger(value)
     ? value.toLocaleString('en-GB')
     : value.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return '\u00A3' + formatted;
+}
+
+function getActiveCurrency() {
+  if (window.__epicCurrency && window.__epicCurrency.ready) {
+    return {
+      currency: window.__epicCurrency.currency || 'GBP',
+      currencySymbol: window.__epicCurrency.symbol || '\u00A3',
+      tierPrice:
+        typeof window.__epicCurrency.cardPrice === 'number'
+          ? window.__epicCurrency.cardPrice
+          : CARD_PRICE_GBP,
+      country: window.__epicCurrency.country || 'GB'
+    };
+  }
+  return {
+    currency: 'GBP',
+    currencySymbol: '\u00A3',
+    tierPrice: CARD_PRICE_GBP,
+    country: 'GB'
+  };
 }
 
 function buildUploadProofUrl() {
@@ -74,6 +97,7 @@ function buildThankYouUrl() {
 }
 
 function buildVinReport(vin, plate, email, vehicleType, carModel, year) {
+  var active = getActiveCurrency();
   return {
     vin: vin || '',
     plate: plate || '',
@@ -84,9 +108,11 @@ function buildVinReport(vin, plate, email, vehicleType, carModel, year) {
     year: year || '',
     tier: 'basic',
     tierName: 'basic',
-    tierPrice: CARD_PRICE_GBP,
-    currency: 'GBP',
-    currencySymbol: '\u00A3',
+    tierPrice: active.tierPrice,
+    tierPriceGbp: CARD_PRICE_GBP,
+    currency: active.currency,
+    currencySymbol: active.currencySymbol,
+    country: active.country,
     timestamp: new Date().toISOString()
   };
 }

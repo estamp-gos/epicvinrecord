@@ -263,8 +263,8 @@
       localStorage.setItem('vinReport', JSON.stringify(Object.assign({}, report, state.currentOrder, {
         paymentMethod: 'bank',
         amountPaid: BANK_PRICE_GBP,
-        currency: 'GBP',
-        currencySymbol: '\u00A3'
+        currency: (window.__epicCurrency && window.__epicCurrency.currency) || 'GBP',
+        currencySymbol: (window.__epicCurrency && window.__epicCurrency.symbol) || '\u00A3'
       })));
     } catch (e) { /* continue */ }
     window.open(WISE_BANK_URL, '_blank', 'noopener,noreferrer');
@@ -279,8 +279,8 @@
       localStorage.setItem('vinReport', JSON.stringify(Object.assign({}, report, state.currentOrder, {
         paymentMethod: 'card',
         amountPaid: CARD_PRICE_GBP,
-        currency: 'GBP',
-        currencySymbol: '\u00A3'
+        currency: (window.__epicCurrency && window.__epicCurrency.currency) || 'GBP',
+        currencySymbol: (window.__epicCurrency && window.__epicCurrency.symbol) || '\u00A3'
       })));
     } catch (e) { /* continue */ }
     // Same pattern as bank: open PayPal in a new tab, stay on-site for thank-you / PDF
