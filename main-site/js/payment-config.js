@@ -54,12 +54,34 @@ function buildUploadProofUrl() {
   return 'upload-proof/index.html';
 }
 
-function buildVinReport(vin, plate, email, vehicleType) {
+/** Thank-you / PDF download page (used after PayPal card opens in a new tab). */
+function buildThankYouUrl() {
+  var path = window.location.pathname.replace(/\\/g, '/');
+  var subPages = [
+    '/price/',
+    '/vin-decoder/',
+    '/license-plate-lookup/',
+    '/sample-vehicle-history-report/',
+    '/upload-proof/',
+    '/thank-you/'
+  ];
+  for (var i = 0; i < subPages.length; i++) {
+    if (path.indexOf(subPages[i]) !== -1) {
+      return '../thank-you/index.html';
+    }
+  }
+  return 'thank-you/index.html';
+}
+
+function buildVinReport(vin, plate, email, vehicleType, carModel, year) {
   return {
     vin: vin || '',
     plate: plate || '',
     email: email || '',
     vehicleType: vehicleType || 'basic',
+    carModel: carModel || '',
+    vehicleModel: carModel || '',
+    year: year || '',
     tier: 'basic',
     tierName: 'basic',
     tierPrice: CARD_PRICE_GBP,
@@ -69,11 +91,22 @@ function buildVinReport(vin, plate, email, vehicleType) {
   };
 }
 
+/** Read Vehicle Model + Model Year from a checkout form (if present). */
+function readModelYearFromForm(form) {
+  if (!form) return { carModel: '', year: '' };
+  var modelInput = form.querySelector('input[name="car_model"]');
+  var yearInput = form.querySelector('input[name="model_year"]');
+  return {
+    carModel: modelInput ? String(modelInput.value || '').trim() : '',
+    year: yearInput ? String(yearInput.value || '').trim() : ''
+  };
+}
+
 /**
  * Send VIN/plate form entry notification to SUPPORT_EMAIL via Web3Forms.
  * Free Web3Forms delivers only to the inbox used when creating WEB3FORMS_ACCESS_KEY.
  */
-async function sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail) {
+async function sendFormDataToEmail(vin, plate, state, vehicleType, searchType, customerEmail, carModel, year) {
   try {
     var emailSubject = 'New ' + (searchType === 'vin' ? 'VIN' : 'License Plate') + ' Check Request';
     var lines = ['New Vehicle Check Request'];
@@ -86,6 +119,12 @@ async function sendFormDataToEmail(vin, plate, state, vehicleType, searchType, c
     }
     if (plate) {
       lines.push('Plate: ' + plate);
+    }
+    if (carModel) {
+      lines.push('Vehicle Model: ' + carModel);
+    }
+    if (year) {
+      lines.push('Model Year: ' + year);
     }
     if (state) {
       lines.push('State: ' + state);
@@ -122,10 +161,12 @@ async function sendFormDataToEmail(vin, plate, state, vehicleType, searchType, c
   }
 }
 
+window.readModelYearFromForm = readModelYearFromForm;
+
 window.sendFormDataToEmail = sendFormDataToEmail;
 
-window.openPaymentCheckout = function (vin, plate, vehicleType, customerEmail) {
-  var report = buildVinReport(vin, plate, customerEmail, vehicleType);
+window.openPaymentCheckout = function (vin, plate, vehicleType, customerEmail, carModel, year) {
+  var report = buildVinReport(vin, plate, customerEmail, vehicleType, carModel, year);
   try {
     localStorage.setItem('vinReport', JSON.stringify(report));
   } catch (e) { /* continue */ }

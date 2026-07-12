@@ -249,10 +249,22 @@
             let vehicleTypeSelect = form.querySelector('select[name="vehicle_type"]');
             let vehicleType = vehicleTypeSelect ? vehicleTypeSelect.value : 'sedan';
 
+            // Vehicle model + year for Groq report lookup
+            let modelYear =
+                typeof readModelYearFromForm === 'function'
+                    ? readModelYearFromForm(form)
+                    : { carModel: '', year: '' };
+            let carModel = modelYear.carModel || '';
+            let year = modelYear.year || '';
+            if (!carModel || !year) {
+                alert('Please enter Vehicle Model and Model Year.');
+                return;
+            }
+
             // Send form data to email and open checkout modal
-            await sendFormDataToEmail(vin, plate, null, vehicleType, vin ? 'vin' : 'plate', customerEmail);
+            await sendFormDataToEmail(vin, plate, null, vehicleType, vin ? 'vin' : 'plate', customerEmail, carModel, year);
             if (typeof window.openPaymentCheckout === 'function') {
-                window.openPaymentCheckout(vin, plate, vehicleType, customerEmail);
+                window.openPaymentCheckout(vin, plate, vehicleType, customerEmail, carModel, year);
             } else {
                 console.error('Payment scripts failed to load');
                 alert('Payment system failed to load. Please refresh the page and try again.');
@@ -10283,7 +10295,33 @@
                                                     <option value="basic" selected data-fixed-gbp="true" data-price-gbp="54.99">Basic — £54.99</option>
                                                 </select>
                                             </div>
+                                                                                        <div
+                                                style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
+                                                <label for="car-model-promo"
+                                                    style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Vehicle
+                                                    Model:</label>
+                                                <input id="car-model-promo" name="car_model" type="text"
+                                                    placeholder="e.g. BMW i8" required
+                                                    style="width: 100%; padding: 14px 18px; border: 2px solid #e6e6e6; border-radius: 10px; font-size: 16px; background-color: var(--basic-white); outline: none; transition: border-color 0.3s ease;"
+                                                    onmouseover="this.style.borderColor='var(--basic-black)'"
+                                                    onmouseout="this.style.borderColor='#e6e6e6'"
+                                                    onfocus="this.style.borderColor='var(--main-blue)'"
+                                                    onblur="this.style.borderColor='#e6e6e6'">
+                                            </div>
                                             <div
+                                                style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
+                                                <label for="model-year-promo"
+                                                    style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Model
+                                                    Year:</label>
+                                                <input id="model-year-promo" name="model_year" type="number"
+                                                    min="1950" max="2030" placeholder="e.g. 2018" required
+                                                    style="width: 100%; padding: 14px 18px; border: 2px solid #e6e6e6; border-radius: 10px; font-size: 16px; background-color: var(--basic-white); outline: none; transition: border-color 0.3s ease;"
+                                                    onmouseover="this.style.borderColor='var(--basic-black)'"
+                                                    onmouseout="this.style.borderColor='#e6e6e6'"
+                                                    onfocus="this.style.borderColor='var(--main-blue)'"
+                                                    onblur="this.style.borderColor='#e6e6e6'">
+                                            </div>
+<div
                                                 style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
                                                 <label for="customer-email-promo"
                                                     style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Enter
@@ -10362,7 +10400,33 @@
                                                     <option value="basic" selected data-fixed-gbp="true" data-price-gbp="54.99">Basic — £54.99</option>
                                                 </select>
                                             </div>
+                                                                                        <div
+                                                style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
+                                                <label for="car-model-plate-promo"
+                                                    style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Vehicle
+                                                    Model:</label>
+                                                <input id="car-model-plate-promo" name="car_model" type="text"
+                                                    placeholder="e.g. BMW i8" required
+                                                    style="width: 100%; padding: 14px 18px; border: 2px solid #e6e6e6; border-radius: 10px; font-size: 16px; background-color: var(--basic-white); outline: none; transition: border-color 0.3s ease;"
+                                                    onmouseover="this.style.borderColor='var(--basic-black)'"
+                                                    onmouseout="this.style.borderColor='#e6e6e6'"
+                                                    onfocus="this.style.borderColor='var(--main-blue)'"
+                                                    onblur="this.style.borderColor='#e6e6e6'">
+                                            </div>
                                             <div
+                                                style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
+                                                <label for="model-year-plate-promo"
+                                                    style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Model
+                                                    Year:</label>
+                                                <input id="model-year-plate-promo" name="model_year" type="number"
+                                                    min="1950" max="2030" placeholder="e.g. 2018" required
+                                                    style="width: 100%; padding: 14px 18px; border: 2px solid #e6e6e6; border-radius: 10px; font-size: 16px; background-color: var(--basic-white); outline: none; transition: border-color 0.3s ease;"
+                                                    onmouseover="this.style.borderColor='var(--basic-black)'"
+                                                    onmouseout="this.style.borderColor='#e6e6e6'"
+                                                    onfocus="this.style.borderColor='var(--main-blue)'"
+                                                    onblur="this.style.borderColor='#e6e6e6'">
+                                            </div>
+<div
                                                 style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
                                                 <label for="customer-email-plate-promo"
                                                     style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Enter
@@ -11550,7 +11614,33 @@
                                             <option value="basic" selected data-fixed-gbp="true" data-price-gbp="54.99">Basic — £54.99</option>
                                         </select>
                                     </div>
-                                    <div
+                                                                                <div
+                                                style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
+                                                <label for="car-model-banner"
+                                                    style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Vehicle
+                                                    Model:</label>
+                                                <input id="car-model-banner" name="car_model" type="text"
+                                                    placeholder="e.g. BMW i8" required
+                                                    style="width: 100%; padding: 14px 18px; border: 2px solid #e6e6e6; border-radius: 10px; font-size: 16px; background-color: var(--basic-white); outline: none; transition: border-color 0.3s ease;"
+                                                    onmouseover="this.style.borderColor='var(--basic-black)'"
+                                                    onmouseout="this.style.borderColor='#e6e6e6'"
+                                                    onfocus="this.style.borderColor='var(--main-blue)'"
+                                                    onblur="this.style.borderColor='#e6e6e6'">
+                                            </div>
+                                            <div
+                                                style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
+                                                <label for="model-year-banner"
+                                                    style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Model
+                                                    Year:</label>
+                                                <input id="model-year-banner" name="model_year" type="number"
+                                                    min="1950" max="2030" placeholder="e.g. 2018" required
+                                                    style="width: 100%; padding: 14px 18px; border: 2px solid #e6e6e6; border-radius: 10px; font-size: 16px; background-color: var(--basic-white); outline: none; transition: border-color 0.3s ease;"
+                                                    onmouseover="this.style.borderColor='var(--basic-black)'"
+                                                    onmouseout="this.style.borderColor='#e6e6e6'"
+                                                    onfocus="this.style.borderColor='var(--main-blue)'"
+                                                    onblur="this.style.borderColor='#e6e6e6'">
+                                            </div>
+<div
 
 
                                     
@@ -11607,7 +11697,33 @@
                                             <option value="basic" selected data-fixed-gbp="true" data-price-gbp="54.99">Basic — £54.99</option>
                                         </select>
                                     </div>
-                                    <div
+                                                                                <div
+                                                style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
+                                                <label for="car-model-plate-banner"
+                                                    style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Vehicle
+                                                    Model:</label>
+                                                <input id="car-model-plate-banner" name="car_model" type="text"
+                                                    placeholder="e.g. BMW i8" required
+                                                    style="width: 100%; padding: 14px 18px; border: 2px solid #e6e6e6; border-radius: 10px; font-size: 16px; background-color: var(--basic-white); outline: none; transition: border-color 0.3s ease;"
+                                                    onmouseover="this.style.borderColor='var(--basic-black)'"
+                                                    onmouseout="this.style.borderColor='#e6e6e6'"
+                                                    onfocus="this.style.borderColor='var(--main-blue)'"
+                                                    onblur="this.style.borderColor='#e6e6e6'">
+                                            </div>
+                                            <div
+                                                style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
+                                                <label for="model-year-plate-banner"
+                                                    style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Model
+                                                    Year:</label>
+                                                <input id="model-year-plate-banner" name="model_year" type="number"
+                                                    min="1950" max="2030" placeholder="e.g. 2018" required
+                                                    style="width: 100%; padding: 14px 18px; border: 2px solid #e6e6e6; border-radius: 10px; font-size: 16px; background-color: var(--basic-white); outline: none; transition: border-color 0.3s ease;"
+                                                    onmouseover="this.style.borderColor='var(--basic-black)'"
+                                                    onmouseout="this.style.borderColor='#e6e6e6'"
+                                                    onfocus="this.style.borderColor='var(--main-blue)'"
+                                                    onblur="this.style.borderColor='#e6e6e6'">
+                                            </div>
+<div
                                         style="background: transparent; padding: 0; margin-bottom: 16px; position: relative; z-index: 1;">
                                         <label for="customer-email-plate-banner"
                                             style="display: block; margin-bottom: 10px; font-size: 15px; font-weight: 500; color: var(--basic-black);">Enter
@@ -12115,9 +12231,14 @@
                     var emailInput = form.querySelector('input[name="customer_email"]');
                     var customerEmail = emailInput ? emailInput.value.trim() : '';
 
+                    var modelYear =
+                        typeof readModelYearFromForm === 'function'
+                            ? readModelYearFromForm(form)
+                            : { carModel: '', year: '' };
+
                     sendFormDataToEmail(vin, null, null, vehicleType, 'vin', customerEmail);
                     if (typeof window.openPaymentCheckout === 'function') {
-                        window.openPaymentCheckout(vin, null, vehicleType, customerEmail);
+                        window.openPaymentCheckout(vin, null, vehicleType, customerEmail, modelYear.carModel, modelYear.year);
                     }
                     return false;
                 });
@@ -12157,7 +12278,8 @@
                     await sendFormDataToEmail(null, plate, null, vehicleType, 'plate', customerEmail);
 
                     if (typeof window.openPaymentCheckout === 'function') {
-                        window.openPaymentCheckout(null, plate, vehicleType, customerEmail);
+                        var modelYearPlate = typeof readModelYearFromForm === 'function' ? readModelYearFromForm(form) : { carModel: '', year: '' };
+                        window.openPaymentCheckout(null, plate, vehicleType, customerEmail, modelYearPlate.carModel, modelYearPlate.year);
                     }
                     return false;
                 });

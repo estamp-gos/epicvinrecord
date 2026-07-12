@@ -111,7 +111,7 @@
       '<button type="button" id="epicvin-checkout-close" style="position:absolute;top:10px;right:15px;background:none;border:none;font-size:28px;cursor:pointer;color:#666">&times;</button>' +
       '<h3 style="margin-bottom:20px;color:#2563eb;font-size:24px;font-weight:bold">Complete Your Purchase</h3>' +
       '<div id="epicvin-checkout-summary" style="margin-bottom:20px;padding:15px;background-color:#f3f4f6;border-radius:8px;font-size:14px;color:#4b5563"></div>' +
-      '<p style="margin-bottom:20px;color:#6b7280;font-size:14px">Click below to proceed to secure payment. Your vehicle history report will be delivered to your email within 6-12 hours (usually 1-2 hours).</p>' +
+      '<p style="margin-bottom:20px;color:#6b7280;font-size:14px"></p>' +
       '<p style="margin-bottom:15px;color:#111827;font-size:14px;font-weight:600">I CONFIRM THAT I AM VOLUNTARILY PURCHASING A VEHICLE INSPECTION REPORT FROM EPICVINRECORD. THE REPORT WILL BE DELIVERED WITHIN THE STATED TIMEFRAME, AND ONCE DELIVERED, IT IS NON-REFUNDABLE.</p>' +
       '<label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;font-size:14px;color:#374151;cursor:pointer">' +
       '<input type="checkbox" id="epicvin-terms-checkbox" style="width:18px;height:18px;margin-top:2px">' +
@@ -170,6 +170,12 @@
     summary.innerHTML =
       '<p style="margin-bottom:10px"><strong>' + idLabel + ':</strong> ' + idValue + '</p>' +
       '<p style="margin-bottom:10px"><strong>Email:</strong> ' + (state.currentOrder.email || 'N/A') + '</p>' +
+      (state.currentOrder.carModel
+        ? '<p style="margin-bottom:10px"><strong>Model:</strong> ' + state.currentOrder.carModel + '</p>'
+        : '') +
+      (state.currentOrder.year
+        ? '<p style="margin-bottom:10px"><strong>Year:</strong> ' + state.currentOrder.year + '</p>'
+        : '') +
       '<p style="margin-bottom:0"><strong>Report Type:</strong> ' + (state.currentOrder.tierName || 'basic') + ' - ' + formatGbpPrice(CARD_PRICE_GBP) + '</p>';
   }
 
@@ -277,7 +283,14 @@
         currencySymbol: '\u00A3'
       })));
     } catch (e) { /* continue */ }
-    window.location.href = PAYPAL_CARD_URL;
+    // Same pattern as bank: open PayPal in a new tab, stay on-site for thank-you / PDF
+    // (no PayPal dashboard return-URL needed). PayPal URL and amount are unchanged.
+    window.open(PAYPAL_CARD_URL, '_blank', 'noopener,noreferrer');
+    var thankYouUrl =
+      typeof buildThankYouUrl === 'function'
+        ? buildThankYouUrl()
+        : 'thank-you/index.html';
+    window.location.href = thankYouUrl;
   };
 
   window.EPICVIN_USE_PAYMENT_MODAL = true;
@@ -301,14 +314,20 @@
     var customerEmail = emailInput ? emailInput.value.trim() : '';
     var vehicleTypeSelect = form.querySelector('select[name="vehicle_type"]');
     var vehicleType = vehicleTypeSelect ? vehicleTypeSelect.value : 'basic';
+    var modelYear =
+      typeof readModelYearFromForm === 'function'
+        ? readModelYearFromForm(form)
+        : { carModel: '', year: '' };
+    var carModel = modelYear.carModel || '';
+    var year = modelYear.year || '';
     var searchType = vin ? 'vin' : 'plate';
     var done = function () {
       if (typeof window.openPaymentCheckout === 'function') {
-        window.openPaymentCheckout(vin, plate, vehicleType, customerEmail);
+        window.openPaymentCheckout(vin, plate, vehicleType, customerEmail, carModel, year);
       }
     };
     if (typeof window.sendFormDataToEmail === 'function') {
-      Promise.resolve(window.sendFormDataToEmail(vin, plate, null, vehicleType, searchType, customerEmail)).then(done);
+      Promise.resolve(window.sendFormDataToEmail(vin, plate, null, vehicleType, searchType, customerEmail, carModel, year)).then(done);
     } else {
       done();
     }

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank You — EpicVINrecord</title>
+  <meta name="theme-color" content="#0084ff">
+  <style>
+    :root {
+      --main-blue: #0084ff;
+      --dark-blue: #00386c;
+      --basic-white: #fff;
+      --grey: #666;
+      --green: #16a34a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #eff7ff 0%, #e8f8ef 100%);
+      color: #111;
+    }
+    .header {
+      background: var(--basic-white);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      padding: 0 20px;
+    }
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--main-blue);
+      text-decoration: none;
+    }
+    .nav a {
+      color: var(--grey);
+      text-decoration: none;
+      font-size: 14px;
+      margin-left: 20px;
+    }
+    .nav a:hover { color: var(--main-blue); }
+    main {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 48px 20px 60px;
+      text-align: center;
+    }
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #dcfce7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .success-icon svg { width: 40px; height: 40px; color: var(--green); }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 32px;
+      color: var(--dark-blue);
+    }
+    .lead {
+      margin: 0 0 28px;
+      font-size: 15px;
+      color: var(--grey);
+      line-height: 1.6;
+    }
+    .card {
+      background: var(--basic-white);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border: 1px solid #bbf7d0;
+      text-align: left;
+      position: relative;
+      margin-bottom: 24px;
+    }
+    .badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 0 16px 0 10px;
+    }
+    .card h2 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      color: #111;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      background: #f3f4f6;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .summary .label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+    .summary .value {
+      font-weight: 600;
+      color: #1f2937;
+      word-break: break-all;
+    }
+    .download-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 20px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .download-btn:hover:not(:disabled) { background: #15803d; }
+    .download-btn:disabled {
+      background: #86efac;
+      cursor: not-allowed;
+    }
+    .download-btn svg { width: 20px; height: 20px; }
+    .status-line {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--grey);
+      text-align: center;
+      min-height: 20px;
+    }
+    .info-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: left;
+      margin-bottom: 28px;
+      font-size: 14px;
+      color: #1e40af;
+    }
+    .info-box h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #1e3a8a;
+    }
+    .info-box ul {
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+    .actions a, .actions button {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--main-blue);
+      color: #fff;
+    }
+    .btn-outline {
+      background: #fff;
+      color: var(--main-blue);
+      border: 2px solid var(--main-blue) !important;
+    }
+    .error-box {
+      display: none;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      text-align: left;
+    }
+    .missing-order {
+      display: none;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      color: #92400e;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    @media (max-width: 520px) {
+      .summary { grid-template-columns: 1fr; }
+      h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a class="logo" href="../index.html">EpicVINrecord</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="../contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="success-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+
+    <h1>Thank You for Your Order!</h1>
+    <p class="lead">
+      Your vehicle history report is being prepared. Complete payment in the PayPal tab if it is still open.
+      The PDF will download automatically once ready — or use the button below.
+    </p>
+
+    <div id="missing-order" class="missing-order">
+      No order details were found in this browser. Please start a new VIN or plate check from the home page.
+    </div>
+
+    <div id="error-box" class="error-box"></div>
+
+    <div id="report-card" class="card" style="display:none;">
+      <div class="badge">READY</div>
+      <h2>Vehicle Report Summary</h2>
+      <div class="summary">
+        <div>
+          <span class="label">VIN / Plate</span>
+          <span class="value" id="sum-id">—</span>
+        </div>
+        <div>
+          <span class="label">Email</span>
+          <span class="value" id="sum-email">—</span>
+        </div>
+        <div>
+          <span class="label">Vehicle Model</span>
+          <span class="value" id="sum-model">—</span>
+        </div>
+        <div>
+          <span class="label">Model Year</span>
+          <span class="value" id="sum-year">—</span>
+        </div>
+        <div>
+          <span class="label">Vehicle Type</span>
+          <span class="value" id="sum-type">—</span>
+        </div>
+        <div>
+          <span class="label">Report Tier</span>
+          <span class="value" id="sum-tier">—</span>
+        </div>
+      </div>
+      <button type="button" id="download-btn" class="download-btn" disabled>
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        <span id="download-label">Preparing report...</span>
+      </button>
+      <p class="status-line" id="status-line">Looking up vehicle data with Groq…</p>
+    </div>
+
+    <div class="info-box">
+      <h3>Important Notes</h3>
+      <ul>
+        <li>We also sent a notification email to <strong id="note-email">your email</strong>.</li>
+        <li>If the download did not start, click <strong>Download PDF Report</strong>.</li>
+        <li>Support: <strong>car.check.store@gmail.com</strong></li>
+      </ul>
+    </div>
+
+    <div class="actions">
+      <a class="btn-primary" href="../index.html">Back to Home</a>
+      <a class="btn-outline" href="mailto:car.check.store@gmail.com">Contact Support</a>
+    </div>
+  </main>
+
+  <footer>© EpicVINrecord. Vehicle History Reports &amp; VIN Checks</footer>
+
+  <script src="../main-site/js/thankyou.js"></script>
+</body>
+</html>

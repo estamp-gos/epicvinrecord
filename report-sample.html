@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vehicle Inspection Report - {{REGISTRATION}}</title>
+<style>
+  :root{
+    --navy:#12141a;
+    --blue:#2f7fe0;
+    --blue-bg:#e9f1fd;
+    --yellow:#f6c944;
+    --border:#e6e9ef;
+    --label-bg:#f2f5f9;
+    --text:#1f2430;
+    --text-gray:#8992a3;
+    --green:#1a9b4a;
+    --green-bg:#eaf9ef;
+    --green-border:#c6ecd3;
+    --green-text:#136b31;
+    --red:#e0362e;
+    --shadow:0 1px 3px rgba(16,24,40,0.06), 0 1px 2px rgba(16,24,40,0.04);
+    /* Title-brand / safety / security sections */
+    --purple:#6c5ce7;
+    --purple-grad-a:#8b7bf7;
+    --purple-grad-b:#6c5ce7;
+    --purple-light:#efeaff;
+    --pill-bg:#f7f8fb;
+    --pill-border:#e8ebf2;
+    --recall-bg:#f3f6fb;
+    --banner-bg:#eef3fb;
+    --banner-icon:#2f7fe0;
+    --label:#4b5062;
+    --value:#1a1d29;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    background:#f4f5f7;
+    font-family:Arial, "Helvetica Neue", Helvetica, sans-serif;
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .page{
+    max-width:880px;
+    margin:0 auto;
+    background:#ffffff;
+    padding:32px 36px 60px;
+  }
+
+  /* ---------- HEADER ---------- */
+  .top-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:24px;
+  }
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .logo .brand-logo{
+    display:block;
+    height:96px;
+    width:auto;
+    max-width:560px;
+    object-fit:contain;
+  }
+  .logo-icon{
+    display:none;
+  }
+  .logo-text{
+    display:none;
+  }
+
+  .report-date-badge{
+    background:var(--navy);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    padding:10px 16px;
+    border-radius:6px;
+    white-space:nowrap;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--navy);
+    border-radius:10px;
+    padding:26px 30px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:28px;
+  }
+  .hero-left h1{
+    color:#fff;
+    font-size:26px;
+    margin:0 0 12px 0;
+    font-weight:700;
+  }
+  .hero-make{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .hero-make .roundel{
+    width:26px;height:26px;
+    border-radius:50%;
+    background:conic-gradient(#0a5eb0 0 90deg,#fff 90deg 180deg,#0a5eb0 180deg 270deg,#fff 270deg 360deg);
+    border:2px solid #cfd3da;
+  }
+  .hero-make span{
+    color:#d8dbe2;
+    font-size:14px;
+    font-weight:600;
+  }
+  .hero-right{
+    text-align:center;
+  }
+  .plate{
+    background:var(--yellow);
+    border:2px solid var(--navy);
+    border-radius:6px;
+    padding:12px 26px;
+    font-family:"Courier New", monospace;
+    font-weight:800;
+    font-size:22px;
+    letter-spacing:2px;
+    color:var(--navy);
+  }
+  .plate-label{
+    color:#8f95a3;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:1px;
+    margin-top:8px;
+  }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section{
+    margin-bottom:26px;
+  }
+  .section-head{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    margin-bottom:14px;
+  }
+  .section-icon{
+    width:34px;height:34px;
+    border-radius:8px;
+    background:var(--blue-bg);
+    display:flex;align-items:center;justify-content:center;
+    font-size:17px;
+    flex-shrink:0;
+  }
+  .section-icon.red{background:#fde9e8;}
+  .section-icon.orange{background:#fef1e0;}
+  .section-title{
+    font-size:16px;
+    font-weight:700;
+    color:var(--text);
+    margin:0;
+  }
+  .section-sub{
+    font-size:12.5px;
+    color:var(--text-gray);
+    margin:2px 0 0 0;
+  }
+  .section-rule{
+    border:none;
+    border-top:1px solid var(--border);
+    margin:12px 0 16px 0;
+  }
+
+  /* ---------- CARD / TABLE ---------- */
+  .card{
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    background:#fff;
+  }
+  .row2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .row2 .cell-label{
+    padding:13px 18px;
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:0.3px;
+    color:#3a4152;
+  }
+  .row2 .cell-value{
+    padding:13px 18px;
+    font-size:13.5px;
+    color:var(--text);
+    text-align:right;
+  }
+  .row2.shaded{background:var(--label-bg);}
+  .row2.plain{background:#fff;}
+  .row2 + .row2{border-top:1px solid var(--border);}
+
+  .two-col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+  }
+
+  /* ---------- LEGAL CHECKS ---------- */
+  .legal-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .legal-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px 16px;
+    background:var(--pill-bg);
+    border:1px solid var(--pill-border);
+    border-radius:10px;
+  }
+  .legal-item-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+  }
+  .legal-item-icon{
+    width:22px;
+    height:22px;
+    flex-shrink:0;
+    color:#5a6275;
+  }
+  .legal-item-icon svg{
+    width:100%;
+    height:100%;
+    display:block;
+  }
+  .legal-item-label{
+    font-size:13px;
+    font-weight:600;
+    color:var(--label);
+    line-height:1.3;
+  }
+  .legal-item-value{
+    font-size:13px;
+    font-weight:700;
+    color:var(--value);
+    text-align:right;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+
+  /* ---------- PAGE-1 INSPECTION BANNER ---------- */
+  .inspection-banner{
+    margin:8px 0 6px;
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    background:#fff;
+    text-align:center;
+  }
+  .inspection-banner img{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height:420px;
+    object-fit:contain;
+    object-position:center;
+    margin:0 auto;
+  }
+
+  /* ---------- CO2 LABEL ---------- */
+  .co2-card{
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+    padding:18px;
+  }
+  .co2-title{
+    text-align:center;
+    font-size:13px;
+    font-weight:700;
+    margin:0 0 16px 0;
+  }
+  .co2-row{
+    display:flex;
+    align-items:center;
+    height:26px;
+    margin-bottom:6px;
+    position:relative;
+  }
+  .co2-bar{
+    height:100%;
+    display:flex;
+    align-items:center;
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    padding-left:10px;
+    clip-path:polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
+  }
+  .co2-letters{
+    font-size:9px;
+    font-weight:800;
+    color:#fff;
+    margin-left:auto;
+    padding-right:16px;
+    line-height:1;
+  }
+  .co2-flag{
+    position:absolute;
+    right:-4px;
+    background:#0a8a3c;
+    color:#fff;
+    font-size:11px;
+    font-weight:800;
+    padding:4px 14px 4px 10px;
+    clip-path:polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
+  }
+
+  /* ---------- MOT STATUS BOXES ---------- */
+  .stat-card{
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .stat-card-head{
+    display:flex;align-items:center;gap:8px;
+    padding:14px 16px;
+    font-size:13px;
+    font-weight:700;
+    border-bottom:1px solid var(--border);
+  }
+  .progress-track{
+    background:#e7eaf0;
+    border-radius:6px;
+    height:8px;
+    margin-top:6px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    background:#1f9d4b;
+    height:100%;
+    border-radius:6px;
+  }
+
+  /* ---------- MOT HISTORY LIST ---------- */
+  .mot-entry-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 18px;
+    background:var(--label-bg);
+    font-size:13px;
+    font-weight:700;
+  }
+  .mot-entry-head .date{font-weight:400;color:#5b6272;font-size:12px;}
+  .mot-sub-row{
+    display:flex;
+    padding:12px 18px;
+    border-top:1px solid var(--border);
+  }
+  .mot-sub-row .lab{
+    flex:1;font-size:11px;color:var(--text-gray);font-weight:600;
+  }
+  .mot-sub-row .val{
+    flex:1;font-size:13px;font-weight:700;
+  }
+  .mot-sub-row .val.pass{color:var(--green);}
+  .advice-box{
+    margin:0 18px 14px 18px;
+    padding:12px 14px;
+    background:var(--green-bg);
+    border:1px solid var(--green-border);
+    border-radius:8px;
+  }
+  .advice-box:first-of-type{margin-top:14px;}
+  .advice-tag{
+    display:inline-block;
+    background:#bfe8cc;
+    color:#0f6b30;
+    font-size:10.5px;
+    font-weight:800;
+    padding:3px 10px;
+    border-radius:12px;
+    margin-bottom:8px;
+  }
+  .advice-text{font-size:12.5px;color:#3a4152;}
+  .mot-block{border-top:1px solid var(--border);}
+  .mot-block:first-child{border-top:none;}
+
+  /* ---------- SUCCESS / CLEAR BOX ---------- */
+  .clear-box{
+    background:var(--green-bg);
+    border:1px solid var(--green-border);
+    border-radius:10px;
+    padding:16px 20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:13.5px;
+    font-weight:700;
+    color:#136b31;
+  }
+  .clear-box .tick{
+    color:var(--green);
+    font-size:16px;
+  }
+
+  /* ---------- CAR DIAGRAM ---------- */
+  .car-diagram{
+    margin-top:20px;
+    display:flex;
+    justify-content:center;
+  }
+
+  /* ---------- EMPTY STATE ---------- */
+  .empty-card{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:44px 20px;
+    text-align:center;
+    color:var(--text-gray);
+  }
+  .empty-icon{
+    width:40px;height:40px;
+    border-radius:50%;
+    background:#e9ecf2;
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 14px auto;
+    font-size:18px;
+  }
+
+  /* ---------- OWNER CARDS ---------- */
+  .owner-card{
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .owner-card-head{
+    padding:12px 16px;
+    font-size:13px;
+    font-weight:700;
+    border-bottom:1px solid var(--border);
+  }
+
+  /* ---------- MULTI-COLUMN TABLE (mileage history) ---------- */
+  table.data-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+  table.data-table th{
+    background:var(--label-bg);
+    text-align:left;
+    padding:12px 18px;
+    font-size:11.5px;
+    letter-spacing:0.3px;
+    color:#3a4152;
+  }
+  table.data-table td{
+    padding:12px 18px;
+    border-top:1px solid var(--border);
+  }
+
+  @media print{
+    body{
+      background:#fff !important;
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+    }
+    .page{
+      max-width:100%;
+      padding:10px 14px 16px;
+      margin:0;
+    }
+    .logo .brand-logo{
+      height:56px;
+      max-width:320px;
+    }
+    .top-header{margin-bottom:14px;}
+    .hero{margin-bottom:16px;padding:18px 20px;}
+    .hero-left h1{font-size:22px;margin:0;}
+    .section{margin-bottom:16px;}
+    .section-rule{margin:8px 0 12px;}
+    .card,.co2-card,.stat-card,.owner-card,.clear-box,.empty-card{
+      box-shadow:none !important;
+    }
+    .card{
+      margin:0 0 14px 0 !important;
+      padding:16px 18px !important;
+      border-radius:10px;
+      /* Allow cards to split — avoid forces huge blank gaps */
+      page-break-inside:auto;
+      break-inside:auto;
+    }
+    .card-head{
+      margin-bottom:12px;
+      page-break-after:avoid;
+      break-after:avoid;
+      page-break-inside:avoid;
+      break-inside:avoid;
+    }
+    .card-head + .subsection,
+    .card-head + .check-grid,
+    .card-head + .feature-grid,
+    .card-head + .grid,
+    .card-head + .two-col,
+    .section-head + .section-rule,
+    .section-rule + .card,
+    .section-rule + .two-col{
+      page-break-before:avoid;
+      break-before:avoid;
+    }
+    .section-head{
+      page-break-after:avoid;
+      break-after:avoid;
+      page-break-inside:avoid;
+      break-inside:avoid;
+    }
+    .subsection{
+      margin-bottom:14px;
+      page-break-inside:avoid;
+      break-inside:avoid;
+    }
+    .legal-checks-section,
+    .legal-grid,
+    .legal-item,
+    .inspection-banner{
+      page-break-inside:avoid;
+      break-inside:avoid;
+    }
+    .subsection-title{
+      page-break-after:avoid;
+      break-after:avoid;
+    }
+    .check-grid,
+    .feature-grid,
+    .two-col,
+    .grid{
+      page-break-inside:avoid;
+      break-inside:avoid;
+    }
+    .check-item,
+    .feature-row,
+    .row2,
+    .row,
+    .clear-box,
+    .banner,
+    .recall-box,
+    .co2-card{
+      page-break-inside:avoid;
+      break-inside:avoid;
+    }
+    /* Never orphan a heading alone at the bottom of a page */
+    h1,h2,h3,.card-title,.section-title,.section-sub{
+      page-break-after:avoid;
+      break-after:avoid;
+    }
+    /* Do NOT keep entire large sections unbreakable */
+    .section{
+      page-break-inside:auto;
+      break-inside:auto;
+      margin-bottom:14px;
+    }
+  }
+  .card{
+    max-width:1020px;
+    margin:0 auto;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:28px 32px 26px;
+  }
+  .card-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .icon-box{
+    width:44px;height:44px;
+    border-radius:12px;
+    background:linear-gradient(135deg,#8b7bf7,#6c5ce7);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .icon-box svg{width:20px;height:20px;}
+  .card-title{
+    font-size:19px;
+    font-weight:700;
+    color:#1a1d29;
+    margin:0;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    column-gap:56px;
+  }
+  .row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:15px 0;
+    border-bottom:1px dotted #d9dce3;
+    gap:16px;
+  }
+  .row:last-child{border-bottom:none;}
+  .row .label{
+    font-size:14.5px;
+    color:var(--label);
+    white-space:nowrap;
+  }
+  .row .value{
+    font-size:14.5px;
+    color:var(--value);
+    font-weight:500;
+    text-align:right;
+  }
+  .pill{
+    background:var(--green-bg);
+    color:var(--green-text);
+    font-size:12.5px;
+    font-weight:600;
+    padding:6px 14px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+
+  .banner{
+    margin-top:22px;
+    background:var(--banner-bg);
+    border-radius:12px;
+    padding:16px 20px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .banner .tick{
+    width:24px;height:24px;
+    border-radius:50%;
+    background:var(--banner-icon);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .banner .tick svg{width:13px;height:13px;}
+  .banner .text{
+    font-size:14.5px;
+    color:#3d4250;
+  }
+  .banner .text b{
+    color:#1a1d29;
+    font-weight:700;
+  }
+
+  @media (max-width:640px){
+    .grid{grid-template-columns:1fr;}
+  }
+  .wrap{
+    max-width:1020px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+  }
+  .card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:26px 30px 30px;
+  }
+
+  /* ---- Card head (icon + title) ---- */
+  .card-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .icon-box{
+    width:40px;height:40px;
+    border-radius:11px;
+    background:linear-gradient(135deg,var(--purple-grad-a),var(--purple-grad-b));
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .icon-box svg{width:19px;height:19px;color:#fff;}
+  .card-title{
+    font-size:18px;
+    font-weight:700;
+    color:#1a1d29;
+    margin:0;
+  }
+
+  /* ---- Sub-section title ---- */
+  .subsection{
+    margin-bottom:26px;
+  }
+  .subsection:last-child{margin-bottom:0;}
+  .subsection-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:14px;
+    font-weight:700;
+    color:var(--purple);
+    margin:0 0 14px 0;
+  }
+  .subsection-title svg{
+    width:15px;height:15px;flex-shrink:0;
+    stroke:var(--purple);
+    color:var(--purple);
+  }
+
+  /* ---- Check grid (pill cards with Yes/No) ---- */
+  .check-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+  }
+  .check-item{
+    background:var(--pill-bg);
+    border:1px solid var(--pill-border);
+    border-radius:10px;
+    padding:11px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .check-item .label{
+    font-size:13px;
+    color:#2f3444;
+    font-weight:500;
+  }
+  .check-item .value-no{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--green);
+    white-space:nowrap;
+  }
+
+  /* ---- Recalls callout box ---- */
+  .recall-box{
+    background:var(--recall-bg);
+    border-left:4px solid var(--green);
+    border-radius:10px;
+    padding:18px 20px;
+    margin-top:22px;
+  }
+  .recall-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:14.5px;
+    font-weight:700;
+    color:#1a1d29;
+    margin-bottom:10px;
+  }
+  .recall-head svg{width:16px;height:16px;}
+  .recall-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    background:var(--green-bg);
+    color:var(--green);
+    font-size:12.5px;
+    font-weight:700;
+    padding:5px 12px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  .recall-text{
+    font-size:13px;
+    color:#6b7080;
+    margin:0;
+  }
+
+  /* ---- Feature rows (Equipped pills) ---- */
+  .feature-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    column-gap:32px;
+  }
+  .feature-grid.cols-2{
+    grid-template-columns:repeat(2,1fr);
+  }
+  .feature-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 0;
+    border-bottom:1px dotted #dde0e7;
+    gap:12px;
+  }
+  .feature-row .label{
+    font-size:13.5px;
+    color:#2f3444;
+    font-weight:500;
+  }
+  .equipped-pill{
+    background:var(--purple-light);
+    color:var(--purple);
+    font-size:12px;
+    font-weight:600;
+    padding:5px 14px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+
+  @media (max-width:800px){
+    .check-grid{grid-template-columns:repeat(2,1fr);}
+    .feature-grid, .feature-grid.cols-2{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="top-header">
+    <div class="logo">
+      <img class="brand-logo" src="{{LOGO_SRC}}" alt="EpicVINrecord" width="520" height="96">
+    </div>
+    <div class="report-date-badge">Report Date:{{REPORT_DATE}}</div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-left">
+      <h1>{{BANNER_TITLE}}</h1>
+    </div>
+    <div class="hero-right">
+      <div class="plate">{{REGISTRATION}}</div>
+      <div class="plate-label">REGISTRATION NUMBER</div>
+    </div>
+  </div>
+
+  <!-- GENERAL INFORMATION -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon red">🚗</div>
+      <div>
+        <p class="section-title">General Information</p>
+        <p class="section-sub">Basic vehicle specifications and details</p>
+      </div>
+    </div>
+    <hr class="section-rule">
+    <div class="card">
+      <div class="row2 shaded"><div class="cell-label">MAKE</div><div class="cell-value">{{MAKE}}</div></div>
+      <div class="row2 plain"><div class="cell-label">MODEL</div><div class="cell-value">{{MODEL}}</div></div>
+      <div class="row2 shaded"><div class="cell-label">DOOR</div><div class="cell-value">{{NUMBER_OF_DOORS}}</div></div>
+      <div class="row2 plain"><div class="cell-label">YEAR OF MANUFACTURE</div><div class="cell-value">{{YEAR}}</div></div>
+      <div class="row2 shaded"><div class="cell-label">GEARBOX</div><div class="cell-value">{{GEARBOX}}</div></div>
+      <div class="row2 plain"><div class="cell-label">TOP SPEED</div><div class="cell-value">{{TOP_SPEED}}</div></div>
+    </div>
+  </div>
+
+  <!-- LEGAL CHECKS (fills page-1 whitespace) -->
+  <div class="section legal-checks-section">
+    <div class="section-head">
+      <div class="section-icon" style="background:var(--purple-light);color:var(--purple);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 3v2M5 9h14M7 9l-2 8h14l-2-8M9 17h6M10 21h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 5l6 4H6l6-4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <p class="section-title">Legal Checks</p>
+      </div>
+    </div>
+    <div class="legal-grid">
+      <div class="legal-item">
+        <div class="legal-item-left">
+          <span class="legal-item-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="legal-item-label">Financial &amp; Legal Status</span>
+        </div>
+        <span class="legal-item-value">{{LEGAL_FINANCIAL_STATUS}}</span>
+      </div>
+      <div class="legal-item">
+        <div class="legal-item-left">
+          <span class="legal-item-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 16l3-3 2 2 4-5 5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="7" r="2.2" stroke="currentColor" stroke-width="1.6"/><path d="M4 19h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+          <span class="legal-item-label">Insurance Write-off</span>
+        </div>
+        <span class="legal-item-value">{{LEGAL_WRITE_OFF_STATUS}}</span>
+      </div>
+      <div class="legal-item">
+        <div class="legal-item-left">
+          <span class="legal-item-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7V3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3v4h4M9 12h6M9 16h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+          <span class="legal-item-label">Accident Records</span>
+        </div>
+        <span class="legal-item-value">{{LEGAL_ACCIDENT_STATUS}}</span>
+      </div>
+      <div class="legal-item">
+        <div class="legal-item-left">
+          <span class="legal-item-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+          <span class="legal-item-label">Theft / Stolen Markers</span>
+        </div>
+        <span class="legal-item-value">{{LEGAL_THEFT_STATUS}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="inspection-banner">
+    <img src="{{INSPECTION_BANNER_SRC}}" alt="Vehicle inspection" width="1200" height="675" />
+  </div>
+
+  <!-- ENGINE & FUEL -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon">⚙️</div>
+      <div>
+        <p class="section-title">Engine &amp; Fuel Consumption</p>
+        <p class="section-sub">Technical specifications and environmental data</p>
+      </div>
+    </div>
+    <hr class="section-rule">
+    <div class="two-col">
+      <div class="card">
+        <div class="row2 shaded"><div class="cell-label">POWER</div><div class="cell-value">{{POWER}}</div></div>
+        <div class="row2 plain"><div class="cell-label">MAX. TORQUE</div><div class="cell-value">{{MAX_TORQUE}}</div></div>
+        <div class="row2 shaded"><div class="cell-label">ENGINE CAPACITY</div><div class="cell-value">{{ENGINE_CAPACITY}}</div></div>
+        <div class="row2 plain"><div class="cell-label">CYLINDERS</div><div class="cell-value">{{CYLINDERS}}</div></div>
+        <div class="row2 shaded"><div class="cell-label">FUEL TYPE</div><div class="cell-value">{{FUEL_TYPE}}</div></div>
+        <div class="row2 plain"><div class="cell-label">CONSUMPTION CITY</div><div class="cell-value">{{CONSUMPTION_CITY}}</div></div>
+        <div class="row2 shaded"><div class="cell-label">CONSUMPTION EXTRA URBAN</div><div class="cell-value">{{CONSUMPTION_EXTRA_URBAN}}</div></div>
+        <div class="row2 plain"><div class="cell-label">CONSUMPTION COMBINED</div><div class="cell-value">{{CONSUMPTION_COMBINED}}</div></div>
+        <div class="row2 shaded"><div class="cell-label">CO2 EMISSION</div><div class="cell-value">{{CO2_EMISSION}}</div></div>
+        <div class="row2 plain"><div class="cell-label">CO2 LABEL</div><div class="cell-value">{{CO2_LABEL}}</div></div>
+      </div>
+
+      <div class="co2-card">
+        <p class="co2-title">CO2 Emissions Label</p>
+        <div class="co2-row">
+          <div class="co2-bar" style="width:62%;background:#0a8a3c;">0 &lt; 101</div>
+          <div class="co2-flag" style="left:64%;">LABEL {{CO2_LABEL}}</div>
+        </div>
+        <div class="co2-row">
+          <div class="co2-bar" style="width:52%;background:#3fb04f;">101 - 120<span class="co2-letters">B<br>C</span></div>
+        </div>
+        <div class="co2-row">
+          <div class="co2-bar" style="width:47%;background:#8bc34a;">121 - 140<span class="co2-letters">D<br>E</span></div>
+        </div>
+        <div class="co2-row">
+          <div class="co2-bar" style="width:42%;background:#ffc107;">141 - 165<span class="co2-letters">F<br>G</span></div>
+        </div>
+        <div class="co2-row">
+          <div class="co2-bar" style="width:37%;background:#ff9800;">166 - 185<span class="co2-letters">H</span></div>
+        </div>
+        <div class="co2-row">
+          <div class="co2-bar" style="width:32%;background:#f4511e;">186 - 225<span class="co2-letters">I<br>J</span></div>
+        </div>
+        <div class="co2-row">
+          <div class="co2-bar" style="width:27%;background:#d32f2f;">225+<span class="co2-letters">K<br>L<br>M</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TYRE & WHEEL -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon">📏</div>
+      <div>
+        <p class="section-title">Tyre &amp; Wheel Details</p>
+        <p class="section-sub">Factory tyre sizes, pressures and fitment</p>
+      </div>
+    </div>
+    <hr class="section-rule">
+    <div class="two-col">
+      <div class="card">
+        <div class="row2 shaded"><div class="cell-label">TYRE DATA MODEL</div><div class="cell-value">N/A</div></div>
+        <div class="row2 plain"><div class="cell-label">ENGINE POWER (KW)</div><div class="cell-value">{{ENGINE_POWER_KW}}</div></div>
+        <div class="row2 shaded"><div class="cell-label">STANDARD FITMENT</div><div class="cell-value">{{STANDARD_FITMENT}}</div></div>
+      </div>
+      <div class="card">
+        <div class="row2 shaded"><div class="cell-label">FRONT TYRE SIZE</div><div class="cell-value">{{FRONT_TYRE_SIZE}}</div></div>
+        <div class="row2 plain"><div class="cell-label">REAR TYRE SIZE</div><div class="cell-value">{{REAR_TYRE_SIZE}}</div></div>
+        <div class="row2 shaded"><div class="cell-label">FRONT PRESSURE (BAR / PSI)</div><div class="cell-value">{{FRONT_PRESSURE}}</div></div>
+        <div class="row2 plain"><div class="cell-label">REAR PRESSURE (BAR / PSI)</div><div class="cell-value">{{REAR_PRESSURE}}</div></div>
+        <div class="row2 shaded"><div class="cell-label">WHEEL / HUB</div><div class="cell-value">{{WHEEL_HUB}}</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="#ffffff" fill-opacity="0.95"/>
+          <path d="M14 2v5a1 1 0 0 0 1 1h5" fill="#8b7bf7"/>
+          <line x1="7.5" y1="12" x2="16.5" y2="12" stroke="#6c5ce7" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="7.5" y1="15.2" x2="16.5" y2="15.2" stroke="#6c5ce7" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="7.5" y1="18.4" x2="13" y2="18.4" stroke="#6c5ce7" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="card-title">Executive Summary &amp; Vehicle Identity</p>
+    </div>
+  
+    <div class="grid">
+      <div class="col">
+        <div class="row">
+          <span class="label">Vehicle</span>
+          <span class="value" id="exec-vehicle" data-fallback="VOLKSWAGEN TRANSPORTER T28 TDI P/V HIGHLINE (2013)">{{VEHICLE_FULL_NAME}}</span>
+        </div>
+        <div class="row">
+          <span class="label">Stolen Records</span>
+          <span class="pill">No Records Found</span>
+        </div>
+        <div class="row">
+          <span class="label">Accidents</span>
+          <span class="pill">No Records Found</span>
+        </div>
+        <div class="row">
+          <span class="label">Total Loss</span>
+          <span class="pill">No Records Found</span>
+        </div>
+        <div class="row">
+          <span class="label">Recalls</span>
+          <span class="pill">No Records Found</span>
+        </div>
+      </div>
+  
+      <div class="col">
+        <div class="row">
+          <span class="label">Identification Number</span>
+          <span class="value" id="exec-id" data-fallback="T 40 VAC">{{IDENTIFICATION_NUMBER}}</span>
+        </div>
+        <div class="row">
+          <span class="label">Title Records</span>
+          <span class="pill">No Records Found</span>
+        </div>
+        <div class="row">
+          <span class="label">Junk/Salvage</span>
+          <span class="pill">No Records Found</span>
+        </div>
+        <div class="row">
+          <span class="label">Problem Checks</span>
+          <span class="pill">No Records Found</span>
+        </div>
+      </div>
+    </div>
+  
+    <div class="banner">
+      <div class="tick">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 13l4 4L19 7" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="text"><b>Great News!</b> No accident or junk/salvage records have been reported by any state authority.</div>
+    </div>
+  </div>
+
+  <!-- TAX CALCULATION -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon orange">💰</div>
+      <div>
+        <p class="section-title">Tax Calculation</p>
+        <p class="section-sub">Vehicle tax band and calculation details</p>
+      </div>
+    </div>
+    <hr class="section-rule">
+    <div class="card">
+      <div class="row2 shaded"><div class="cell-label">BAND</div><div class="cell-value" style="font-weight:700;">{{TAX_BAND}}</div></div>
+      <div class="row2 plain"><div class="cell-label">SINGLE PAYMENT (12 MONTHS)</div><div class="cell-value" style="font-weight:700;">N/A</div></div>
+    </div>
+  </div>
+
+  <!-- FINANCE CHECK -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon">🏦</div>
+      <div>
+        <p class="section-title">Finance Check</p>
+        <p class="section-sub">Outstanding finance and loan information</p>
+      </div>
+    </div>
+    <hr class="section-rule">
+    <div class="clear-box"><span class="tick">✔</span> {{FINANCE_STATUS}}</div>
+  </div>
+
+  <!-- DAMAGE HISTORY -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon red">🚗</div>
+      <div>
+        <p class="section-title">Damage History</p>
+        <p class="section-sub">Accident and damage records</p>
+      </div>
+    </div>
+    <hr class="section-rule">
+    <div class="clear-box"><span class="tick">✔</span> {{DAMAGE_STATUS}}</div>
+
+    <div class="car-diagram">
+      <svg width="360" height="260" viewBox="0 0 360 260" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" stroke="#333" stroke-width="1.5">
+          <rect x="110" y="10" width="140" height="100" rx="35"/>
+          <line x1="110" y1="60" x2="60" y2="45" />
+          <line x1="250" y1="60" x2="300" y2="45" />
+          <rect x="110" y="150" width="140" height="100" rx="35"/>
+          <line x1="110" y1="200" x2="60" y2="215" />
+          <line x1="250" y1="200" x2="300" y2="215" />
+        </g>
+        <text x="180" y="135" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" letter-spacing="2" fill="#333">{{MAKE}} {{MODEL}}</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- STOLEN STATUS -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon">🔒</div>
+      <div>
+        <p class="section-title">Stolen Status</p>
+        <p class="section-sub">Theft and security status check</p>
+      </div>
+    </div>
+    <hr class="section-rule">
+    <div class="clear-box"><span class="tick">✔</span> {{STOLEN_STATUS}}</div>
+  </div>
+
+  <!-- DIMENSIONS & WEIGHT -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon">📏</div>
+      <div>
+        <p class="section-title">Dimensions &amp; Weight</p>
+        <p class="section-sub">Physical specifications and measurements</p>
+      </div>
+    </div>
+    <hr class="section-rule">
+    <div class="card">
+      <div class="row2 shaded"><div class="cell-label">WIDTH</div><div class="cell-value">{{WIDTH}}</div></div>
+      <div class="row2 plain"><div class="cell-label">HEIGHT</div><div class="cell-value">{{HEIGHT}}</div></div>
+      <div class="row2 shaded"><div class="cell-label">LENGTH</div><div class="cell-value">{{LENGTH}}</div></div>
+      <div class="row2 plain"><div class="cell-label">WHEEL BASE</div><div class="cell-value">{{WHEEL_BASE}}</div></div>
+      <div class="row2 shaded"><div class="cell-label">KERB WEIGHT</div><div class="cell-value">{{KERB_WEIGHT}}</div></div>
+      <div class="row2 plain"><div class="cell-label">MAX. ALLOWED WEIGHT</div><div class="cell-value">{{MAX_ALLOWED_WEIGHT}}</div></div>
+    </div>
+  </div>
+
+ <!-- =========================================================
+       SECTION 1: Title Brand & Problem Checks (Comprehensive)
+       ========================================================= -->
+       <div class="card">
+        <div class="card-head">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.5 3.5l6 6-8.5 8.5-6.5 1 1-6.5 8-8z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="card-title">Title Brand &amp; Problem Checks (Comprehensive)</p>
+        </div>
+    
+        <!-- Damage & Salvage Checks -->
+        <div class="subsection">
+          <p class="subsection-title">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Damage &amp; Salvage Checks
+          </p>
+          <div class="check-grid">
+            <div class="check-item"><span class="label">Flood Damage</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Fire Damage</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Hail Damage</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Junk</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Totaled</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Salvage</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Former Rental</span><span class="value-no">✓ No</span></div>
+          </div>
+        </div>
+    
+        <!-- Title History Checks -->
+        <div class="subsection">
+          <p class="subsection-title">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Title History Checks
+          </p>
+          <div class="check-grid">
+            <div class="check-item"><span class="label">Prior Taxi</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Odometer Not Actual</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Vandalism</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Rebuilt</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Dismantled</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Collision</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Prior Police</span><span class="value-no">✓ No</span></div>
+          </div>
+        </div>
+    
+        <!-- Warranty & Status Checks -->
+        <div class="subsection">
+          <p class="subsection-title">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            Warranty &amp; Status Checks
+          </p>
+          <div class="check-grid">
+            <div class="check-item"><span class="label">Warranty Return</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Parts Only</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Recovered Theft</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Undisclosed Lien</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Antique / Classic</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Agricultural Vehicle</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Reissued VIN</span><span class="value-no">✓ No</span></div>
+          </div>
+        </div>
+    
+        <!-- Safety & Defect Checks -->
+        <div class="subsection">
+          <p class="subsection-title">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            Safety &amp; Defect Checks
+          </p>
+          <div class="check-grid">
+            <div class="check-item"><span class="label">Manufacturer Buy Back</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Salvage / Stolen</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Crushed</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Inoperable Vehicle</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Hazardous</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Export Only Vehicle</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Odometer Tampering</span><span class="value-no">✓ No</span></div>
+            <div class="check-item"><span class="label">Gray Market</span><span class="value-no">✓ No</span></div>
+          </div>
+        </div>
+      </div>
+    
+    
+      <!-- =========================================================
+           SECTION 2: Odometer & Discrepancy Checks + Recalls
+           ========================================================= -->
+      <div class="card">
+        <div class="card-head">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.6"/><path d="M12 16v.01M12 13c0-2 2-2 2-4a2 2 0 1 0-4 0" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <p class="card-title">Odometer &amp; Discrepancy Checks</p>
+        </div>
+    
+        <div class="check-grid">
+          <div class="check-item"><span class="label">Odometer Exceeds Limits</span><span class="value-no">✓ No</span></div>
+          <div class="check-item"><span class="label">Odometer Altered</span><span class="value-no">✓ No</span></div>
+          <div class="check-item"><span class="label">Odometer Replaced</span><span class="value-no">✓ No</span></div>
+          <div class="check-item"><span class="label">Odometer Discrepancy</span><span class="value-no">✓ No</span></div>
+          <div class="check-item"><span class="label">Pending Junk</span><span class="value-no">✓ No</span></div>
+          <div class="check-item"><span class="label">Junk Automobile</span><span class="value-no">✓ No</span></div>
+        </div>
+    
+        <div class="recall-box">
+          <p class="recall-head">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L2 20h20L12 3z" stroke="#f59e0b" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v4M12 17v.01" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Recalls Section
+          </p>
+          <span class="recall-pill">✓ No Active Campaigns Found</span>
+          <p class="recall-text">No manufacturer campaigns or active recalls have been reported for this vehicle.</p>
+        </div>
+      </div>
+    
+    
+      <!-- =========================================================
+           SECTION 3: Safety Features
+           ========================================================= -->
+      <div class="card">
+        <div class="card-head">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <p class="card-title">Safety Features</p>
+        </div>
+    
+        <div class="feature-grid">
+          <div class="feature-row"><span class="label">Front Airbags</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row"><span class="label">Side Airbags</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row"><span class="label">Side Curtain Airbags</span><span class="equipped-pill">Equipped</span></div>
+    
+          <div class="feature-row"><span class="label">ABS</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row"><span class="label">Braking Assist</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row"><span class="label">Electronic Brakeforce Distribution</span><span class="equipped-pill">Equipped</span></div>
+    
+          <div class="feature-row"><span class="label">Active Head Restraints</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row"><span class="label">Child Safety Door Locks</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row"><span class="label">Child Seat Anchors</span><span class="equipped-pill">Equipped</span></div>
+    
+          <div class="feature-row" style="border-bottom:none;"><span class="label">Crumple Zones</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row" style="border-bottom:none;"><span class="label">Emergency Trunk Release</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row" style="border-bottom:none;"></div>
+        </div>
+      </div>
+    
+    
+      <!-- =========================================================
+           SECTION 4: Security Features
+           ========================================================= -->
+      <div class="card">
+        <div class="card-head">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="11" width="14" height="9" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8 11V7a4 4 0 1 1 8 0v4" stroke="#fff" stroke-width="1.6"/></svg>
+          </div>
+          <p class="card-title">Security Features</p>
+        </div>
+    
+        <div class="feature-grid cols-2">
+          <div class="feature-row"><span class="label">Hill Holder Control</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row"><span class="label">Stability Control</span><span class="equipped-pill">Equipped</span></div>
+    
+          <div class="feature-row"><span class="label">Traction Control</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row"><span class="label">Anti-Theft System</span><span class="equipped-pill">Equipped</span></div>
+    
+          <div class="feature-row"><span class="label">Power Door Locks</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row"><span class="label">Front Seatbelts</span><span class="equipped-pill">Equipped</span></div>
+    
+          <div class="feature-row"><span class="label">Rear Seatbelts</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row"><span class="label">Seatbelt Pretensioners</span><span class="equipped-pill">Equipped</span></div>
+    
+          <div class="feature-row" style="border-bottom:none;"><span class="label">Seatbelt Warning Sensor</span><span class="equipped-pill">Equipped</span></div>
+          <div class="feature-row" style="border-bottom:none;"></div>
+        </div>
+      </div>
+
+
+</div>
+<script>
+(function () {
+  var SAMPLE = {
+    LOGO_SRC: 'img2/epicvin-logos/epicvinrecord-logo.png',
+    INSPECTION_BANNER_SRC: 'img2/report/car-img.png',
+    REPORT_DATE: new Date().toISOString().slice(0, 10),
+    BANNER_TITLE: 'BMW i8',
+    VEHICLE_FULL_NAME: 'BMW i8 (2018)',
+    IDENTIFICATION_NUMBER: 'MF18OBG',
+    REGISTRATION: 'MF18OBG',
+    MAKE: 'BMW',
+    MODEL: 'i8',
+    YEAR: '2018',
+    NUMBER_OF_DOORS: '2',
+    GEARBOX: '6 speed Automatic',
+    TOP_SPEED: '155 mph',
+    POWER: '357 BHP',
+    MAX_TORQUE: '570 Nm at 3.700 rpm',
+    ENGINE_CAPACITY: '1.499 cc',
+    CYLINDERS: '3',
+    FUEL_TYPE: 'Petrol/Electric',
+    CONSUMPTION_CITY: 'mpg',
+    CONSUMPTION_EXTRA_URBAN: 'mpg',
+    CONSUMPTION_COMBINED: '134.5 mpg',
+    CO2_EMISSION: '49 g/km',
+    CO2_LABEL: 'A',
+    TYRE_DATA_MODEL: 'i8 Coupe',
+    ENGINE_POWER_KW: '266 kW',
+    STANDARD_FITMENT: 'Yes',
+    FRONT_TYRE_SIZE: '195/50R20',
+    REAR_TYRE_SIZE: '215/45R20',
+    FRONT_PRESSURE: '2.20 bar / 32.00 psi',
+    REAR_PRESSURE: '2.20 bar / 32.00 psi',
+    WHEEL_HUB: 'PCD 5x112 | Centre bore 66.70 mm',
+    TAX_BAND: 'A',
+    TAX_SINGLE_PAYMENT: '£ 0,-',
+    FINANCE_STATUS: 'Clear — No outstanding loans or financial agreements on this vehicle.',
+    DAMAGE_STATUS: 'Clear — No record of accidents or damage reported for this vehicle.',
+    STOLEN_STATUS: 'Clear — No theft record found.',
+    LEGAL_FINANCIAL_STATUS: 'Clear / No issues',
+    LEGAL_WRITE_OFF_STATUS: 'Not recorded as write-off',
+    LEGAL_ACCIDENT_STATUS: 'No accident records',
+    LEGAL_THEFT_STATUS: 'No theft markers',
+    WIDTH: '1.942 mm',
+    HEIGHT: '1.297 mm',
+    LENGTH: '4.689 mm',
+    WHEEL_BASE: '2.800 mm',
+    KERB_WEIGHT: '1.485 kg',
+    MAX_ALLOWED_WEIGHT: '1.870 kg'
+  };
+
+  function buildVehicleName(order) {
+    var model = (order && (order.carModel || order.vehicleModel)) || '';
+    var year = (order && order.year) || '';
+    if (model && year) return model + ' (' + year + ')';
+    if (model) return model;
+    var e = order && order.enrichment;
+    if (e && (e.make || e.model)) {
+      var parts = [e.make, e.model].filter(Boolean).join(' ').trim();
+      var y = e.yearOfManufacture || year;
+      return y ? parts + ' (' + y + ')' : parts;
+    }
+    return '';
+  }
+
+  function mapFromOrder(order) {
+    if (!order) return Object.assign({}, SAMPLE);
+    var e = order.enrichment || {};
+    var make = e.make || '';
+    var model = order.carModel || order.vehicleModel || e.model || '';
+    var year = order.year || e.yearOfManufacture || '';
+    var reg = order.vin || order.plate || SAMPLE.REGISTRATION;
+    var full = buildVehicleName(order) || SAMPLE.VEHICLE_FULL_NAME;
+    var banner = [make, model].filter(Boolean).join(' ') || full || SAMPLE.BANNER_TITLE;
+    return Object.assign({}, SAMPLE, e, {
+      REPORT_DATE: new Date().toISOString().slice(0, 10),
+      BANNER_TITLE: banner,
+      VEHICLE_FULL_NAME: full,
+      IDENTIFICATION_NUMBER: reg,
+      REGISTRATION: reg,
+      MAKE: make || SAMPLE.MAKE,
+      MODEL: model || SAMPLE.MODEL,
+      YEAR: year || SAMPLE.YEAR,
+      NUMBER_OF_DOORS: e.numberOfDoors || e.doors || SAMPLE.NUMBER_OF_DOORS,
+      GEARBOX: e.gearbox || SAMPLE.GEARBOX,
+      TOP_SPEED: e.topSpeed || SAMPLE.TOP_SPEED,
+      POWER: e.power || SAMPLE.POWER,
+      MAX_TORQUE: e.maxTorque || SAMPLE.MAX_TORQUE,
+      ENGINE_CAPACITY: e.engineCapacity || SAMPLE.ENGINE_CAPACITY,
+      CYLINDERS: e.cylinders || SAMPLE.CYLINDERS,
+      FUEL_TYPE: e.fuelType || SAMPLE.FUEL_TYPE,
+      CONSUMPTION_CITY: e.consumptionCity || SAMPLE.CONSUMPTION_CITY,
+      CONSUMPTION_EXTRA_URBAN: e.consumptionExtraUrban || SAMPLE.CONSUMPTION_EXTRA_URBAN,
+      CONSUMPTION_COMBINED: e.consumptionCombined || SAMPLE.CONSUMPTION_COMBINED,
+      CO2_EMISSION: e.co2Emission || SAMPLE.CO2_EMISSION,
+      CO2_LABEL: e.co2Label || SAMPLE.CO2_LABEL,
+      TYRE_DATA_MODEL: e.tyreDataModel || SAMPLE.TYRE_DATA_MODEL,
+      ENGINE_POWER_KW: e.enginePowerKw || SAMPLE.ENGINE_POWER_KW,
+      STANDARD_FITMENT: e.standardFitment || SAMPLE.STANDARD_FITMENT,
+      FRONT_TYRE_SIZE: e.frontTyreSize || SAMPLE.FRONT_TYRE_SIZE,
+      REAR_TYRE_SIZE: e.rearTyreSize || SAMPLE.REAR_TYRE_SIZE,
+      FRONT_PRESSURE: e.frontPressure || SAMPLE.FRONT_PRESSURE,
+      REAR_PRESSURE: e.rearPressure || SAMPLE.REAR_PRESSURE,
+      WHEEL_HUB: e.wheelHub || SAMPLE.WHEEL_HUB,
+      TAX_BAND: e.taxBand || e.co2Label || SAMPLE.TAX_BAND,
+      TAX_SINGLE_PAYMENT: e.taxSinglePayment || SAMPLE.TAX_SINGLE_PAYMENT,
+      FINANCE_STATUS: e.financeStatus || SAMPLE.FINANCE_STATUS,
+      DAMAGE_STATUS: e.damageStatus || SAMPLE.DAMAGE_STATUS,
+      STOLEN_STATUS: e.stolenStatus || SAMPLE.STOLEN_STATUS,
+      WIDTH: e.width || SAMPLE.WIDTH,
+      HEIGHT: e.height || SAMPLE.HEIGHT,
+      LENGTH: e.length || SAMPLE.LENGTH,
+      WHEEL_BASE: e.wheelBase || SAMPLE.WHEEL_BASE,
+      KERB_WEIGHT: e.kerbWeight || SAMPLE.KERB_WEIGHT,
+      MAX_ALLOWED_WEIGHT: e.maxAllowedWeight || SAMPLE.MAX_ALLOWED_WEIGHT
+    });
+  }
+
+  function applyMap(map) {
+    var html = document.documentElement.innerHTML;
+    var keys = Object.keys(map).sort(function (a, b) { return b.length - a.length; });
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var token = new RegExp('\\{\\{\\s*' + key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\}\\}', 'g');
+      html = html.replace(token, String(map[key]));
+    }
+    document.documentElement.innerHTML = html;
+  }
+
+  function fillFromOrder() {
+    var order = null;
+    try {
+      order = JSON.parse(localStorage.getItem('vinReport') || 'null');
+    } catch (e) { /* ignore */ }
+    applyMap(mapFromOrder(order));
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fillFromOrder);
+  } else {
+    fillFromOrder();
+  }
+})();
+</script>
+</body>
+</html>

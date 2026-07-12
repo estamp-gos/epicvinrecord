@@ -2,8 +2,18 @@
   "name": "epicvinrecord",
   "private": true,
   "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "build:template": "node scripts/build-report-template.js",
     "deploy": "wrangler deploy",
     "deploy:worker": "wrangler deploy"
+  },
+  "dependencies": {
+    "@sparticuz/chromium-min": "^149.0.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "groq-sdk": "^0.15.0",
+    "puppeteer-core": "^24.2.0"
   },
   "devDependencies": {
     "wrangler": "^4.61.0"
