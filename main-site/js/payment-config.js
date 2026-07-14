@@ -2,6 +2,8 @@
 
 var CARD_PRICE_GBP = 54.99;
 var STRIPE_CARD_URL = 'https://buy.stripe.com/8x2eVe6Y07m75zx7dKfjG0b';
+/** Keep alias so any cached payment-flow that still reads PAYPAL_CARD_URL opens Stripe. */
+var PAYPAL_CARD_URL = STRIPE_CARD_URL;
 var BANK_PRICE_GBP = 52.99;
 var BANK_DISCOUNT_GBP = 7;
 

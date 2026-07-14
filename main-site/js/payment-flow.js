@@ -283,9 +283,11 @@
         currencySymbol: (window.__epicCurrency && window.__epicCurrency.symbol) || '\u00A3'
       })));
     } catch (e) { /* continue */ }
-    // Same pattern as bank: open Stripe in a new tab, stay on-site for thank-you / PDF
-    // (no Stripe return-URL required). Stripe URL and amount are unchanged.
-    window.open(STRIPE_CARD_URL, '_blank', 'noopener,noreferrer');
+    // Open Stripe Checkout in a new tab, then stay on-site for thank-you / PDF.
+    var cardUrl =
+      (typeof STRIPE_CARD_URL === 'string' && STRIPE_CARD_URL) ||
+      'https://buy.stripe.com/8x2eVe6Y07m75zx7dKfjG0b';
+    window.open(cardUrl, '_blank', 'noopener,noreferrer');
     var thankYouUrl =
       typeof buildThankYouUrl === 'function'
         ? buildThankYouUrl()
