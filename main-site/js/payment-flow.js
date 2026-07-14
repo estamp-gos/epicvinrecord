@@ -283,9 +283,9 @@
         currencySymbol: (window.__epicCurrency && window.__epicCurrency.symbol) || '\u00A3'
       })));
     } catch (e) { /* continue */ }
-    // Same pattern as bank: open PayPal in a new tab, stay on-site for thank-you / PDF
-    // (no PayPal dashboard return-URL needed). PayPal URL and amount are unchanged.
-    window.open(PAYPAL_CARD_URL, '_blank', 'noopener,noreferrer');
+    // Same pattern as bank: open Stripe in a new tab, stay on-site for thank-you / PDF
+    // (no Stripe return-URL required). Stripe URL and amount are unchanged.
+    window.open(STRIPE_CARD_URL, '_blank', 'noopener,noreferrer');
     var thankYouUrl =
       typeof buildThankYouUrl === 'function'
         ? buildThankYouUrl()

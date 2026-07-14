@@ -1,7 +1,7 @@
 /** Bank transfer payment configuration (matches VinXtract flow) */
 
 var CARD_PRICE_GBP = 54.99;
-var PAYPAL_CARD_URL = 'https://www.paypal.com/ncp/payment/FFWBH4VTGWVCS';
+var STRIPE_CARD_URL = 'https://buy.stripe.com/8x2eVe6Y07m75zx7dKfjG0b';
 var BANK_PRICE_GBP = 52.99;
 var BANK_DISCOUNT_GBP = 7;
 
@@ -77,7 +77,7 @@ function buildUploadProofUrl() {
   return 'upload-proof/index.html';
 }
 
-/** Thank-you / PDF download page (used after PayPal card opens in a new tab). */
+/** Thank-you / PDF download page (used after Stripe card opens in a new tab). */
 function buildThankYouUrl() {
   var path = window.location.pathname.replace(/\\/g, '/');
   var subPages = [
