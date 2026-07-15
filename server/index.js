@@ -28,7 +28,11 @@ app.get('/api/health', (_req, res) => {
 
 app.use(express.static(ROOT))
 
-app.listen(PORT, () => {
-  console.log(`EpicVINrecord report API listening on http://localhost:${PORT}`)
-  console.log(`Thank you page: http://localhost:${PORT}/thank-you/`)
-})
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`EpicVINrecord report API listening on http://localhost:${PORT}`)
+    console.log(`Thank you page: http://localhost:${PORT}/thank-you/`)
+  })
+}
+
+module.exports = app
