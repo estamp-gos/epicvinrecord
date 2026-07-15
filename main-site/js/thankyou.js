@@ -187,7 +187,7 @@
     } catch (err) {
       console.error('Failed to generate PDF:', err);
       var msg = err && err.message ? err.message : 'Failed to generate report PDF.';
-      showError(msg + ' Make sure the report API is running (npm start).');
+      showError(msg);
       setStatus('Generation failed — you can retry with the button.');
     } finally {
       setDownloading(false);
