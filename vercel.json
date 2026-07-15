@@ -1,10 +1,8 @@
 {
-  "version": 2,
   "functions": {
     "api/generate-report.js": {
       "memory": 1024,
-      "maxDuration": 60,
-      "includeFiles": ["report-sample.html", "img2/**/*"]
+      "includeFiles": "img2/**/*"
     }
   }
 }
