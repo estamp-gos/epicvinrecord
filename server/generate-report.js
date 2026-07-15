@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer-core')
 const { resolveChromeExecutable } = require('./chromePath')
 
 const CHROMIUM_PACK_URL =
-  'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
+  'https://github.com/Sparticuz/chromium/releases/download/v133.0.0/chromium-v133.0.0-pack.tar'
 
 const LOCAL_CHROME_ARGS = [
   '--no-sandbox',
