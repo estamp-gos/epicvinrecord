@@ -1,12 +1,11 @@
 const fs = require('fs/promises')
 const path = require('path')
 const { pathToFileURL } = require('url')
-const chromium = require('@sparticuz/chromium-min')
-const puppeteer = require('puppeteer-core')
 const { resolveChromeExecutable } = require('./chromePath')
 
+// ESM-only packages — must use dynamic import() from CommonJS
 const CHROMIUM_PACK_URL =
-  'https://github.com/Sparticuz/chromium/releases/download/v133.0.0/chromium-v133.0.0-pack.tar'
+  'https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack.x64.tar'
 
 const LOCAL_CHROME_ARGS = [
   '--no-sandbox',
@@ -21,6 +20,16 @@ const RAW_HTML_KEYS = new Set([
   'LOGO_SRC',
   'INSPECTION_BANNER_SRC',
 ])
+
+async function loadChromium() {
+  const { default: chromium } = await import('@sparticuz/chromium-min')
+  return chromium
+}
+
+async function loadPuppeteer() {
+  const { default: puppeteer } = await import('puppeteer-core')
+  return puppeteer
+}
 
 async function getLaunchOptions() {
   const useSparticuz = !!process.env.VERCEL || process.platform === 'linux'
@@ -39,6 +48,7 @@ async function getLaunchOptions() {
     }
   }
 
+  const chromium = await loadChromium()
   return {
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
@@ -444,6 +454,7 @@ async function generateReportHandler(req, res) {
 
   let browser
   try {
+    const puppeteer = await loadPuppeteer()
     browser = await puppeteer.launch(await getLaunchOptions())
     const page = await browser.newPage()
     await page.setViewport({ width: 1024, height: 1400 })
