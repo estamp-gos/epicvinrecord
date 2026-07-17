@@ -283,16 +283,12 @@
         currencySymbol: (window.__epicCurrency && window.__epicCurrency.symbol) || '\u00A3'
       })));
     } catch (e) { /* continue */ }
-    // Open Stripe Checkout in a new tab, then stay on-site for thank-you / PDF.
+    // Continue to Stripe in this tab. Stripe's Payment Link must be configured
+    // to redirect to /thank-you/ only after a successful payment.
     var cardUrl =
       (typeof STRIPE_CARD_URL === 'string' && STRIPE_CARD_URL) ||
       'https://buy.stripe.com/8x2eVe6Y07m75zx7dKfjG0b';
-    window.open(cardUrl, '_blank', 'noopener,noreferrer');
-    var thankYouUrl =
-      typeof buildThankYouUrl === 'function'
-        ? buildThankYouUrl()
-        : 'thank-you/index.html';
-    window.location.href = thankYouUrl;
+    window.location.href = cardUrl;
   };
 
   window.EPICVIN_USE_PAYMENT_MODAL = true;
