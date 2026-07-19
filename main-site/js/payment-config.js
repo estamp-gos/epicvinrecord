@@ -1,9 +1,11 @@
-/** Bank transfer payment configuration (matches VinXtract flow) */
+/** Card / Freemius checkout payment configuration */
 
 var CARD_PRICE_GBP = 54.99;
-var STRIPE_CARD_URL = 'https://buy.stripe.com/8x2eVe6Y07m75zx7dKfjG0b';
-/** Keep alias so any cached payment-flow that still reads PAYPAL_CARD_URL opens Stripe. */
-var PAYPAL_CARD_URL = STRIPE_CARD_URL;
+/** Freemius checkout — after payment redirects to /thank-you/ (set in Freemius dashboard). */
+var FREEMIUS_CHECKOUT_URL = 'https://checkout.freemius.com/product/27824/plan/47537/';
+/** Legacy aliases so older cached payment-flow builds still open Freemius. */
+var STRIPE_CARD_URL = FREEMIUS_CHECKOUT_URL;
+var PAYPAL_CARD_URL = FREEMIUS_CHECKOUT_URL;
 var BANK_PRICE_GBP = 52.99;
 var BANK_DISCOUNT_GBP = 7;
 
@@ -79,7 +81,7 @@ function buildUploadProofUrl() {
   return 'upload-proof/index.html';
 }
 
-/** Thank-you / PDF download page (used after Stripe card opens in a new tab). */
+/** Thank-you / PDF download page (Freemius success redirect target). */
 function buildThankYouUrl() {
   var path = window.location.pathname.replace(/\\/g, '/');
   var subPages = [

@@ -277,17 +277,18 @@
       var existing = localStorage.getItem('vinReport');
       var report = existing ? JSON.parse(existing) : (state.currentOrder || {});
       localStorage.setItem('vinReport', JSON.stringify(Object.assign({}, report, state.currentOrder, {
-        paymentMethod: 'card',
+        paymentMethod: 'freemius',
         amountPaid: CARD_PRICE_GBP,
         currency: (window.__epicCurrency && window.__epicCurrency.currency) || 'GBP',
         currencySymbol: (window.__epicCurrency && window.__epicCurrency.symbol) || '\u00A3'
       })));
     } catch (e) { /* continue */ }
-    // Continue to Stripe in this tab. Stripe's Payment Link must be configured
-    // to redirect to /thank-you/ only after a successful payment.
+    // Continue to Freemius in this tab. Freemius success URL must redirect
+    // to /thank-you/ only after a successful payment (set in Freemius dashboard).
     var cardUrl =
+      (typeof FREEMIUS_CHECKOUT_URL === 'string' && FREEMIUS_CHECKOUT_URL) ||
       (typeof STRIPE_CARD_URL === 'string' && STRIPE_CARD_URL) ||
-      'https://buy.stripe.com/8x2eVe6Y07m75zx7dKfjG0b';
+      'https://checkout.freemius.com/product/27824/plan/47537/';
     window.location.href = cardUrl;
   };
 
