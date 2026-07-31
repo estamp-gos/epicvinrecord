@@ -5625,11 +5625,11 @@
         }
 
         .main-nav {
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             justify-content: normal;
             padding: 0;
             position: static;
-            row-gap: 10px
+            row-gap: 0
         }
 
         .main-nav__burger-btn {
@@ -5708,23 +5708,30 @@
 
         .main-nav__list {
             align-items: center;
-            display: none;
-            flex: 1 1 auto;
+            display: flex;
+            flex: 1 1 100%;
             justify-content: center;
             list-style: none;
             margin: 0;
-            max-width: 640px;
-            padding: 0 20px;
-            row-gap: 10px
+            order: 10;
+            padding: 8px 0 0;
+            row-gap: 10px;
+            width: 100%
         }
 
         .main-nav__notice {
             color: var(--dark-grey);
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 500;
             line-height: 1.35;
             margin: 0;
             text-align: center
+        }
+
+        @media(min-width:768px) {
+            .main-nav__notice {
+                font-size: 12px
+            }
         }
 
         @media(min-width:1340px) {
@@ -5900,7 +5907,16 @@
             .main-nav__list {
                 -moz-column-gap: 20px;
                 column-gap: 20px;
-                display: flex
+                display: flex;
+                flex: 1 1 auto;
+                max-width: 640px;
+                order: 0;
+                padding: 0 20px;
+                width: auto
+            }
+
+            .main-nav__notice {
+                font-size: 13px
             }
 
             .main-nav__btns .lang-dropdown {
