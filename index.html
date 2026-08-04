@@ -5682,7 +5682,7 @@
         }
 
         .main-nav__logo {
-            margin-right: auto;
+            margin-right: 0;
             padding: 0
         }
 
@@ -5853,7 +5853,18 @@
             align-items: center;
             -moz-column-gap: 10px;
             column-gap: 10px;
-            display: flex
+            display: flex;
+            margin-left: auto
+        }
+
+        .main-nav__uk-flag {
+            border-radius: 2px;
+            display: block;
+            flex-shrink: 0;
+            height: 22px;
+            margin-right: 4px;
+            object-fit: cover;
+            width: 32px
         }
 
         .main-nav__btns .lang-dropdown,
@@ -10169,7 +10180,7 @@
                             </div>
                         </div>
                         <a class="navbar-brand main-nav__logo" href="https://epicvinrecord.com">
-                            <img src="img2/epicvin-logos/logo.png" alt="EpicVINrecord Logo" width="146" height="26">
+                            <img src="img2/epicvin-logos/logo.png" alt="EpicVINrecord UK Logo" width="180" height="26">
                         </a>
                         <ul class="main-nav__list">
                             <li>
@@ -10177,6 +10188,7 @@
                             </li>
                         </ul>
                         <div class="main-nav__btns">
+                            <img class="main-nav__uk-flag" src="img/lng/uk.png" alt="United Kingdom flag" width="32" height="22">
                             <div class="lang-dropdown">
                                 <button id="langDropdownDesktop" class="btn-reset dropdown-toggle lang-dropdown__btn"
                                     type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
