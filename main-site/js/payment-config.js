@@ -2,7 +2,7 @@
 
 var CARD_PRICE_GBP = 54.99;
 /** Freemius checkout — after payment redirects to /thank-you/ (set in Freemius dashboard). */
-var FREEMIUS_CHECKOUT_URL = 'https://checkout.freemius.com/product/27824/plan/47537/';
+var FREEMIUS_CHECKOUT_URL = 'https://checkout.freemius.com/product/27824/plan/61097/licenses/1/currency/gbp/';
 /** Legacy aliases so older cached payment-flow builds still open Freemius. */
 var STRIPE_CARD_URL = FREEMIUS_CHECKOUT_URL;
 var PAYPAL_CARD_URL = FREEMIUS_CHECKOUT_URL;

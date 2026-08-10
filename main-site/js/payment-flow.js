@@ -288,7 +288,7 @@
     var cardUrl =
       (typeof FREEMIUS_CHECKOUT_URL === 'string' && FREEMIUS_CHECKOUT_URL) ||
       (typeof STRIPE_CARD_URL === 'string' && STRIPE_CARD_URL) ||
-      'https://checkout.freemius.com/product/27824/plan/47537/';
+      'https://checkout.freemius.com/product/27824/plan/61097/licenses/1/currency/gbp/';
     window.location.href = cardUrl;
   };
 
