@@ -82,7 +82,7 @@
     els.sumEmail.textContent = order.email || '—';
     if (els.sumModel) els.sumModel.textContent = order.carModel || order.vehicleModel || '—';
     if (els.sumYear) els.sumYear.textContent = order.year || '—';
-    els.sumType.textContent = order.vehicleType || 'basic';
+    els.sumType.textContent = order.vehicleCategory || order.vehicleType || '—';
     els.sumTier.textContent = order.tierName || 'basic';
     if (els.noteEmail) {
       els.noteEmail.textContent = order.email || 'your email';
@@ -164,6 +164,74 @@
     URL.revokeObjectURL(url);
   }
 
+  async function notifyPaymentSuccess(order) {
+    if (!order || order.paymentSuccessEmailSentAt) return;
+    var email = String(order.email || '').trim();
+    if (!email) return;
+    if (!order.paymentMethod) return;
+
+    try {
+      var res = await fetch(getApiBase() + '/api/send-payment-success', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          paid: true,
+          paymentCompleted: true,
+          vin: order.vin || '',
+          plate: order.plate || ''
+        })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok || !data.success) {
+        console.error('Failed to send payment success email:', data.message || res.status);
+        return;
+      }
+      vinReport = Object.assign({}, vinReport || order, {
+        paymentSuccessEmailSentAt: new Date().toISOString()
+      });
+      try {
+        localStorage.setItem('vinReport', JSON.stringify(vinReport));
+      } catch (e) { /* ignore */ }
+    } catch (err) {
+      console.error('Payment success email failed:', err);
+    }
+  }
+
+  async function notifyPdfDownloaded(order) {
+    if (!order || order.pdfDownloadNotifiedAt) return;
+
+    try {
+      var res = await fetch(getApiBase() + '/api/notify-download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: order.email || '',
+          vin: order.vin || '',
+          plate: order.plate || '',
+          carModel: order.carModel || order.vehicleModel || '',
+          vehicleModel: order.carModel || order.vehicleModel || '',
+          vehicleCategory: order.vehicleCategory || '',
+          vehicleType: order.vehicleType || ''
+        })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok || !data.success) {
+        console.error('Failed to send PDF download notification:', data.message || res.status);
+        return;
+      }
+
+      vinReport = Object.assign({}, order, {
+        pdfDownloadNotifiedAt: new Date().toISOString()
+      });
+      try {
+        localStorage.setItem('vinReport', JSON.stringify(vinReport));
+      } catch (e) { /* ignore */ }
+    } catch (err) {
+      console.error('PDF download notification failed:', err);
+    }
+  }
+
   async function generatePDF() {
     if (!vinReport || downloading) return;
 
@@ -184,6 +252,7 @@
       setStatus('Generating PDF report…');
       await generatePdf(vinReport, enrichment);
       setStatus('Download started. If nothing happened, click the button again.');
+      await notifyPdfDownloaded(vinReport);
     } catch (err) {
       console.error('Failed to generate PDF:', err);
       var msg = err && err.message ? err.message : 'Failed to generate report PDF.';
@@ -202,6 +271,7 @@
     }
 
     renderSummary(vinReport);
+    notifyPaymentSuccess(vinReport);
 
     if (els.btn) {
       els.btn.addEventListener('click', function () {

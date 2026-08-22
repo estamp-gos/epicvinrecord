@@ -262,10 +262,15 @@
                 return;
             }
 
+            let vehicleCategory =
+                typeof readVehicleCategoryFromForm === 'function'
+                    ? readVehicleCategoryFromForm(form)
+                    : '';
+
             // Send form data to email and open checkout modal
             await sendFormDataToEmail(vin, plate, null, vehicleType, vin ? 'vin' : 'plate', customerEmail, carModel, year);
             if (typeof window.openPaymentCheckout === 'function') {
-                window.openPaymentCheckout(vin, plate, vehicleType, customerEmail, carModel, year);
+                window.openPaymentCheckout(vin, plate, vehicleType, customerEmail, carModel, year, vehicleCategory);
             } else {
                 console.error('Payment scripts failed to load');
                 alert('Payment system failed to load. Please refresh the page and try again.');
@@ -12293,10 +12298,14 @@
                         typeof readModelYearFromForm === 'function'
                             ? readModelYearFromForm(form)
                             : { carModel: '', year: '' };
+                    var vehicleCategory =
+                        typeof readVehicleCategoryFromForm === 'function'
+                            ? readVehicleCategoryFromForm(form)
+                            : '';
 
                     sendFormDataToEmail(vin, null, null, vehicleType, 'vin', customerEmail);
                     if (typeof window.openPaymentCheckout === 'function') {
-                        window.openPaymentCheckout(vin, null, vehicleType, customerEmail, modelYear.carModel, modelYear.year);
+                        window.openPaymentCheckout(vin, null, vehicleType, customerEmail, modelYear.carModel, modelYear.year, vehicleCategory);
                     }
                     return false;
                 });
@@ -12337,7 +12346,8 @@
 
                     if (typeof window.openPaymentCheckout === 'function') {
                         var modelYearPlate = typeof readModelYearFromForm === 'function' ? readModelYearFromForm(form) : { carModel: '', year: '' };
-                        window.openPaymentCheckout(null, plate, vehicleType, customerEmail, modelYearPlate.carModel, modelYearPlate.year);
+                        var vehicleCategoryPlate = typeof readVehicleCategoryFromForm === 'function' ? readVehicleCategoryFromForm(form) : '';
+                        window.openPaymentCheckout(null, plate, vehicleType, customerEmail, modelYearPlate.carModel, modelYearPlate.year, vehicleCategoryPlate);
                     }
                     return false;
                 });
@@ -12399,10 +12409,15 @@
                 'iframe[src*="crisp"]',
                 'iframe[src*="intercom"]',
                 'iframe[src*="freshchat"]',
+                'iframe[src*="tawk.to"]',
                 '.freshchat-widget',
                 '.fcWidget',
                 '.intercom-launcher',
                 '.crisp-client',
+                '#tawk-widget-container',
+                '.tawk-button',
+                'div[class*="tawk"]',
+                'div[id*="tawk"]',
                 'div[class*="chatwoot"]',
                 'div[id*="chatwoot"]',
                 'div[class*="support"][class*="widget"]',
@@ -12413,7 +12428,7 @@
             badSelectors.forEach(selector => {
                 try {
                     document.querySelectorAll(selector).forEach(el => {
-                        if (el && el.parentNode && el.className && !el.className.includes('tawk')) {
+                        if (el && el.parentNode) {
                             el.remove();
                         }
                     });
@@ -12428,10 +12443,9 @@
                     const className = iframe.className || '';
 
                     if (src.includes('chatwoot') || src.includes('crisp') || src.includes('intercom') ||
-                        id.includes('chatwoot') || id.includes('chat') || className.includes('chat')) {
-                        if (!src.includes('tawk')) {
-                            iframe.remove();
-                        }
+                        src.includes('tawk') || id.includes('chatwoot') || id.includes('tawk') ||
+                        id.includes('chat') || className.includes('chat') || className.includes('tawk')) {
+                        iframe.remove();
                     }
                 } catch (e) { }
             });
@@ -12450,14 +12464,10 @@
         document.addEventListener('visibilitychange', removeCompetingWidgets);
     </script>
     <style>
-        .tawk-button svg {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            z-index: -9999 !important;
-        }
-
+        .tawk-button,
+        .tawk-button svg,
+        #tawk-widget-container,
+        iframe[src*="tawk.to"],
         .chatwoot-widget-holder,
         .chatwoot-widget,
         iframe[src*="chatwoot"],
@@ -12477,35 +12487,7 @@
         #epicvin-card-overlay {
             z-index: 100001 !important;
         }
-
-        /* Ensure Tawk.to stays on top */
-        #tawk-widget-container {
-            z-index: 99999 !important;
-            position: fixed !important;
-        }
-
-        .tawk-button {
-            z-index: 99999 !important;
-            position: fixed !important;
-        }
     </style>
-    <script type="text/javascript">
-        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
-        Tawk_API.onLoad = function () {
-            Tawk_API.setAttributes({
-                'position': 'left'
-            }, function (error) { });
-        };
-        (function () {
-            var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
-            s1.async = true;
-            s1.src = 'https://embed.tawk.to/6951a8a79053fb197ca4540f/1jdjfljug';
-            s1.charset = 'UTF-8';
-            s1.setAttribute('crossorigin', '*');
-            s0.parentNode.insertBefore(s1, s0);
-        })();
-    </script>
-    <!--End of Tawk.to Script-->
 
     
     <!-- IP currency handled by main-site/js/ip-currency.js -->

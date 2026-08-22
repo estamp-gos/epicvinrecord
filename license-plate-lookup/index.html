@@ -244,10 +244,11 @@
                 alert('Please enter Vehicle Model and Model Year.');
                 return;
             }
+            let vehicleCategory = typeof readVehicleCategoryFromForm === 'function' ? readVehicleCategoryFromForm(form) : '';
 
             // Send form data to email and open checkout modal
             await sendFormDataToEmail(vin, plate, null, vehicleType, vin ? 'vin' : 'plate', customerEmail);
-            openPaymentCheckout(vin, plate, vehicleType, customerEmail, carModel, year);
+            openPaymentCheckout(vin, plate, vehicleType, customerEmail, carModel, year, vehicleCategory);
             return;
 
             // Old code below (kept as fallback)
@@ -2428,7 +2429,7 @@ registration card or insurance documents.
                         
                         // Open checkout modal with VIN, vehicle type, and customer email
                         sendFormDataToEmail(vin, null, null, vehicleType, 'vin', customerEmail);
-                        if (typeof window.openPaymentCheckout === 'function') { window.openPaymentCheckout(vin, null, vehicleType, customerEmail, (typeof readModelYearFromForm === 'function' ? readModelYearFromForm(form).carModel : ''), (typeof readModelYearFromForm === 'function' ? readModelYearFromForm(form).year : '')); }
+                        if (typeof window.openPaymentCheckout === 'function') { window.openPaymentCheckout(vin, null, vehicleType, customerEmail, (typeof readModelYearFromForm === 'function' ? readModelYearFromForm(form).carModel : ''), (typeof readModelYearFromForm === 'function' ? readModelYearFromForm(form).year : ''), (typeof readVehicleCategoryFromForm === 'function' ? readVehicleCategoryFromForm(form) : '')); }
                         return false;
                     });
                 });
@@ -2465,7 +2466,7 @@ registration card or insurance documents.
                         
                         
                         // Open Paddle Checkout with plate, vehicle type, and customer email
-                        if (typeof window.openPaymentCheckout === 'function') { window.openPaymentCheckout(null, plate, vehicleType, customerEmail, (typeof readModelYearFromForm === 'function' ? readModelYearFromForm(form).carModel : ''), (typeof readModelYearFromForm === 'function' ? readModelYearFromForm(form).year : '')); }
+                        if (typeof window.openPaymentCheckout === 'function') { window.openPaymentCheckout(null, plate, vehicleType, customerEmail, (typeof readModelYearFromForm === 'function' ? readModelYearFromForm(form).carModel : ''), (typeof readModelYearFromForm === 'function' ? readModelYearFromForm(form).year : ''), (typeof readVehicleCategoryFromForm === 'function' ? readVehicleCategoryFromForm(form) : '')); }
                         return false;
                     });
                 });

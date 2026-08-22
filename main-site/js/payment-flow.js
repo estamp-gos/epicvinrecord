@@ -176,6 +176,9 @@
       (state.currentOrder.year
         ? '<p style="margin-bottom:10px"><strong>Year:</strong> ' + state.currentOrder.year + '</p>'
         : '') +
+      (state.currentOrder.vehicleCategory
+        ? '<p style="margin-bottom:10px"><strong>Vehicle Type:</strong> ' + state.currentOrder.vehicleCategory + '</p>'
+        : '') +
       '<p style="margin-bottom:0"><strong>Report Type:</strong> ' + (state.currentOrder.tierName || 'basic') + ' - ' + formatGbpPrice(CARD_PRICE_GBP) + '</p>';
   }
 
@@ -319,10 +322,14 @@
         : { carModel: '', year: '' };
     var carModel = modelYear.carModel || '';
     var year = modelYear.year || '';
+    var vehicleCategory =
+      typeof readVehicleCategoryFromForm === 'function'
+        ? readVehicleCategoryFromForm(form)
+        : '';
     var searchType = vin ? 'vin' : 'plate';
     var done = function () {
       if (typeof window.openPaymentCheckout === 'function') {
-        window.openPaymentCheckout(vin, plate, vehicleType, customerEmail, carModel, year);
+        window.openPaymentCheckout(vin, plate, vehicleType, customerEmail, carModel, year, vehicleCategory);
       }
     };
     if (typeof window.sendFormDataToEmail === 'function') {

@@ -3,6 +3,9 @@
     "api/generate-report.js": {
       "memory": 1024,
       "includeFiles": "img2/**/*"
+    },
+    "api/notify-download.js": {
+      "includeFiles": "img2/epicvin-logos/**"
     }
   }
 }

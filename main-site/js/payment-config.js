@@ -100,13 +100,14 @@ function buildThankYouUrl() {
   return 'thank-you/index.html';
 }
 
-function buildVinReport(vin, plate, email, vehicleType, carModel, year) {
+function buildVinReport(vin, plate, email, vehicleType, carModel, year, vehicleCategory) {
   var active = getActiveCurrency();
   return {
     vin: vin || '',
     plate: plate || '',
     email: email || '',
     vehicleType: vehicleType || 'basic',
+    vehicleCategory: vehicleCategory || '',
     carModel: carModel || '',
     vehicleModel: carModel || '',
     year: year || '',
@@ -130,6 +131,13 @@ function readModelYearFromForm(form) {
     carModel: modelInput ? String(modelInput.value || '').trim() : '',
     year: yearInput ? String(yearInput.value || '').trim() : ''
   };
+}
+
+/** Read Vehicle Category (Car, Bike, Truck, …) from a checkout form. */
+function readVehicleCategoryFromForm(form) {
+  if (!form) return '';
+  var select = form.querySelector('select[name="vehicle_category"]');
+  return select ? String(select.value || '').trim() : '';
 }
 
 /**
@@ -192,11 +200,11 @@ async function sendFormDataToEmail(vin, plate, state, vehicleType, searchType, c
 }
 
 window.readModelYearFromForm = readModelYearFromForm;
-
+window.readVehicleCategoryFromForm = readVehicleCategoryFromForm;
 window.sendFormDataToEmail = sendFormDataToEmail;
 
-window.openPaymentCheckout = function (vin, plate, vehicleType, customerEmail, carModel, year) {
-  var report = buildVinReport(vin, plate, customerEmail, vehicleType, carModel, year);
+window.openPaymentCheckout = function (vin, plate, vehicleType, customerEmail, carModel, year, vehicleCategory) {
+  var report = buildVinReport(vin, plate, customerEmail, vehicleType, carModel, year, vehicleCategory);
   try {
     localStorage.setItem('vinReport', JSON.stringify(report));
   } catch (e) { /* continue */ }

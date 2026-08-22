@@ -4,6 +4,9 @@ const path = require('path')
 const express = require('express')
 const { lookupVehicleHandler } = require('./lookup-vehicle')
 const { generateReportHandler } = require('./generate-report')
+const { notifyDownloadHandler } = require('./notify-download')
+const { sendReminderHandler } = require('./send-reminder')
+const { sendPaymentSuccessHandler } = require('./send-payment-success')
 
 const app = express()
 const PORT = Number(process.env.PORT) || 3001
@@ -21,6 +24,9 @@ app.use((req, res, next) => {
 
 app.post('/api/lookup-vehicle', lookupVehicleHandler)
 app.post('/api/generate-report', generateReportHandler)
+app.post('/api/notify-download', notifyDownloadHandler)
+app.post('/api/send-reminder', sendReminderHandler)
+app.post('/api/send-payment-success', sendPaymentSuccessHandler)
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, service: 'epicvinrecord-report-api' })

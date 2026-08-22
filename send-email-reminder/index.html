@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Email Reminder — EpicVINrecord</title>
+  <meta name="theme-color" content="#0084ff">
+  <style>
+    :root {
+      --main-blue: #0084ff;
+      --dark-blue: #00386c;
+      --orange: #ffae00;
+      --basic-white: #fff;
+      --grey: #666;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f3f8fc;
+      color: #111;
+    }
+    .header {
+      background: var(--basic-white);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      padding: 0 20px;
+    }
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--main-blue);
+      text-decoration: none;
+    }
+    .nav a {
+      color: var(--grey);
+      text-decoration: none;
+      font-size: 14px;
+      margin-left: 20px;
+    }
+    .nav a:hover { color: var(--main-blue); }
+    main {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 48px 20px 60px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      color: var(--dark-blue);
+    }
+    .lead {
+      margin: 0 0 28px;
+      font-size: 15px;
+      color: var(--grey);
+      line-height: 1.6;
+    }
+    .card {
+      background: var(--basic-white);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      border: 1px solid #dbeafe;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+    input, select {
+      width: 100%;
+      padding: 13px 14px;
+      border: 2px solid #e6e6e6;
+      border-radius: 10px;
+      font-size: 15px;
+      margin-bottom: 16px;
+      outline: none;
+      background: #fff;
+    }
+    input:focus, select:focus { border-color: var(--main-blue); }
+    .send-btn {
+      width: 100%;
+      padding: 14px 20px;
+      background: var(--orange);
+      color: #111;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .send-btn:hover:not(:disabled) { filter: brightness(0.96); }
+    .send-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+    .status {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .status.ok {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+    .status.err {
+      display: block;
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a class="logo" href="../index.html">EpicVINrecord</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="../contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h1>Send Payment Reminder</h1>
+    <p class="lead">Enter an email address to send the incomplete-payment reminder template.</p>
+
+    <form class="card" id="reminder-form">
+      <label for="email">Email address</label>
+      <input id="email" name="email" type="email" required placeholder="customer@email.com" autocomplete="email">
+
+      <button type="submit" class="send-btn" id="send-btn">Send</button>
+      <div id="status" class="status" role="status"></div>
+    </form>
+  </main>
+
+  <footer>© EpicVINrecord. Vehicle History Reports &amp; VIN Checks</footer>
+
+  <script src="../main-site/js/send-email-reminder.js"></script>
+</body>
+</html>
