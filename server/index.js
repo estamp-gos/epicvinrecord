@@ -38,6 +38,7 @@ if (process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
     console.log(`EpicVINrecord report API listening on http://localhost:${PORT}`)
     console.log(`Thank you page: http://localhost:${PORT}/thank-you/`)
+    console.log(`Vehicle Check form: http://localhost:${PORT}/report-form/`)
   })
 }
 

@@ -350,12 +350,28 @@ function coercePlaceholders(payload) {
   }
 }
 
-function safeFilename(reg) {
+function isVehicleCheckBrand(payload) {
+  const raw = String(
+    payload.brandName || payload.brand || payload.reportBrand || ''
+  ).trim()
+  return /^vehicle\s*check$/i.test(raw) || /^vehiclecheck$/i.test(raw)
+}
+
+function vehicleCheckLogoDataUri() {
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="96" viewBox="0 0 480 96">' +
+    '<text x="8" y="62" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="700">' +
+    '<tspan fill="#0084FF">Vehicle</tspan><tspan fill="#111111"> Check</tspan>' +
+    '</text></svg>'
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`
+}
+
+function safeFilename(reg, prefix) {
   const base =
     String(reg || 'vehicle')
       .replace(/[^\w\d-]+/gi, '')
       .slice(0, 32) || 'vehicle'
-  return `EpicVIN-Report-${base}.pdf`
+  return `${prefix || 'EpicVIN-Report'}-${base}.pdf`
 }
 
 async function resolveLogoDataUri(cwd) {
@@ -437,8 +453,18 @@ async function generateReportHandler(req, res) {
   }
 
   const placeholders = coercePlaceholders(payload)
-  placeholders.LOGO_SRC = await resolveLogoDataUri(cwd)
+  const vehicleCheck = isVehicleCheckBrand(payload)
+  placeholders.LOGO_SRC = vehicleCheck
+    ? vehicleCheckLogoDataUri()
+    : await resolveLogoDataUri(cwd)
   placeholders.INSPECTION_BANNER_SRC = await resolveInspectionBannerDataUri(cwd)
+
+  if (vehicleCheck) {
+    rawTemplate = rawTemplate.replace(
+      /alt=["']EpicVINrecord["']/gi,
+      'alt="Vehicle Check"'
+    )
+  }
 
   // Also force-replace any leftover relative logo paths
   rawTemplate = rawTemplate.replace(
@@ -487,7 +513,10 @@ async function generateReportHandler(req, res) {
     await browser.close()
     browser = undefined
 
-    const filename = safeFilename(placeholders.REGISTRATION)
+    const filename = safeFilename(
+      placeholders.REGISTRATION,
+      vehicleCheck ? 'VehicleCheck-Report' : 'EpicVIN-Report'
+    )
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader(
       'Content-Disposition',
