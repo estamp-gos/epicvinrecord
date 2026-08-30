@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refund Policy - epicvinrecord</title>
+    <title>Refund &amp; Cancellation Policy - EpicVINRecord</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -57,96 +57,230 @@
             padding: 15px;
             margin: 20px 0;
         }
+        .refund-form-wrap {
+            max-width: 580px;
+            margin: 48px auto 0;
+            padding: 36px 32px 32px;
+            background: #fff;
+            border: 1px solid #dceaf6;
+            border-radius: 16px;
+            box-shadow: 0 14px 40px rgba(0, 84, 166, 0.1);
+        }
+        .refund-form-wrap h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        .refund-form-wrap > p {
+            text-align: center;
+            color: #5b6573;
+        }
+        .refund-form label {
+            display: block;
+            font-weight: 600;
+            margin: 16px 0 8px;
+            color: #1f2937;
+            font-size: 14px;
+        }
+        .refund-form .optional {
+            font-weight: 400;
+            color: #888;
+            font-size: 0.9em;
+        }
+        .refund-form input[type="text"],
+        .refund-form input[type="email"],
+        .refund-form input[type="date"],
+        .refund-form textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px 14px;
+            border: 1px solid #d5e3ef;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            background: #f8fbff;
+        }
+        .refund-form input:focus,
+        .refund-form textarea:focus {
+            outline: none;
+            background: #fff;
+            border-color: #0084ff;
+            box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.16);
+        }
+        .refund-form textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+        .choice-list {
+            display: grid;
+            gap: 8px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .choice-list label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 0;
+            font-weight: 500;
+            padding: 11px 12px;
+            background: #f8fbff;
+            border: 1px solid #dceaf6;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .choice-list label:hover {
+            border-color: #0084ff;
+            background: #eef7ff;
+        }
+        .choice-list input {
+            margin-top: 3px;
+            accent-color: #0084ff;
+        }
+        .refund-form button {
+            display: block;
+            width: 100%;
+            margin-top: 24px;
+            padding: 14px 28px;
+            background: #0084ff;
+            color: #fff;
+            border: 0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(0, 132, 255, 0.28);
+        }
+        .refund-form button:hover {
+            background: #0071b2;
+        }
+        .refund-form button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .form-status {
+            margin-top: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .form-status.ok { color: #157347; }
+        .form-status.err { color: #b42318; }
+        .next-steps {
+            margin-top: 28px;
+            padding-top: 22px;
+            border-top: 1px solid #edf1f5;
+            text-align: center;
+        }
+        @media (max-width: 640px) {
+            .refund-form-wrap { padding: 24px 18px 22px; }
+        }
     </style>
 </head>
 <body>
     <a href="/" class="back-link">← Back to Home</a>
     
-    <h1>Refund Policy</h1>
-    <p class="last-updated">Last Updated: December 22, 2025</p>
+    <h1>Refund &amp; Cancellation Policy</h1>
+    <p class="last-updated">Last Updated: August 30, 2026</p>
     
-    <p>At <span class="company-name">epicvinrecord</span> (epicvinrecord.com), we are committed to customer satisfaction. This Refund Policy outlines the circumstances under which refunds may be issued for our vehicle history reports and related services.</p>
+    <p>At <span class="company-name">EpicVINRecord</span>, our goal is to provide customers with accurate and useful vehicle history information in a fast and convenient manner. If you experience an issue with your order or report, please contact our support team so we can review the matter and assist you.</p>
+    
+    <h2>1. Digital Service</h2>
+    <p><span class="company-name">EpicVINRecord</span> provides vehicle history reports as a digital service. Reports are generated based on the vehicle information submitted by the customer and are delivered electronically.</p>
+    <p>Because reports are digital products and are generally generated immediately after purchase, cancellation or refund requests may be subject to the circumstances of the individual order.</p>
+    
+    <h2>2. If There Is an Issue With Your Report</h2>
+    <p>If you believe that:</p>
+    <ul>
+        <li>Your report was not delivered;</li>
+        <li>Your report contains an issue;</li>
+        <li>You entered incorrect vehicle information;</li>
+        <li>You received a report that does not correspond to the information you submitted; or</li>
+        <li>You have another concern regarding your purchase,</li>
+    </ul>
+    <p>please contact our support team as soon as possible.</p>
+    <p>We will review your order and determine the appropriate resolution. Depending on the circumstances, we may provide assistance, a corrected report where possible, or a refund.</p>
+    
+    <h2>3. Incorrect Vehicle Information</h2>
+    <p>Customers are responsible for reviewing the vehicle information they enter before completing payment.</p>
+    <p>If incorrect information was submitted during checkout, please contact us immediately. We will review the order and determine whether the report can be corrected or whether another resolution is available.</p>
+    
+    <h2>4. Refund Requests</h2>
+    <p>To request a refund, please contact our support team through the <a href="#refund-request-form">refund request form</a> below, or through the official contact method provided on our website.</p>
+    <p>Please include:</p>
+    <ul>
+        <li>Order ID</li>
+        <li>Email address used for the purchase</li>
+        <li>Vehicle registration/VIN submitted with the order</li>
+        <li>Reason for the refund request</li>
+    </ul>
+    <p>Providing this information allows us to locate and review your order more quickly.</p>
+    
+    <h2>5. Contact Us Before Escalating a Payment Issue</h2>
+    <p>If you have a problem with your purchase, please contact <span class="company-name">EpicVINRecord</span> support first. We are happy to review the order and work with you to resolve the issue.</p>
+    <p>Our support team can investigate delivery issues, report concerns, and eligible refund requests directly.</p>
+    
+    <h2>6. Refund Processing</h2>
+    <p>If a refund is approved, it will normally be returned through the original payment method. The time required for the funds to appear in your account may depend on your payment provider or financial institution.</p>
+    
+    <h2>7. Questions</h2>
+    <p>If you are unsure whether your order qualifies for a refund, please contact us. We encourage customers to contact our support team before taking further action so that we have an opportunity to investigate and resolve the issue.</p>
     
     <div class="highlight-box">
-        <strong>Quick Summary:</strong> We offer refunds within 14 days of purchase if the report contains no data or if there was a technical error preventing access to your report.
+        <strong>EpicVINRecord Support</strong><br>
+        We're here to help.
     </div>
-    
-    <h2>1. Refund Eligibility</h2>
-    <p>You may be eligible for a full refund under the following circumstances:</p>
-    <ul>
-        <li><strong>No Data Available:</strong> If the vehicle history report contains no data or is unable to locate information for the VIN or license plate you provided.</li>
-        <li><strong>Technical Issues:</strong> If you experience technical problems that prevent you from accessing or downloading your purchased report, and our support team is unable to resolve the issue.</li>
-        <li><strong>Duplicate Purchase:</strong> If you accidentally purchased the same report multiple times.</li>
-        <li><strong>Incorrect VIN Entry:</strong> If you entered an incorrect VIN number and contact us within 24 hours of purchase.</li>
-    </ul>
-    
-    <h2>2. Non-Refundable Situations</h2>
-    <p>Refunds will NOT be issued in the following cases:</p>
-    <ul>
-        <li>If the report was successfully delivered and contains available data, even if the information is not what you expected or hoped for.</li>
-        <li>If you are dissatisfied with the content of the report after reviewing it.</li>
-        <li>If you decide you no longer need the report after it has been generated and accessed.</li>
-        <li>If the report shows negative information about the vehicle (accidents, damage, etc.).</li>
-        <li>If you purchased the wrong type of report or package after accessing it.</li>
-    </ul>
-    
-    <h2>3. Refund Request Timeframe</h2>
-    <p>Refund requests must be submitted within <strong>14 days</strong> of the original purchase date. Requests made after this period will not be considered.</p>
-    
-    <h2>4. How to Request a Refund</h2>
-    <p>To request a refund, please follow these steps:</p>
-    <ol>
-        <li>Contact our customer support team at <a href="mailto:info@epicvinrecord.com">info@epicvinrecord.com</a></li>
-        <li>Include your order number or transaction ID</li>
-        <li>Provide the VIN or license plate number used for the report</li>
-        <li>Clearly explain the reason for your refund request</li>
-        <li>Include any relevant screenshots or documentation</li>
-    </ol>
-    
-    <h2>5. Refund Processing</h2>
-    <p>Once your refund request is approved:</p>
-    <ul>
-        <li>Refunds will be processed within 3-5 business days</li>
-        <li>The refund will be issued to the original payment method used for the purchase</li>
-        <li>Depending on your bank or payment provider, it may take an additional 5-10 business days for the refund to appear in your account</li>
-        <li>You will receive a confirmation email once the refund has been processed</li>
-    </ul>
-    
-    <h2>6. Subscription Services</h2>
-    <p>For subscription-based services:</p>
-    <ul>
-        <li>You may cancel your subscription at any time</li>
-        <li>Cancellations will take effect at the end of the current billing period</li>
-        <li>No refunds will be issued for partial subscription periods</li>
-        <li>You will retain access to the service until the end of the paid period</li>
-    </ul>
-    
-    <h2>7. Chargebacks</h2>
-    <p>If you initiate a chargeback or payment dispute with your bank or credit card company without first contacting us, we reserve the right to permanently ban your account and may dispute the chargeback. Please contact us directly so we can resolve any issues before taking such action.</p>
-    
-    <h2>8. Partial Refunds</h2>
-    <p>In certain situations, epicvinrecord may offer partial refunds at its discretion. This may apply when:</p>
-    <ul>
-        <li>The report contains some data but is incomplete</li>
-        <li>There was a minor technical issue that caused inconvenience</li>
-        <li>Other circumstances deemed appropriate by our customer service team</li>
-    </ul>
-    
-    <h2>9. Modifications to Refund Policy</h2>
-    <p>epicvinrecord reserves the right to modify this Refund Policy at any time. Changes will be effective immediately upon posting to our website. Your continued use of our services after changes are posted constitutes acceptance of the modified policy.</p>
-    
-    <h2>10. Contact Information</h2>
-    <p>For refund requests or questions about this policy, please contact:</p>
-    <p>
-        <strong>epicvinrecord Customer Support</strong><br>
-        Email: <a href="mailto:info@epicvinrecord.com">info@epicvinrecord.com</a><br>
-        Website: <a href="https://epicvinrecord.com">https://epicvinrecord.com</a>
-    </p>
-    
-    <p>We aim to respond to all refund requests within 24-48 hours during business days.</p>
+
+    <section class="refund-form-wrap" id="refund-request-form">
+        <h2>Request a Refund or Order Review</h2>
+        <p>We're sorry you're experiencing an issue with your order. Please provide the information below so our support team can review your purchase and assist you as quickly as possible.</p>
+
+        <form class="refund-form" id="refund-form" novalidate>
+            <label for="order-id">Order ID <span class="optional">(optional)</span></label>
+            <input id="order-id" name="orderId" type="text" placeholder="Enter your Order ID" autocomplete="off">
+
+            <label for="email">Email Address</label>
+            <input id="email" name="email" type="email" placeholder="Enter the email used for your purchase" required autocomplete="email">
+
+            <label for="vehicle">Vehicle Registration / VIN</label>
+            <input id="vehicle" name="vehicle" type="text" placeholder="Enter the registration or VIN" required>
+
+            <label for="purchase-date">Purchase Date <span class="optional">(the date you bought the report)</span></label>
+            <input id="purchase-date" name="purchaseDate" type="date" required>
+
+            <label>What can we help you with?</label>
+            <ul class="choice-list">
+                <li><label><input type="checkbox" name="helpWith" value="not_received"> I did not receive my report</label></li>
+                <li><label><input type="checkbox" name="helpWith" value="report_issue"> There is an issue with my report</label></li>
+                <li><label><input type="checkbox" name="helpWith" value="incorrect_info"> I entered incorrect vehicle information</label></li>
+                <li><label><input type="checkbox" name="helpWith" value="request_refund"> I would like to request a refund</label></li>
+                <li><label><input type="checkbox" name="helpWith" value="other"> Other</label></li>
+            </ul>
+
+            <label for="description">Please describe the issue:</label>
+            <textarea id="description" name="description" placeholder="Describe your issue" required></textarea>
+
+            <label>Preferred Resolution:</label>
+            <ul class="choice-list">
+                <li><label><input type="radio" name="resolution" value="refund" required> Refund</label></li>
+                <li><label><input type="radio" name="resolution" value="corrected_report"> Corrected/reissued report, if available</label></li>
+                <li><label><input type="radio" name="resolution" value="review_first"> I would like support to review the issue first</label></li>
+            </ul>
+
+            <button type="submit" id="refund-submit">Submit Request</button>
+            <p class="form-status" id="refund-status" aria-live="polite"></p>
+        </form>
+
+        <div class="next-steps">
+            <h2>What happens next?</h2>
+            <p>Our support team will review your order and contact you using the email address provided.</p>
+            <p>Please allow our team an opportunity to review your request before escalating the payment issue through your bank or card provider. We are committed to resolving legitimate concerns as quickly as possible.</p>
+        </div>
+    </section>
     
     <p style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
-        © 2012 - 2025 epicvinrecord (epicvinrecord.com). All Rights Reserved.
+        © 2012 - 2026 EpicVINRecord (epicvinrecord.com). All Rights Reserved.
     </p>
+    <script src="main-site/js/refund-request-form.js"></script>
 </body>
 </html>

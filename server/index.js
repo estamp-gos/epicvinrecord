@@ -7,6 +7,7 @@ const { generateReportHandler } = require('./generate-report')
 const { notifyDownloadHandler } = require('./notify-download')
 const { sendReminderHandler } = require('./send-reminder')
 const { sendPaymentSuccessHandler } = require('./send-payment-success')
+const { sendRefundRequestHandler } = require('./send-refund-request')
 
 const app = express()
 const PORT = Number(process.env.PORT) || 3001
@@ -27,6 +28,7 @@ app.post('/api/generate-report', generateReportHandler)
 app.post('/api/notify-download', notifyDownloadHandler)
 app.post('/api/send-reminder', sendReminderHandler)
 app.post('/api/send-payment-success', sendPaymentSuccessHandler)
+app.post('/api/send-refund-request', sendRefundRequestHandler)
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, service: 'epicvinrecord-report-api' })

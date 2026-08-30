@@ -11837,6 +11837,210 @@
             </section>
             <div id="confirm-overlay"></div>
         </main>
+        <style>
+            .refund-home {
+                background: linear-gradient(180deg, #f4f8fc 0%, #eaf3fb 100%);
+                border-top: 1px solid #e6e6e6;
+                padding: 56px 16px 72px;
+            }
+            .refund-home .container.holder {
+                max-width: 640px;
+                margin-left: auto;
+                margin-right: auto;
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+            .refund-home__card {
+                background: #fff;
+                border: 1px solid #dceaf6;
+                border-radius: 16px;
+                box-shadow: 0 14px 40px rgba(0, 84, 166, 0.1);
+                padding: 36px 32px 32px;
+            }
+            .refund-home__title {
+                margin: 0 0 10px;
+                color: #0084ff;
+                font-size: 26px;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                text-align: center;
+                line-height: 1.25;
+            }
+            .refund-home__lead {
+                margin: 0 auto 26px;
+                color: #5b6573;
+                font-size: 15px;
+                line-height: 1.6;
+                text-align: center;
+            }
+            .refund-home .refund-form label {
+                display: block;
+                margin: 16px 0 8px;
+                color: #1f2937;
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .refund-form__optional {
+                color: #888;
+                font-weight: 400;
+                font-size: 0.9em;
+            }
+            .refund-home .refund-form input[type="text"],
+            .refund-home .refund-form input[type="email"],
+            .refund-home .refund-form input[type="date"],
+            .refund-home .refund-form textarea {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                padding: 13px 14px;
+                border: 1px solid #d5e3ef;
+                border-radius: 10px;
+                background: #f8fbff;
+                font-family: inherit;
+                font-size: 15px;
+                color: #111;
+            }
+            .refund-home .refund-form input:focus,
+            .refund-home .refund-form textarea:focus {
+                outline: none;
+                background: #fff;
+                border-color: #0084ff;
+                box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.16);
+            }
+            .refund-home .refund-form textarea {
+                min-height: 110px;
+                resize: vertical;
+            }
+            .refund-choice-list {
+                display: grid;
+                gap: 8px;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+            }
+            .refund-choice-list label {
+                display: flex !important;
+                align-items: flex-start;
+                gap: 10px;
+                margin: 0 !important;
+                padding: 11px 12px;
+                border: 1px solid #dceaf6;
+                border-radius: 10px;
+                background: #f8fbff;
+                font-weight: 500 !important;
+                font-size: 14px;
+                cursor: pointer;
+            }
+            .refund-choice-list label:hover {
+                border-color: #0084ff;
+                background: #eef7ff;
+            }
+            .refund-choice-list input {
+                margin-top: 3px;
+                accent-color: #0084ff;
+            }
+            .refund-form__submit {
+                display: block;
+                width: 100%;
+                margin-top: 24px;
+                padding: 14px 28px;
+                border: 0;
+                border-radius: 10px;
+                background: #0084ff;
+                color: #fff;
+                font-size: 16px;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 8px 18px rgba(0, 132, 255, 0.28);
+            }
+            .refund-form__submit:hover {
+                background: #0071b2;
+            }
+            .refund-form__submit:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+                box-shadow: none;
+            }
+            .refund-home .form-status {
+                margin-top: 14px;
+                text-align: center;
+                font-weight: 600;
+            }
+            .refund-home .form-status.ok { color: #157347; }
+            .refund-home .form-status.err { color: #b42318; }
+            .refund-home__next {
+                margin-top: 28px;
+                padding-top: 22px;
+                border-top: 1px solid #edf1f5;
+                text-align: center;
+            }
+            .refund-home__next h3 {
+                margin: 0 0 10px;
+                color: #0071b2;
+                font-size: 18px;
+            }
+            .refund-home__next p {
+                margin: 0 0 10px;
+                color: #5b6573;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+            @media (max-width: 640px) {
+                .refund-home { padding: 36px 12px 48px; }
+                .refund-home__card { padding: 24px 18px 22px; }
+                .refund-home__title { font-size: 22px; }
+            }
+        </style>
+        <section class="refund-home" id="refund-request-form">
+            <div class="container holder">
+                <div class="refund-home__card">
+                <h2 class="refund-home__title">Request a Refund or Order Review</h2>
+                <p class="refund-home__lead">We're sorry you're experiencing an issue with your order. Please provide the information below so our support team can review your purchase and assist you as quickly as possible.</p>
+
+                <form class="refund-form" id="home-refund-form" novalidate>
+                    <label for="home-order-id">Order ID <span class="refund-form__optional">(optional)</span></label>
+                    <input id="home-order-id" name="orderId" type="text" placeholder="Enter your Order ID" autocomplete="off">
+
+                    <label for="home-refund-email">Email Address</label>
+                    <input id="home-refund-email" name="email" type="email" placeholder="Enter the email used for your purchase" required autocomplete="email">
+
+                    <label for="home-refund-vehicle">Vehicle Registration / VIN</label>
+                    <input id="home-refund-vehicle" name="vehicle" type="text" placeholder="Enter the registration or VIN" required>
+
+                    <label for="home-purchase-date">Purchase Date <span class="refund-form__optional">(the date you bought the report)</span></label>
+                    <input id="home-purchase-date" name="purchaseDate" type="date" required>
+
+                    <label>What can we help you with?</label>
+                    <ul class="refund-choice-list">
+                        <li><label><input type="checkbox" name="helpWith" value="not_received"> I did not receive my report</label></li>
+                        <li><label><input type="checkbox" name="helpWith" value="report_issue"> There is an issue with my report</label></li>
+                        <li><label><input type="checkbox" name="helpWith" value="incorrect_info"> I entered incorrect vehicle information</label></li>
+                        <li><label><input type="checkbox" name="helpWith" value="request_refund"> I would like to request a refund</label></li>
+                        <li><label><input type="checkbox" name="helpWith" value="other"> Other</label></li>
+                    </ul>
+
+                    <label for="home-refund-description">Please describe the issue:</label>
+                    <textarea id="home-refund-description" name="description" placeholder="Describe your issue" required></textarea>
+
+                    <label>Preferred Resolution:</label>
+                    <ul class="refund-choice-list">
+                        <li><label><input type="radio" name="resolution" value="refund" required> Refund</label></li>
+                        <li><label><input type="radio" name="resolution" value="corrected_report"> Corrected/reissued report, if available</label></li>
+                        <li><label><input type="radio" name="resolution" value="review_first"> I would like support to review the issue first</label></li>
+                    </ul>
+
+                    <button class="refund-form__submit" type="submit">Submit Request</button>
+                    <p class="form-status" aria-live="polite"></p>
+                </form>
+
+                <div class="refund-home__next">
+                    <h3>What happens next?</h3>
+                    <p>Our support team will review your order and contact you using the email address provided.</p>
+                    <p>Please allow our team an opportunity to review your request before escalating the payment issue through your bank or card provider. We are committed to resolving legitimate concerns as quickly as possible.</p>
+                </div>
+                </div>
+            </div>
+        </section>
         <footer class="footer">
             <div class="container holder">
                 <div class="footer__top">
@@ -12491,6 +12695,7 @@
 
     
     <!-- IP currency handled by main-site/js/ip-currency.js -->
+    <script src="main-site/js/refund-request-form.js"></script>
 
 
 </body>
