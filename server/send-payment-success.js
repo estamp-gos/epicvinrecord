@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer')
 
 const HOME_URL = 'https://www.epicvinrecord.com/'
 const CONTACT_URL = 'https://www.epicvinrecord.com/contact.html'
+const REFUND_FORM_URL = 'https://www.epicvinrecord.com/#refund-request-form'
 const LOGO_URL = 'https://www.epicvinrecord.com/img2/epicvin-logos/epicvinrecord-logo.png'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -71,6 +72,10 @@ function buildPaymentSuccessHtml() {
                             <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">Thank you for completing your payment with EpicVINrecord.</p>
                             <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">We hope you have received your vehicle history report successfully. If you haven&rsquo;t received it yet, please let us know and we&rsquo;ll be happy to resend it to you.</p>
                             <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">If you have any further questions or experience any issues with your report, our support team is always here to assist you. Please feel free to contact us anytime.</p>
+                            <p style="margin:18px 0 10px 0; font-size:16px; line-height:25px; color:#111827; font-weight:700;">Need Help With Your Report?</p>
+                            <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">If you notice any issue with your vehicle history report, or if you believe there is a problem with your order, please contact us before opening a payment dispute or chargeback. Our support team will review your order and work with you to resolve the issue.</p>
+                            <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">If your order qualifies for a refund after review, we will be happy to assist you with the refund process.</p>
+                            <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">You can also submit your request directly through our <a href="${REFUND_FORM_URL}" style="color:#2563eb; text-decoration:underline;">Request a Refund or Order Review</a> form available in the footer of our website.</p>
                             <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">Thank you for choosing EpicVINrecord. We truly appreciate your business!</p>
                             <p style="margin:0; font-size:15px; line-height:25px; color:#374151;">Best regards,<br>EpicVINrecord Support Team</p>
                         </td>
@@ -159,6 +164,17 @@ async function sendPaymentSuccessHandler(req, res) {
         'We hope you have received your vehicle history report successfully. If you haven’t received it yet, please let us know and we’ll be happy to resend it to you.',
         '',
         'If you have any further questions or experience any issues with your report, our support team is always here to assist you.',
+        '',
+        'Need Help With Your Report?',
+        '',
+        'If you notice any issue with your vehicle history report, or if you believe there is a problem with your order, please contact us before opening a payment dispute or chargeback. Our support team will review your order and work with you to resolve the issue.',
+        '',
+        'If your order qualifies for a refund after review, we will be happy to assist you with the refund process.',
+        '',
+        'You can also submit your request directly through our Request a Refund or Order Review form available in the footer of our website.',
+        REFUND_FORM_URL,
+        '',
+        'Thank you for choosing EpicVINrecord. We truly appreciate your business!',
         '',
         'Best regards,',
         'EpicVINrecord Support Team',
