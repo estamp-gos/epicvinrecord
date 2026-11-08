@@ -31,14 +31,14 @@ app.post('/api/send-payment-success', sendPaymentSuccessHandler)
 app.post('/api/send-refund-request', sendRefundRequestHandler)
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, service: 'epicvinrecord-report-api' })
+  res.json({ ok: true, service: 'vinunified-report-api' })
 })
 
 app.use(express.static(ROOT))
 
 if (process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
-    console.log(`EpicVINrecord report API listening on http://localhost:${PORT}`)
+    console.log(`VINUnified report API listening on http://localhost:${PORT}`)
     console.log(`Thank you page: http://localhost:${PORT}/thank-you/`)
     console.log(`Vehicle Check form: http://localhost:${PORT}/report-form/`)
   })

@@ -1,9 +1,9 @@
 const nodemailer = require('nodemailer')
 
-const HOME_URL = 'https://www.epicvinrecord.com/'
-const CONTACT_URL = 'https://www.epicvinrecord.com/contact.html'
-const REFUND_URL = 'https://www.epicvinrecord.com/refund-policy.html'
-const LOGO_URL = 'https://www.epicvinrecord.com/img2/epicvin-logos/epicvinrecord-logo.png'
+const HOME_URL = 'https://vinunified.store/'
+const CONTACT_URL = 'https://vinunified.store/contact.html'
+const REFUND_URL = 'https://vinunified.store/refund-policy.html'
+const LOGO_URL = 'https://vinunified.store/img2/vinunified-logos/vinunified-logo.png'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const SUPPORT_TO = 'epicvinrecordreport@gmail.com'
 
@@ -78,7 +78,7 @@ function emailShell(badge, heroTitle, heroSub, innerHtml, footerNote) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${escapeHtml(heroTitle)} - EpicVINRecord</title>
+    <title>${escapeHtml(heroTitle)} - VINUnified</title>
 </head>
 <body style="margin:0; padding:0; background-color:#f3f8fc; font-family:Arial, Helvetica, sans-serif; color:#111827;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f8fc; margin:0; padding:35px 15px;">
@@ -91,7 +91,7 @@ function emailShell(badge, heroTitle, heroSub, innerHtml, footerNote) {
                                 <tr>
                                     <td align="left" valign="middle" height="58" style="height:58px;">
                                         <a href="${HOME_URL}" style="text-decoration:none;">
-                                            <img src="${LOGO_URL}" alt="EpicVINRecord" height="40" style="display:block; max-height:40px; width:auto; max-width:175px; border:0;">
+                                            <img src="${LOGO_URL}" alt="VINUnified" height="40" style="display:block; max-height:40px; width:auto; max-width:175px; border:0;">
                                         </a>
                                     </td>
                                     <td align="right" valign="middle" height="58" style="height:58px; font-size:12px; color:#6b7280;">
@@ -114,7 +114,7 @@ function emailShell(badge, heroTitle, heroSub, innerHtml, footerNote) {
                     </tr>
                     <tr>
                         <td style="background:#f8fafc; padding:24px 30px; text-align:center; border-top:1px solid #edf1f5;">
-                            <p style="margin:0 0 8px 0; font-size:12px; color:#6b7280;">&copy; 2026 EpicVINRecord. All Rights Reserved.</p>
+                            <p style="margin:0 0 8px 0; font-size:12px; color:#6b7280;">&copy; 2026 VINUnified. All Rights Reserved.</p>
                             <p style="margin:0; font-size:12px; line-height:20px; color:#9ca3af;">
                                 <a href="${HOME_URL}" style="color:#6b7280; text-decoration:none;">Visit Website</a>
                                 &nbsp; | &nbsp;
@@ -179,14 +179,14 @@ function buildCustomerHtml(data) {
     <p style="margin:0 0 22px 0; font-size:15px; line-height:25px; color:#374151;">Our support team will review your order and contact you at <strong>${escapeHtml(data.email)}</strong>. You will receive a response as soon as we have an update.</p>
     ${detailsTable(data)}
     <p style="margin:22px 0 0 0; font-size:15px; line-height:25px; color:#374151;">Please allow our team an opportunity to review your request before escalating the payment issue through your bank or card provider.</p>
-    <p style="margin:18px 0 0 0; font-size:15px; line-height:25px; color:#374151;">Best regards,<br>EpicVINRecord Support Team</p>
+    <p style="margin:18px 0 0 0; font-size:15px; line-height:25px; color:#374151;">Best regards,<br>VINUnified Support Team</p>
   `
   return emailShell(
     'Request Received',
     'We Received Your Request',
     'Your refund request is in process. You will receive a response soon.',
     inner,
-    'This email was sent because a refund or order review request was submitted on EpicVINRecord.'
+    'This email was sent because a refund or order review request was submitted on VINUnified.'
   )
 }
 
@@ -200,7 +200,7 @@ function buildAdminHtml(data) {
     'New Refund Request',
     'A customer asked for a refund or order review.',
     inner,
-    'Internal notification from the EpicVINRecord refund request form.'
+    'Internal notification from the VINUnified refund request form.'
   )
 }
 
@@ -266,7 +266,7 @@ async function sendRefundRequestHandler(req, res) {
       'Preferred resolution: ' + resolution,
       'Issue description: ' + description,
       '',
-      'EpicVINRecord Support Team',
+      'VINUnified Support Team',
       HOME_URL
     ].join('\n')
 
@@ -283,7 +283,7 @@ async function sendRefundRequestHandler(req, res) {
     ].join('\n')
 
     await transporter.sendMail({
-      from: `"EpicVINRecord Support" <${fromUser}>`,
+      from: `"VINUnified Support" <${fromUser}>`,
       to: adminTo,
       replyTo: email,
       subject: 'New Refund Request' + (orderId ? ' — ' + orderId : ''),
@@ -292,7 +292,7 @@ async function sendRefundRequestHandler(req, res) {
     })
 
     await transporter.sendMail({
-      from: `"EpicVINRecord Support" <${fromUser}>`,
+      from: `"VINUnified Support" <${fromUser}>`,
       to: email,
       subject: 'We Received Your Refund Request — It Is In Process',
       text: customerText,

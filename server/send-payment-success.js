@@ -1,9 +1,9 @@
 const nodemailer = require('nodemailer')
 
-const HOME_URL = 'https://www.epicvinrecord.com/'
-const CONTACT_URL = 'https://www.epicvinrecord.com/contact.html'
-const REFUND_FORM_URL = 'https://www.epicvinrecord.com/#refund-request-form'
-const LOGO_URL = 'https://www.epicvinrecord.com/img2/epicvin-logos/epicvinrecord-logo.png'
+const HOME_URL = 'https://vinunified.store/'
+const CONTACT_URL = 'https://vinunified.store/contact.html'
+const REFUND_FORM_URL = 'https://vinunified.store/#refund-request-form'
+const LOGO_URL = 'https://vinunified.store/img2/vinunified-logos/vinunified-logo.png'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function createTransporter() {
@@ -26,7 +26,7 @@ function buildPaymentSuccessHtml() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful - EpicVINrecord</title>
+    <title>Payment Successful - VINUnified</title>
     <style type="text/css">
       @media only screen and (max-width: 620px) {
         .email-outer { padding: 16px 8px !important; }
@@ -49,7 +49,7 @@ function buildPaymentSuccessHtml() {
                                 <tr>
                                     <td align="left" valign="middle" height="58" style="height:58px;">
                                         <a href="${HOME_URL}" style="text-decoration:none;">
-                                            <img class="email-logo" src="${LOGO_URL}" alt="EpicVINrecord" height="40" style="display:block; max-height:40px; width:auto; max-width:175px; border:0;">
+                                            <img class="email-logo" src="${LOGO_URL}" alt="VINUnified" height="40" style="display:block; max-height:40px; width:auto; max-width:175px; border:0;">
                                         </a>
                                     </td>
                                     <td align="right" valign="middle" height="58" style="height:58px; font-size:12px; color:#16a34a; font-weight:600;">
@@ -63,21 +63,21 @@ function buildPaymentSuccessHtml() {
                         <td class="email-hero" style="background:#eef7ff; padding:38px 35px 30px 35px; text-align:center;">
                             <div style="display:inline-block; width:58px; height:58px; line-height:58px; background:#dcfce7; border-radius:50%; font-size:28px; margin-bottom:18px;">&#127881;</div>
                             <h1 class="email-h1" style="margin:0 0 12px 0; font-size:27px; line-height:35px; color:#111111; font-weight:700;">Thanks For Choosing Us!</h1>
-                            <p style="margin:0; font-size:15px; line-height:24px; color:#5b6573;">Thank you for completing your payment with EpicVINrecord</p>
+                            <p style="margin:0; font-size:15px; line-height:24px; color:#5b6573;">Thank you for completing your payment with VINUnified</p>
                         </td>
                     </tr>
                     <tr>
                         <td class="email-pad" style="padding:32px 35px;">
                             <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">Hello,</p>
-                            <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">Thank you for completing your payment with EpicVINrecord.</p>
+                            <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">Thank you for completing your payment with VINUnified.</p>
                             <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">We hope you have received your vehicle history report successfully. If you haven&rsquo;t received it yet, please let us know and we&rsquo;ll be happy to resend it to you.</p>
                             <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">If you have any further questions or experience any issues with your report, our support team is always here to assist you. Please feel free to contact us anytime.</p>
                             <p style="margin:18px 0 10px 0; font-size:16px; line-height:25px; color:#111827; font-weight:700;">Need Help With Your Report?</p>
                             <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">If you notice any issue with your vehicle history report, or if you believe there is a problem with your order, please contact us before opening a payment dispute or chargeback. Our support team will review your order and work with you to resolve the issue.</p>
                             <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">If your order qualifies for a refund after review, we will be happy to assist you with the refund process.</p>
                             <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">You can also submit your request directly through our <a href="${REFUND_FORM_URL}" style="color:#2563eb; text-decoration:underline;">Request a Refund or Order Review</a> form available in the footer of our website.</p>
-                            <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">Thank you for choosing EpicVINrecord. We truly appreciate your business!</p>
-                            <p style="margin:0; font-size:15px; line-height:25px; color:#374151;">Best regards,<br>EpicVINrecord Support Team</p>
+                            <p style="margin:0 0 18px 0; font-size:15px; line-height:25px; color:#374151;">Thank you for choosing VINUnified. We truly appreciate your business!</p>
+                            <p style="margin:0; font-size:15px; line-height:25px; color:#374151;">Best regards,<br>VINUnified Support Team</p>
                         </td>
                     </tr>
                     <tr>
@@ -85,7 +85,7 @@ function buildPaymentSuccessHtml() {
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #edf1f5;">
                                 <tr>
                                     <td align="center" style="padding-top:25px;">
-                                        <p style="margin:0 0 8px 0; font-size:14px; font-weight:700; color:#111827;">Thank You for Choosing EpicVINrecord</p>
+                                        <p style="margin:0 0 8px 0; font-size:14px; font-weight:700; color:#111827;">Thank You for Choosing VINUnified</p>
                                         <p style="margin:0; font-size:13px; line-height:21px; color:#6b7280;">We're here to help you make a more informed vehicle purchase.</p>
                                     </td>
                                 </tr>
@@ -94,7 +94,7 @@ function buildPaymentSuccessHtml() {
                     </tr>
                     <tr>
                         <td class="email-pad" style="background:#f8fafc; padding:24px 30px; text-align:center; border-top:1px solid #edf1f5;">
-                            <p style="margin:0 0 8px 0; font-size:12px; color:#6b7280;">&copy; 2026 EpicVINrecord. All Rights Reserved.</p>
+                            <p style="margin:0 0 8px 0; font-size:12px; color:#6b7280;">&copy; 2026 VINUnified. All Rights Reserved.</p>
                             <p style="margin:0; font-size:12px; line-height:20px; color:#9ca3af;">
                                 <a href="${HOME_URL}" style="color:#6b7280; text-decoration:none;">Visit Website</a>
                                 &nbsp; | &nbsp;
@@ -106,7 +106,7 @@ function buildPaymentSuccessHtml() {
                 <table class="email-card" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%;">
                     <tr>
                         <td align="center" style="padding:18px 20px;">
-                            <p style="margin:0; font-size:11px; line-height:18px; color:#9ca3af;">This email was sent because your payment was completed on EpicVINrecord.</p>
+                            <p style="margin:0; font-size:11px; line-height:18px; color:#9ca3af;">This email was sent because your payment was completed on VINUnified.</p>
                         </td>
                     </tr>
                 </table>
@@ -153,13 +153,13 @@ async function sendPaymentSuccessHandler(req, res) {
     const transporter = createTransporter()
 
     await transporter.sendMail({
-      from: `"EpicVINrecord" <${fromUser}>`,
+      from: `"VINUnified" <${fromUser}>`,
       to,
       subject: 'Thanks For Choosing Us! — Payment Successful',
       text: [
         'Thanks For Choosing Us!',
         '',
-        'Thank you for completing your payment with EpicVINrecord.',
+        'Thank you for completing your payment with VINUnified.',
         '',
         'We hope you have received your vehicle history report successfully. If you haven’t received it yet, please let us know and we’ll be happy to resend it to you.',
         '',
@@ -174,10 +174,10 @@ async function sendPaymentSuccessHandler(req, res) {
         'You can also submit your request directly through our Request a Refund or Order Review form available in the footer of our website.',
         REFUND_FORM_URL,
         '',
-        'Thank you for choosing EpicVINrecord. We truly appreciate your business!',
+        'Thank you for choosing VINUnified. We truly appreciate your business!',
         '',
         'Best regards,',
-        'EpicVINrecord Support Team',
+        'VINUnified Support Team',
         HOME_URL
       ].join('\n'),
       html: buildPaymentSuccessHtml()

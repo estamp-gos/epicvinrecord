@@ -371,11 +371,14 @@ function safeFilename(reg, prefix) {
     String(reg || 'vehicle')
       .replace(/[^\w\d-]+/gi, '')
       .slice(0, 32) || 'vehicle'
-  return `${prefix || 'EpicVIN-Report'}-${base}.pdf`
+  return `${prefix || 'VINUnified-Report'}-${base}.pdf`
 }
 
 async function resolveLogoDataUri(cwd) {
   const candidates = [
+    path.join(cwd, 'img2', 'vinunified-logos', 'vinunified-report-logo.png'),
+    path.join(cwd, 'img2', 'vinunified-logos', 'vinunified-logo.png'),
+    path.join(cwd, 'img2', 'vinunified-logos', 'vinunified-logo.svg'),
     path.join(cwd, 'img2', 'epicvin-logos', 'epicvinrecord-logo.png'),
     path.join(cwd, 'img2', 'epicvin-logos', 'epicvinrecord-logo-source.png'),
     path.join(cwd, 'img2', 'epicvin-logos', 'epicvin-main-logo.svg'),
@@ -397,7 +400,7 @@ async function resolveLogoDataUri(cwd) {
   }
   // Tiny inline SVG fallback so PDF never shows a broken image
   const fallbackSvg =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="220" height="40"><text x="0" y="28" font-family="Arial" font-size="22" font-weight="700" fill="#0084FF">EPIC</text><text x="68" y="28" font-family="Arial" font-size="22" font-weight="700" fill="#111">VINRECORD</text></svg>'
+    '<svg xmlns="http://www.w3.org/2000/svg" width="220" height="40"><text x="0" y="28" font-family="Arial" font-size="22" font-weight="700" fill="#0070F3">VIN</text><text x="46" y="28" font-family="Arial" font-size="22" font-weight="700" fill="#0F172A">UNIFIED</text></svg>'
   return `data:image/svg+xml;base64,${Buffer.from(fallbackSvg).toString('base64')}`
 }
 
@@ -461,14 +464,14 @@ async function generateReportHandler(req, res) {
 
   if (vehicleCheck) {
     rawTemplate = rawTemplate.replace(
-      /alt=["']EpicVINrecord["']/gi,
+      /alt=["'](?:EpicVINrecord|VINUnified)["']/gi,
       'alt="Vehicle Check"'
     )
   }
 
   // Also force-replace any leftover relative logo paths
   rawTemplate = rawTemplate.replace(
-    /src=["'](?:\.\.\/)?img2\/epicvin-logos\/epicvinrecord-logo\.png["']/gi,
+    /src=["'](?:\.\.\/)?(?:img2\/(?:epicvin-logos\/epicvinrecord-logo\.png|vinunified-logos\/vinunified-report-logo\.png))["']/gi,
     `src="{{LOGO_SRC}}"`
   )
   rawTemplate = rawTemplate.replace(
@@ -515,7 +518,7 @@ async function generateReportHandler(req, res) {
 
     const filename = safeFilename(
       placeholders.REGISTRATION,
-      vehicleCheck ? 'VehicleCheck-Report' : 'EpicVIN-Report'
+      vehicleCheck ? 'VehicleCheck-Report' : 'VINUnified-Report'
     )
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader(

@@ -1,5 +1,5 @@
 /**
- * IP-based currency display for EpicVINrecord.
+ * IP-based currency display for VINUnified.
  * - United Kingdom (GB) → GBP (£)
  * - Europe → EUR (€)
  * - United States / Canada / Americas USD zone → USD ($)

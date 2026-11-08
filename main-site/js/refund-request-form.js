@@ -2,6 +2,9 @@
   'use strict';
 
   function getApiBase() {
+    if (typeof window.VINUNIFIED_REPORT_API_BASE === 'string') {
+      return window.VINUNIFIED_REPORT_API_BASE.replace(/\/$/, '');
+    }
     if (typeof window.EPICVIN_REPORT_API_BASE === 'string') {
       return window.EPICVIN_REPORT_API_BASE.replace(/\/$/, '');
     }

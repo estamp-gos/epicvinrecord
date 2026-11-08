@@ -174,7 +174,7 @@ async function sendFormDataToEmail(vin, plate, state, vehicleType, searchType, c
     var formData = new FormData();
     formData.append('access_key', WEB3FORMS_ACCESS_KEY);
     formData.append('subject', emailSubject);
-    formData.append('from_name', 'EpicVINrecord');
+    formData.append('from_name', 'VINUnified');
     formData.append('message', lines.join('\n'));
     if (customerEmail) {
       formData.append('replyto', customerEmail);

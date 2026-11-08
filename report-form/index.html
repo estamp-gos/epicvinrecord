@@ -197,7 +197,7 @@
     <h1>Vehicle Check Report</h1>
     <p class="lead">
       Enter the vehicle model, year, and VIN or plate number. A full history report
-      generates automatically using the same Groq lookup as EpicVINrecord.
+      generates automatically using the same Groq lookup as VINUnified.
     </p>
 
     <div class="card">
@@ -245,13 +245,16 @@
     </div>
   </main>
 
-  <footer>Vehicle Check. Same report template as EpicVINrecord.</footer>
+  <footer>Vehicle Check. Same report template as VINUnified.</footer>
 
   <script>
   (function () {
     'use strict';
 
     function getApiBase() {
+      if (typeof window.VINUNIFIED_REPORT_API_BASE === 'string') {
+        return window.VINUNIFIED_REPORT_API_BASE.replace(/\/$/, '');
+      }
       if (typeof window.EPICVIN_REPORT_API_BASE === 'string') {
         return window.EPICVIN_REPORT_API_BASE.replace(/\/$/, '');
       }

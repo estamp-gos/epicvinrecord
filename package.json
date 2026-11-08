@@ -1,5 +1,5 @@
 {
-  "name": "epicvinrecord",
+  "name": "vinunified",
   "private": true,
   "scripts": {
     "start": "node server/index.js",

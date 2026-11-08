@@ -3,7 +3,7 @@ const path = require('path')
 const nodemailer = require('nodemailer')
 
 const DEFAULT_NOTIFY_TO = 'epicvinrecordreport@gmail.com'
-const LOGO_CID = 'epicvinlogo'
+const LOGO_CID = 'vinunifiedlogo'
 
 function escapeHtml(value) {
   return String(value == null ? '' : value)
@@ -17,6 +17,7 @@ function escapeHtml(value) {
 function resolveLogoPath() {
   const cwd = path.join(__dirname, '..')
   const candidates = [
+    path.join(cwd, 'img2', 'vinunified-logos', 'vinunified-logo.png'),
     path.join(cwd, 'img2', 'epicvin-logos', 'epicvinrecord-logo.png'),
     path.join(cwd, 'img2', 'epicvin-logos', 'epicvinrecord-logo-source.png'),
     path.join(cwd, 'img2', 'epicvin-logos', 'logo.png')
@@ -60,8 +61,8 @@ function buildPdfDownloadEmailHtml(details) {
   const showLogo = !!details.includeLogo
 
   const logoBlock = showLogo
-    ? '<img src="cid:' + LOGO_CID + '" alt="EpicVINrecord" height="40" style="display:block;margin:0 auto;border:0;outline:none;text-decoration:none;height:40px;width:auto;max-height:40px;max-width:240px;" />'
-    : '<div style="font-size:18px;font-weight:800;letter-spacing:0.3px;color:#00386c;line-height:58px;">EpicVINrecord</div>'
+    ? '<img src="cid:' + LOGO_CID + '" alt="VINUnified" height="40" style="display:block;margin:0 auto;border:0;outline:none;text-decoration:none;height:40px;width:auto;max-height:40px;max-width:240px;" />'
+    : '<div style="font-size:18px;font-weight:800;letter-spacing:0.3px;color:#00386c;line-height:58px;">VINUnified</div>'
 
   return (
     '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
@@ -104,8 +105,8 @@ function buildPdfDownloadEmailHtml(details) {
     '</td></tr>' +
 
     '<tr><td style="background:#00386c;padding:16px 28px;text-align:center;">' +
-    '<div style="font-size:12px;color:#c5daf0;">© EpicVINrecord</div>' +
-    '<a href="https://www.epicvinrecord.com" style="display:inline-block;margin-top:6px;font-size:12px;color:#ffffff;text-decoration:none;">www.epicvinrecord.com</a>' +
+    '<div style="font-size:12px;color:#c5daf0;">© VINUnified</div>' +
+    '<a href="https://vinunified.store" style="display:inline-block;margin-top:6px;font-size:12px;color:#ffffff;text-decoration:none;">vinunified.store</a>' +
     '</td></tr>' +
 
     '</table>' +
@@ -172,7 +173,7 @@ async function notifyDownloadHandler(req, res) {
     const logoPath = resolveLogoPath()
 
     const mail = {
-      from: `"EpicVINrecord" <${fromUser}>`,
+      from: `"VINUnified" <${fromUser}>`,
       to: notifyTo,
       replyTo: customerEmail || undefined,
       subject: 'PDF Downloaded — ' + vinPlate,
@@ -191,7 +192,7 @@ async function notifyDownloadHandler(req, res) {
     if (logoPath) {
       mail.attachments = [
         {
-          filename: 'epicvinrecord-logo.png',
+          filename: 'vinunified-logo.png',
           path: logoPath,
           cid: LOGO_CID
         }

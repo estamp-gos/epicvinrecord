@@ -5,7 +5,7 @@
       "includeFiles": "img2/**/*"
     },
     "api/notify-download.js": {
-      "includeFiles": "img2/epicvin-logos/**"
+      "includeFiles": "img2/**"
     }
   }
 }

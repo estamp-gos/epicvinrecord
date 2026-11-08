@@ -1,5 +1,5 @@
 /**
- * Cloudflare Worker — EpicVINrecord
+ * Cloudflare Worker — VINUnified
  *b
  * Routes:
  *   POST /upload-proof  — payment proof upload (multipart) → email rmoto7817@gmail.com
@@ -47,7 +47,7 @@ async function sendWeb3FormsEmail({ subject, to, message, html, replyto, ccemail
   const params = {
     access_key: WEB3FORMS_ACCESS_KEY,
     subject,
-    from_name: 'EpicVINrecord',
+    from_name: 'VINUnified',
     to,
     message,
     html,
@@ -156,7 +156,7 @@ async function handleProofUpload(request) {
   <p><strong>Notes:</strong> ${notes || 'None'}</p>
   ${proofHtml}
   <hr style="margin:24px 0;border:none;border-top:1px solid #eee;" />
-  <p style="font-size:12px;color:#666;">Automated notification from EpicVINrecord</p>
+  <p style="font-size:12px;color:#666;">Automated notification from VINUnified</p>
 </body>
 </html>`;
 
@@ -218,7 +218,7 @@ async function handleVinNotify(request) {
     customerEmail, occurredAt, status,
   } = data;
 
-  const displayProduct = product_name || productName || 'EpicVIN Standard Report';
+  const displayProduct = product_name || productName || 'VINUnified Standard Report';
   const displayAmount = amount ? (typeof amount === 'object' ? `${amount.amount} ${amount.currency_code}` : amount) : 'N/A';
   const displayVIN = vin || plate || 'N/A';
   const displayTime = occurredAt || timestamp || new Date().toISOString();
@@ -264,7 +264,7 @@ async function handleVinNotify(request) {
       ${state ? `<div class="field"><span class="label">State</span><div class="value">${state}</div></div>` : ''}
       <div class="field"><span class="label">Timestamp</span><div class="value">${new Date(displayTime).toLocaleString()}</div></div>
     </div>
-    <div class="footer"><p>EpicVINrecord automated notification</p></div>
+    <div class="footer"><p>VINUnified automated notification</p></div>
   </div>
 </body>
 </html>`;

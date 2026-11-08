@@ -157,7 +157,7 @@
       String(registration || 'vehicle')
         .replace(/[^\w\d-]+/gi, '')
         .slice(0, 32) || 'vehicle';
-    a.download = 'EpicVIN-Report-' + safeId + '.pdf';
+    a.download = 'VINUnified-Report-' + safeId + '.pdf';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

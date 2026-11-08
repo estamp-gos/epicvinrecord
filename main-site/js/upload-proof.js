@@ -268,7 +268,7 @@
   function appendWeb3FormsBaseFields(formData, accessKey, data, subject, message) {
     formData.append('access_key', accessKey);
     formData.append('subject', subject);
-    formData.append('from_name', 'EpicVINrecord Payment Proof');
+    formData.append('from_name', 'VINUnified Payment Proof');
     formData.append('email', data.email);
     formData.append('replyto', data.email);
     formData.append('message', message);
