@@ -379,9 +379,6 @@ async function resolveLogoDataUri(cwd) {
     path.join(cwd, 'img2', 'vinunified-logos', 'vinunified-report-logo.png'),
     path.join(cwd, 'img2', 'vinunified-logos', 'vinunified-logo.png'),
     path.join(cwd, 'img2', 'vinunified-logos', 'vinunified-logo.svg'),
-    path.join(cwd, 'img2', 'epicvin-logos', 'epicvinrecord-logo.png'),
-    path.join(cwd, 'img2', 'epicvin-logos', 'epicvinrecord-logo-source.png'),
-    path.join(cwd, 'img2', 'epicvin-logos', 'epicvin-main-logo.svg'),
   ]
   for (const logoPath of candidates) {
     try {
@@ -464,14 +461,14 @@ async function generateReportHandler(req, res) {
 
   if (vehicleCheck) {
     rawTemplate = rawTemplate.replace(
-      /alt=["'](?:EpicVINrecord|VINUnified)["']/gi,
+      /alt=["']VINUnified["']/gi,
       'alt="Vehicle Check"'
     )
   }
 
   // Also force-replace any leftover relative logo paths
   rawTemplate = rawTemplate.replace(
-    /src=["'](?:\.\.\/)?(?:img2\/(?:epicvin-logos\/epicvinrecord-logo\.png|vinunified-logos\/vinunified-report-logo\.png))["']/gi,
+    /src=["'](?:\.\.\/)?(?:img2\/(?:vinunified-logos\/vinunified-logo\.png|vinunified-logos\/vinunified-report-logo\.png))["']/gi,
     `src="{{LOGO_SRC}}"`
   )
   rawTemplate = rawTemplate.replace(

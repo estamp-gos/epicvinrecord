@@ -4,11 +4,11 @@
   /**
    * Prefer same-origin /api when served by `npm start` (Express on :3001).
    * If the page is opened via Live Server / static host / file://, call the
-   * report API on localhost:3001 explicitly (override with EPICVIN_REPORT_API_BASE).
+   * report API on localhost:3001 explicitly (override with VINUNIFIED_REPORT_API_BASE).
    */
   function getApiBase() {
-    if (typeof window.EPICVIN_REPORT_API_BASE === 'string') {
-      return window.EPICVIN_REPORT_API_BASE.replace(/\/$/, '');
+    if (typeof window.VINUNIFIED_REPORT_API_BASE === 'string') {
+      return window.VINUNIFIED_REPORT_API_BASE.replace(/\/$/, '');
     }
     var origin = window.location.origin || '';
     var port = window.location.port || '';

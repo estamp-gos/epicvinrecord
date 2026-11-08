@@ -37,7 +37,7 @@ const req = http.request(
         console.log(buf.toString('utf8').slice(0, 500))
         process.exit(1)
       }
-      const out = path.join(process.env.TEMP || '.', 'epicvin-logo-test.pdf')
+      const out = path.join(process.env.TEMP || '.', 'vinunified-logo-test.pdf')
       fs.writeFileSync(out, buf)
       // PDF should contain image XObject if logo rendered
       const text = buf.toString('latin1')

@@ -17,10 +17,7 @@ function escapeHtml(value) {
 function resolveLogoPath() {
   const cwd = path.join(__dirname, '..')
   const candidates = [
-    path.join(cwd, 'img2', 'vinunified-logos', 'vinunified-logo.png'),
-    path.join(cwd, 'img2', 'epicvin-logos', 'epicvinrecord-logo.png'),
-    path.join(cwd, 'img2', 'epicvin-logos', 'epicvinrecord-logo-source.png'),
-    path.join(cwd, 'img2', 'epicvin-logos', 'logo.png')
+    path.join(cwd, 'img2', 'vinunified-logos', 'vinunified-logo.png')
   ]
   for (const logoPath of candidates) {
     try {

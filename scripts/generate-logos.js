@@ -360,16 +360,11 @@ async function run() {
   // 1. Horizontal Navbar Logo (588 x 79)
   const navHtml = getHorizontalLogoHtml();
   const navBuf = await renderToBuffer(navHtml, 588, 79, true);
-  saveBuffer(navBuf, path.join(__dirname, '..', 'img2', 'epicvin-logos', 'logo.png'));
-  saveBuffer(navBuf, path.join(__dirname, '..', 'img2', 'epicvin-logos', 'epic-vinrecord-uk-logo.png'));
-  saveBuffer(navBuf, path.join(__dirname, '..', 'img2', 'epicvin-logos', 'epicvinrecord-uk-logo.png'));
   saveBuffer(navBuf, path.join(__dirname, '..', 'img2', 'vinunified-logos', 'vinunified-logo.png'));
 
   // 2. Report Header Logo (697 x 220)
   const reportHtml = getReportHeaderLogoHtml();
   const reportBuf = await renderToBuffer(reportHtml, 697, 220, true);
-  saveBuffer(reportBuf, path.join(__dirname, '..', 'img2', 'epicvin-logos', 'epicvinrecord-logo.png'));
-  saveBuffer(reportBuf, path.join(__dirname, '..', 'img2', 'epicvin-logos', 'epicvinrecord-logo-source.png'));
   saveBuffer(reportBuf, path.join(__dirname, '..', 'img2', 'vinunified-logos', 'vinunified-report-logo.png'));
 
   // 3. Square Logo / OG Image (600 x 600)
@@ -388,7 +383,6 @@ async function run() {
 
   // 5. Standalone SVGs
   const svgContent = getFullSvgLogo();
-  fs.writeFileSync(path.join(__dirname, '..', 'img2', 'epicvin-logos', 'epicvin-main-logo.svg'), svgContent, 'utf8');
   fs.writeFileSync(path.join(__dirname, '..', 'img2', 'vinunified-logos', 'vinunified-logo.svg'), svgContent, 'utf8');
   console.log('Generated standalone SVGs.');
 

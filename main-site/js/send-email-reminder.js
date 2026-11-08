@@ -5,9 +5,6 @@
     if (typeof window.VINUNIFIED_REPORT_API_BASE === 'string') {
       return window.VINUNIFIED_REPORT_API_BASE.replace(/\/$/, '');
     }
-    if (typeof window.EPICVIN_REPORT_API_BASE === 'string') {
-      return window.EPICVIN_REPORT_API_BASE.replace(/\/$/, '');
-    }
     var origin = window.location.origin || '';
     var port = window.location.port || '';
     if (port === '3001' || /:3001$/i.test(origin)) {
