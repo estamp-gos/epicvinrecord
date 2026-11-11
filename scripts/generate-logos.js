@@ -51,7 +51,7 @@ function getShieldSvgSnippet(size = 64) {
   </svg>`;
 }
 
-// 1. Horizontal Logo HTML (for 588 x 79 PNG)
+// 1. Horizontal Logo HTML (for 320 x 72 PNG, tightly cropped to the logo content)
 function getHorizontalLogoHtml() {
   return `<!DOCTYPE html>
 <html>
@@ -60,8 +60,8 @@ function getHorizontalLogoHtml() {
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      width: 588px;
-      height: 79px;
+      width: 320px;
+      height: 72px;
       display: flex;
       align-items: center;
       background: transparent;
@@ -357,9 +357,9 @@ async function run() {
     console.log(`Saved: ${outPath} (${buf.length} bytes)`);
   }
 
-  // 1. Horizontal Navbar Logo (588 x 79)
+  // 1. Horizontal Navbar Logo (320 x 72)
   const navHtml = getHorizontalLogoHtml();
-  const navBuf = await renderToBuffer(navHtml, 588, 79, true);
+  const navBuf = await renderToBuffer(navHtml, 320, 72, true);
   saveBuffer(navBuf, path.join(__dirname, '..', 'img2', 'vinunified-logos', 'vinunified-logo.png'));
 
   // 2. Report Header Logo (697 x 220)
