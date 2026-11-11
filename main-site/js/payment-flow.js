@@ -179,7 +179,7 @@
       (state.currentOrder.vehicleCategory
         ? '<p style="margin-bottom:10px"><strong>Vehicle Type:</strong> ' + state.currentOrder.vehicleCategory + '</p>'
         : '') +
-      '<p style="margin-bottom:0"><strong>Report Type:</strong> ' + (state.currentOrder.tierName || 'basic') + ' - ' + formatGbpPrice(CARD_PRICE_GBP) + '</p>';
+      '<p style="margin-bottom:0"><strong>Report Type:</strong> ' + (state.currentOrder.tierName || 'Basic') + ' - ' + formatGbpPrice(state.currentOrder.tierPriceGbp || CARD_PRICE_GBP) + '</p>';
   }
 
   function renderCheckoutButtons() {
@@ -200,7 +200,7 @@
 
     container.innerHTML =
       // '<button type="button" id="vinunified-pay-bank" style="width:100%;padding:15px;background:#2563eb;color:white;border:none;border-radius:5px;font-size:16px;font-weight:600;cursor:' + cursor + ';opacity:' + opacity + ';margin-bottom:10px" ' + (disabled ? 'disabled' : '') + '>Pay via Bank (Get \u00A37 discount) \u2014 ' + formatGbpPrice(BANK_PRICE_GBP) + '</button>' +
-      '<button type="button" id="vinunified-pay-card" style="width:100%;padding:15px;background:#fff;color:#2563eb;border:2px solid #2563eb;border-radius:5px;font-size:16px;font-weight:600;cursor:' + cursor + ';opacity:' + opacity + ';margin-bottom:10px" ' + (disabled ? 'disabled' : '') + '>Pay via Card \u2014 ' + formatGbpPrice(CARD_PRICE_GBP) + '</button>' +
+      '<button type="button" id="vinunified-pay-card" style="width:100%;padding:15px;background:#fff;color:#2563eb;border:2px solid #2563eb;border-radius:5px;font-size:16px;font-weight:600;cursor:' + cursor + ';opacity:' + opacity + ';margin-bottom:10px" ' + (disabled ? 'disabled' : '') + '>Pay via Card \u2014 ' + formatGbpPrice((state.currentOrder && state.currentOrder.tierPriceGbp) || CARD_PRICE_GBP) + '</button>' +
       '<button type="button" id="vinunified-pay-cancel" style="width:100%;padding:15px;background:#6b7280;color:white;border:none;border-radius:5px;font-size:16px;font-weight:600;cursor:pointer">Cancel</button>';
 
     // getEl('vinunified-pay-bank').addEventListener('click', function (e) {
@@ -276,16 +276,24 @@
 
   window.payViaCard = function () {
     if (!state.acceptedTerms) return;
+    var tier = (state.currentOrder && state.currentOrder.tier) || 'basic';
+    var tierGbp = (state.currentOrder && state.currentOrder.tierPriceGbp) || CARD_PRICE_GBP;
+    var isPremium = tier === 'premium';
     try {
       var existing = localStorage.getItem('vinReport');
       var report = existing ? JSON.parse(existing) : (state.currentOrder || {});
       localStorage.setItem('vinReport', JSON.stringify(Object.assign({}, report, state.currentOrder, {
-        paymentMethod: 'freemius',
-        amountPaid: CARD_PRICE_GBP,
+        paymentMethod: isPremium ? 'gumroad' : 'freemius',
+        amountPaid: tierGbp,
         currency: (window.__epicCurrency && window.__epicCurrency.currency) || 'GBP',
         currencySymbol: (window.__epicCurrency && window.__epicCurrency.symbol) || '\u00A3'
       })));
     } catch (e) { /* continue */ }
+    // Premium (£55) checks out on Gumroad; Basic (£25) uses Freemius.
+    if (isPremium && typeof GUMROAD_PREMIUM_URL === 'string' && GUMROAD_PREMIUM_URL) {
+      window.location.href = GUMROAD_PREMIUM_URL;
+      return;
+    }
     // Continue to Freemius in this tab. Freemius success URL must redirect
     // to /thank-you/ only after a successful payment (set in Freemius dashboard).
     var cardUrl =

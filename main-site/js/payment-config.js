@@ -1,6 +1,10 @@
 /** Card / Freemius checkout payment configuration */
 
-var CARD_PRICE_GBP = 54.99;
+var BASIC_PRICE_GBP = 25;
+var PREMIUM_PRICE_GBP = 55;
+var CARD_PRICE_GBP = PREMIUM_PRICE_GBP;
+/** Gumroad checkout for the Premium (£55) report option. */
+var GUMROAD_PREMIUM_URL = 'https://rmotoflare.gumroad.com/l/mkyvi?wanted=true&clear=true';
 /** Freemius checkout — after payment redirects to /thank-you/ (set in Freemius dashboard). */
 var FREEMIUS_CHECKOUT_URL = 'https://checkout.freemius.com/product/27824/plan/61097/licenses/1/currency/gbp/';
 /** Legacy aliases so older cached payment-flow builds still open Freemius. */
@@ -45,22 +49,27 @@ function formatGbpPrice(amount) {
   return '\u00A3' + formatted;
 }
 
-function getActiveCurrency() {
+function tierPriceGbp(tier) {
+  return tier === 'premium' ? PREMIUM_PRICE_GBP : BASIC_PRICE_GBP;
+}
+
+function getActiveCurrency(tier) {
+  var gbp = tierPriceGbp(tier);
   if (window.__epicCurrency && window.__epicCurrency.ready) {
+    var rate = typeof window.__epicCurrency.rateFromGbp === 'number'
+      ? window.__epicCurrency.rateFromGbp
+      : 1;
     return {
       currency: window.__epicCurrency.currency || 'GBP',
       currencySymbol: window.__epicCurrency.symbol || '\u00A3',
-      tierPrice:
-        typeof window.__epicCurrency.cardPrice === 'number'
-          ? window.__epicCurrency.cardPrice
-          : CARD_PRICE_GBP,
+      tierPrice: Number((gbp * rate).toFixed(2)),
       country: window.__epicCurrency.country || 'GB'
     };
   }
   return {
     currency: 'GBP',
     currencySymbol: '\u00A3',
-    tierPrice: CARD_PRICE_GBP,
+    tierPrice: gbp,
     country: 'GB'
   };
 }
@@ -101,7 +110,8 @@ function buildThankYouUrl() {
 }
 
 function buildVinReport(vin, plate, email, vehicleType, carModel, year, vehicleCategory) {
-  var active = getActiveCurrency();
+  var tier = vehicleType === 'premium' ? 'premium' : 'basic';
+  var active = getActiveCurrency(tier);
   return {
     vin: vin || '',
     plate: plate || '',
@@ -111,10 +121,10 @@ function buildVinReport(vin, plate, email, vehicleType, carModel, year, vehicleC
     carModel: carModel || '',
     vehicleModel: carModel || '',
     year: year || '',
-    tier: 'basic',
-    tierName: 'basic',
+    tier: tier,
+    tierName: tier === 'premium' ? 'Premium' : 'Basic',
     tierPrice: active.tierPrice,
-    tierPriceGbp: CARD_PRICE_GBP,
+    tierPriceGbp: tierPriceGbp(tier),
     currency: active.currency,
     currencySymbol: active.currencySymbol,
     country: active.country,

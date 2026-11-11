@@ -12,7 +12,7 @@
  *   localStorage.setItem('__mockCountry','GB'); location.reload();
  */
 (function () {
-  var BASE_GBP = typeof CARD_PRICE_GBP === 'number' ? CARD_PRICE_GBP : 54.99;
+  var BASE_GBP = typeof CARD_PRICE_GBP === 'number' ? CARD_PRICE_GBP : 55;
   var BANK_GBP = typeof BANK_PRICE_GBP === 'number' ? BANK_PRICE_GBP : 52.99;
 
   var GEO_APIS = [
@@ -100,12 +100,12 @@
     return 'GB';
   }
 
+  // Live GBP rate, no API key needed. (The old exchangerate.host endpoint
+  // now redirects to APILayer docs and returns no JSON, so it always fell
+  // back to the hardcoded rates below.)
   async function getGbpRate(symbol, fallback) {
     try {
-      var res = await timeoutFetch(
-        'https://api.exchangerate.host/latest?base=GBP&symbols=' + symbol,
-        3500
-      );
+      var res = await timeoutFetch('https://open.er-api.com/v6/latest/GBP', 3500);
       if (!res.ok) throw new Error('rate http ' + res.status);
       var json = await res.json();
       if (json && json.rates && json.rates[symbol]) return Number(json.rates[symbol]);
